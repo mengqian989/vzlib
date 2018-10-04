@@ -17,7 +17,6 @@ Solr server may need to be restarted before retrieving
 documents.
 
 
-
 '''
 
 
