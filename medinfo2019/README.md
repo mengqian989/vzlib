@@ -1,5 +1,3 @@
-# Readme
-
 The files and codes in this folder are being prepared for our next paper to be submited.
 
 ## Data preparation
