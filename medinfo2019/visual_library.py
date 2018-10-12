@@ -30,7 +30,7 @@ import plotly as py
 import plotly.graph_objs as go
 #py.offline.init_notebook_mode()
 
-import igraph as ig
+#import igraph as ig
 
 
 # regular expression patterns
