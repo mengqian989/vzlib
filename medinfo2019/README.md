@@ -78,11 +78,11 @@ Run an evaluation script for full text. Different combinations of parameters are
 $ python ../plos/eval.py --input brca_pmc_top4.txt --output brca_top4_eval_all.csv
 ```
 
-The resulting file has a set of given parameters and evaluation values for each line in the following order.
+The resulting file has a set of given parameters and evaluation metric values for each line in the following order.
 
 > r, d, n, k, c, h, vd, v, ai, fms
 
-r and d are for vcgs, n is number of dimensions set for SVD, k is for k-means, and the rest are cluster qualities: c = completeness, h = homogeneity, vd = v-measure-a, v = v-measure-b, ai = adjusted rand index, and fms = Fowlkes-Mallows index. 
+r and d are VCGS's parameters, n is the number of dimensions (components) for SVD, k is for k-means, and the rest are cluster qualities: c = completeness, h = homogeneity, vd = v-measure-a, v = v-measure-b, ai = adjusted rand index, and fms = Fowlkes-Mallows index. 
 
 v-measure-a and v-measure-b are different in how to treat multi-label cases.  The former treats treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
 
@@ -123,7 +123,7 @@ $ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
 
 
 
-Since this is a controled experiment and we know there're four classes in advance, it may be more adequate to compare the three cases above only for four clusters (i.e., set k=4 for kmeans).
+Since this is a controlled experiment and we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., set k=4 for kmeans).
 
 ```
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -3
