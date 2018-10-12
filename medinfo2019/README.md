@@ -75,7 +75,7 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 Run an evaluation script for full text. Different combinations of parameters are executed.
 
 ```
-$ python ../plos/eval.py --input brca_pmc_top4.txt --output brca_top4_eval_all.csv
+$ python eval.py --input brca_pmc_top4.txt --output brca_top4_eval_all.csv
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order.
@@ -100,7 +100,7 @@ $ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
 Evaluation for title + abstract.
 
 ```
-$ python ../plos/eval.py --input brca_pmc_top4.txt --fields title,abstract --output brca_top4_eval_ta.csv
+$ python eval.py --input brca_pmc_top4.txt --fields title,abstract --output brca_top4_eval_ta.csv
 $ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
 8,0.01,2,2,0.3857,0.2335,0.2909,0.2699,0.2784,0.5861
 8,0.08,2,2,0.3866,0.2335,0.2912,0.2691,0.2753,0.5849
@@ -112,7 +112,7 @@ $ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
 Evaluation for title.
 
 ```
-$ python ../plos/eval.py --input brca_pmc_top4.txt --fields title --output brca_top4_eval_t.csv
+$ python eval.py --input brca_pmc_top4.txt --fields title --output brca_top4_eval_t.csv
 $ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
 8,0.14,0,4,0.2308,0.2264,0.2286,0.2114,0.1748,0.4757
 8,0.14,0,6,0.2581,0.3390,0.2931,0.2695,0.1659,0.4274
@@ -142,11 +142,44 @@ $ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -3
 8,0.01,0,4,0.2212,0.2134,0.2172,0.1995,0.1307,0.4538
 ```
 
-Evaluation for medline data
+What if we look at v-measure-a?
 
 ```
-$ less eval_output.csv | sort -t',' -k9 -nr | head -3
-8,0.01,16,6,0.3302,0.3584,0.3437,0.2980,0.2556,0.5661
-9,0.14,14,4,0.4026,0.2674,0.3214,0.2894,0.2553,0.6363
-9,0.53,6,4,0.4010,0.2577,0.3137,0.2834,0.2459,0.6397
+$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
+8,0.34,16,4,0.3672,0.2997,0.3301,0.2967,0.2462,0.5557
+8,0.08,6,4,0.3579,0.2875,0.3189,0.2936,0.3180,0.5853
+8,0.34,10,4,0.3502,0.2810,0.3118,0.2818,0.2380,0.5523
+
+$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
+8,0.60,0,4,0.3098,0.3168,0.3133,0.2867,0.1904,0.4755
+8,0.34,0,4,0.3185,0.3075,0.3129,0.2863,0.1737,0.4827
+8,0.27,14,4,0.3180,0.3077,0.3128,0.2873,0.1947,0.4926
+
+$ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
+8,0.53,12,4,0.2310,0.2385,0.2347,0.2153,0.0905,0.4234
+8,0.53,20,4,0.2292,0.2384,0.2337,0.2139,0.0941,0.4236
+8,0.14,0,4,0.2308,0.2264,0.2286,0.2114,0.1748,0.4757
+```
+
+Evaluation for medline data.
+
+```
+$ python eval.py --input brca_med_top4.txt.gz --fields title --output brca_med_top4_eval.csv
+
+$ less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -3
+9,0.21,18,6,0.3308,0.2908,0.3095,0.2667,0.2636,0.6121
+9,0.14,10,4,0.3748,0.2579,0.3056,0.2758,0.2567,0.6323
+9,0.14,20,4,0.4014,0.2640,0.3185,0.2866,0.2515,0.6359
+
+$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k9 -nr | head -3
+9,0.14,10,4,0.3748,0.2579,0.3056,0.2758,0.2567,0.6323
+9,0.14,20,4,0.4014,0.2640,0.3185,0.2866,0.2515,0.6359
+9,0.53,6,4,0.4033,0.2599,0.3161,0.2854,0.2479,0.6403
+
+$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
+9,0.14,20,4,0.4014,0.2640,0.3185,0.2866,0.2515,0.6359
+8,0.34,16,4,0.3374,0.2984,0.3167,0.2824,0.2303,0.5724
+9,0.53,6,4,0.4033,0.2599,0.3161,0.2854,0.2479,0.6403
+
+
 ```
