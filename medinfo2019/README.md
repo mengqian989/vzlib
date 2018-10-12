@@ -1,6 +1,4 @@
-The files and codes in this folder are being prepared for our next paper to be submited.
-
-## Data preparation
+# Data preparation
 
 Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on September 21, 2018 and save as brca_med.xml.  
 - Retrieved 224,940 articles.  
@@ -72,7 +70,7 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
     141 Breast Neoplasms, Male
 ```
 
-## Experiments
+# Experiments
 
 Run an evaluation script for full text. Different combinations of parameters are executed.
 
