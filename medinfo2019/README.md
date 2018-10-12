@@ -1,6 +1,8 @@
-# Data preparation
+# Readme
 
+The files and codes in this folder are being prepared for our next paper to be submited to medinfo.
 
+## Data preparation
 
 Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on September 21, 2018 and save as brca_med.xml.  
 - Retrieved 224,940 articles.  
@@ -72,9 +74,9 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
     141 Breast Neoplasms, Male
 ```
 
-# Experiments
+## Experiments
 
-Evaluation for full text
+Run an evaluation script for full text. Different combinations of parameters are executed.
 
 ```
 $ python ../plos/eval.py --input brca_pmc_top4.txt --output brca_top4_eval_all.csv
@@ -86,7 +88,7 @@ $ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
 8,0.08,10,6,0.2976,0.2697,0.2830,0.2604,0.2907,0.5602
 ```
 
-Evaluation for title + abstract
+Evaluation for title + abstract.
 
 ```
 $ python ../plos/eval.py --input brca_pmc_top4.txt --fields title,abstract --output brca_top4_eval_ta.csv
@@ -98,7 +100,7 @@ $ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
 8,0.34,2,2,0.4022,0.2352,0.2968,0.2754,0.2641,0.5882
 ```
 
-Evaluation for title
+Evaluation for title.
 
 ```
 $ python ../plos/eval.py --input brca_pmc_top4.txt --fields title --output brca_top4_eval_t.csv
