@@ -78,6 +78,19 @@ Run an evaluation script for full text. Different combinations of parameters are
 
 ```
 $ python ../plos/eval.py --input brca_pmc_top4.txt --output brca_top4_eval_all.csv
+```
+
+The resulting file has a set of given parameters and evaluation values for each line in the following order.
+
+> r, d, n, k, c, h, vd, v, ai, fms
+
+r and d are for vcgs, n is number of dimensions set for SVD, k is for k-means, and the rest are cluster qualities: c = completeness, h = homogeneity, vd = v-measure-a, v = v-measure-b, ai = adjusted rand index, and fms = Fowlkes-Mallows index. 
+
+v-measure-a and v-measure-b are different in how to treat multi-label cases.  The former treats treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
+
+Let's look at the five best parameter settings for adjusted rand index (ai).
+
+```
 $ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
 8,0.08,6,4,0.3579,0.2875,0.3189,0.2936,0.3180,0.5853
 8,0.08,6,6,0.3043,0.2956,0.2999,0.2786,0.3142,0.5681
@@ -109,6 +122,8 @@ $ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
 8,0.08,0,10,0.1971,0.3345,0.2480,0.2265,0.1431,0.3734
 8,0.14,18,6,0.2451,0.3121,0.2746,0.2526,0.1356,0.4206
 ```
+
+
 
 Since this is a controled experiment and we know there're four classes in advance, it may be more adequate to compare the three cases above only for four clusters (i.e., set k=4 for kmeans).
 
