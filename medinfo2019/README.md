@@ -6,7 +6,7 @@ Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on S
 Did the same for pmc (as pmc doesn't give mesh terms) and save as brca_pmc.xml. 
 - Retrieved 39,332 articles.
 
-Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to a specified level.
+Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to a level specified by **target_mesh** variable in xml2tsv_med.py.
 
 ```bash
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
