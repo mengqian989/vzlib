@@ -28,7 +28,7 @@ Use only top 4 frequent MeSH. (Specify the following in extract.py.)
 >            "Triple Negative Breast Neoplasms",
 >            "Breast Neoplasms, Male"}
 
-Run extract.py again.  (Later found that --major doesn't make difference since there were not MeSH terms under the top four MeSH terms in the MeSH tree.  So, --major and --code may be omitted.)
+Run extract.py again.  (Later found that --major doesn't make difference since there were no MeSH terms under the top four MeSH terms in the MeSH tree.  So, --major and --code may be omitted.)
 
 ```bash
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > brca_med_top4.txt
