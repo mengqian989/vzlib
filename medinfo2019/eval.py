@@ -82,23 +82,16 @@ with open(args.output, "w") as f:
             
             # clustering
 
-            '''
-            # maximin
-            centroids, membership, sim = \
-                maximin(csv_dir, docs, args.sim, 
-                        args.cluster, keywords, args.theta)
-            '''
-
-            # svd + kmeans
             for svd in range(0, 21, 2):  # dimensionality
                 if svd >= len(keywords): # error check
                     break
 
                 # maximin
+                theta = 0.9
                 _, membership, _ = \
                         vl.maximin(csv_dir, docs_small, "", 
                                    "document", keywords,
-                                   0.9, svd)
+                                   theta, svd)
 
                 # output
                 results = vl.evaluate(mesh_small, membership)
