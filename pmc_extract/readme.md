@@ -1,7 +1,7 @@
 #PMC XML Extraction and Indexing
 
-*conf: the configuration files of building solr core for PMC data
-*extract_pmc_7.py: the python script for extracting PMC data and indexing them in a format recognizable by solr
+* conf: the configuration files of building solr core for PMC data
+* extract_pmc_7.py: the python script for extracting PMC data and indexing them in a format recognizable by solr
 
 
 Use the following code to extract information from the articles in PMC dataset and write them in a format readbale by Solr.
