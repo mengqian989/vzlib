@@ -8,7 +8,7 @@
 ## Extraction
 Use the following code to extract information from the articles in PMC dataset and write them in a format readbale by Solr.
 
-`<python extract_pmc_7.py --input <the directory of your input files> --output <the directory of your output files>>`
+`python extract_pmc_7.py --input <the directory of your input files> --output <the directory of your output files>`
 
 **Notes:**
 1. The input directory should contain the original artiles from PMC, which are in formats of xml/nxml/nxml.gz.
@@ -22,11 +22,11 @@ Use the following code to extract information from the articles in PMC dataset a
 ## Indexing
 Use the following steps to build a Solr core and index the extracted data:
 
-`<solr start>`
+`solr start`
 
-`<solr create -c <name of your core> -d <directory containing conf folder>>`
+`solr create -c <name of your core> -d <directory containing conf folder>`
    
-`<post -c <name of your core> <directory of the extracted files>>`
+`post -c <name of your core> <directory of the extracted files>`
 
 **Notes:**
 1. Make sure you have Solr successfully installed before you start indexing.
