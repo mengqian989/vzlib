@@ -8,7 +8,7 @@ Did the same for pmc (as pmc doesn't give mesh terms) and save as brca_pmc.xml.
 
 Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to a specified level.
 
-``` 
+```bash
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
 $ cut -f 4 brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
   11115 Carcinoma, Ductal, Breast
@@ -30,20 +30,20 @@ Use only top 4 frequent MeSH. (Specify the following in extract.py.)
 
 Run extract.py again.
 
-```
+```bash
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > brca_med_top4.txt
 ```
 
 This results in 16576 articles annotated with at least one of the four mesh terms.
 
-```
+```bash
 $ wc -l brca_med_top4.txt 
 16576 brca_med_top4.txt
 ```
 
 Make sure the distribution of the classes is the same as the above but only top four terms.
 
-```
+```bash
 $ cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
   11115 Carcinoma, Ductal, Breast
    3475 Carcinoma, Lobular
@@ -53,13 +53,13 @@ $ cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort
 
 Finally create the data set with full text by adding body text extracted from plos_pmc.xml.
 
-```
+```bash
 $ python xml2tsv_pmc.py > brca_pmc_top4.txt
 ```
 
 Count the number of articles and look at the distribution of classes.
 
-```
+```bash
 $ wc -l brca_pmc_top4.txt
 1932 brca_pmc_top4.txt
 
