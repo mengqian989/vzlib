@@ -1,12 +1,14 @@
 # Data preparation
 
-Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on September 21, 2018 and save as brca_med.xml.  
-- Retrieved 224,940 articles.  
+Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on September 21, 2018 and saved as brca_med.xml.  
+- brca_med.xml contains 224,940 articles.  
 
 Did the same for pmc (as pmc doesn't give mesh terms) and save as brca_pmc.xml. 
-- Retrieved 39,332 articles.
+- brca_pmc.xml contains 39,332 articles.
 
-Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to a level specified by **target_mesh** variable in xml2tsv_med.py. 
+So, 39,332 / 224,940 = 17.5% of the articles have full texts.
+
+Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to the level specified by **target_mesh** variable in xml2tsv_med.py. 
 
 ```bash
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
@@ -21,14 +23,14 @@ $ cut -f 4 brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | le
      61 Breast Carcinoma In Situ
 ```
 
-Use only top 4 frequent MeSH. (Specify the following in extract.py.)
+Use only top 4 frequent MeSH. (Specify **classes** variables as follows in extract.py.)
 
 > classes = {"Carcinoma, Ductal, Breast",
 >            "Carcinoma, Lobular",
 >            "Triple Negative Breast Neoplasms",
 >            "Breast Neoplasms, Male"}
 
-Run extract.py again.  (Later found that --major doesn't make difference since there were no MeSH terms under the top four MeSH terms in the MeSH tree.  So, --major and --code may be omitted.)
+Run extract.py again.  (Later found that --major didn't make difference since there were no MeSH terms under the top four MeSH terms in the MeSH tree.  So, --major and --code may be omitted.)
 
 ```bash
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > brca_med_top4.txt
