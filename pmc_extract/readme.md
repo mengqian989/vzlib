@@ -19,9 +19,9 @@ Use the following code to extract information from the articles in PMC dataset a
 
 Use the following steps to build a Solr core and index the extracted data:
 
-> solr start
-> solr create -c <name of your core> -d <directory containing conf folder>
-> post -c <name of your core> <directory of the extracted files>
+> solr start \n
+> solr create -c <name of your core> -d <directory containing conf folder> \n
+> post -c <name of your core> <directory of the extracted files> \n
 
 **Notes:**
 1. Make sure you have Solr successfully installed before you start indexing.
