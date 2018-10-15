@@ -93,6 +93,22 @@ with open(args.output, "w") as f:
             for svd in range(0, 21, 2):  # dimensionality
                 if svd >= len(keywords): # error check
                     break
+
+                # maximin
+                _, membership, _ = \
+                        vl.maximin(csv_dir, docs_small, "", 
+                                   "document", keywords,
+                                   0.9, svd)
+
+                # output
+                results = vl.evaluate(mesh_small, membership)
+
+                f.write("%d,%.2f,%d,maximin,%d," % \
+                            (rank, p_docs, svd, len(set(membership))))
+                f.write(",".join(["{:6.4f}".format(x) for x in results]))
+                f.write("\n")
+
+                # kmeans
                 for n_clusters in range(2, 21, 2):
                     if n_clusters >= len(docs_small): # error check
                         break
@@ -101,9 +117,10 @@ with open(args.output, "w") as f:
                                   "document", keywords, svd,
                                   n_clusters)
 
+                    # output
                     results = vl.evaluate(mesh_small, membership)
 
-                    f.write("%d,%.2f,%d,%d," % \
+                    f.write("%d,%.2f,%d,kmeans,%d," % \
                                 (rank, p_docs, svd, n_clusters))
                     f.write(",".join(["{:6.4f}".format(x) for x in results]))
                     f.write("\n")
