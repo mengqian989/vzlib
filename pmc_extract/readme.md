@@ -1,9 +1,11 @@
-#PMC XML Extraction and Indexing
+# PMC XML Extraction and Indexing
 
+## Description of the folders
 * conf: the configuration files of building solr core for PMC data
 * extract_pmc_7.py: the python script for extracting PMC data and indexing them in a format recognizable by solr
 
 
+### Extraction
 Use the following code to extract information from the articles in PMC dataset and write them in a format readbale by Solr.
 
 `<python extract_pmc_7.py --input <the directory of your input files> --output <the directory of your output files>>`
@@ -17,11 +19,12 @@ Use the following code to extract information from the articles in PMC dataset a
 4.The process may be time consuming depending on the size of the input. 
 
 
+### Indexing
 Use the following steps to build a Solr core and index the extracted data:
 
-> solr start \n
-> solr create -c <name of your core> -d <directory containing conf folder> \n
-> post -c <name of your core> <directory of the extracted files> \n
+> solr start 
+> solr create -c <name of your core> -d <directory containing conf folder> 
+> post -c <name of your core> <directory of the extracted files> 
 
 **Notes:**
 1. Make sure you have Solr successfully installed before you start indexing.
