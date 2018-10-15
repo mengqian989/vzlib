@@ -6,7 +6,7 @@ Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on S
 Did the same for pmc (as pmc doesn't give mesh terms) and save as brca_pmc.xml. 
 - Retrieved 39,332 articles.
 
-Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize).
+Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to a specified level.
 
 ``` 
 $ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
@@ -74,21 +74,23 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 
 Run an evaluation script for full text. Different combinations of parameters are executed.
 
-```
-$ python eval.py --input brca_pmc_top4.txt --output brca_top4_eval_all.csv
+```bash
+$ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order.
 
-> r, d, n, k, c, h, vd, v, ai, fms
+> r, d, n, alg, k, c, h, vd, v, ai, fms
 
-r and d are VCGS's parameters, n is the number of dimensions (components) for SVD, k is for k-means, and the rest are cluster qualities: c = completeness, h = homogeneity, vd = v-measure-a, v = v-measure-b, ai = adjusted rand index, and fms = Fowlkes-Mallows index. 
+r and d are VCGS's parameters, n is the number of dimensions (components) for SVD, alg is an clustering algorithm (kmeans or maximin), k is the number of clusters, and the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-a, v = v-measure-b, ai = adjusted rand index, and fms = Fowlkes-Mallows index. 
 
-v-measure-a and v-measure-b are different in how to treat multi-label cases.  The former treats treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
+v-measure-a and v-measure-b are different in how to treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
 
-Let's look at the five best parameter settings for adjusted rand index (ai).
+Let's look at the five best parameter combinations based on adjusted rand index (ai).
 
-```
+**The following will be updated soon**
+
+```bash
 $ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
 8,0.08,6,4,0.3579,0.2875,0.3189,0.2936,0.3180,0.5853
 8,0.08,6,6,0.3043,0.2956,0.2999,0.2786,0.3142,0.5681
@@ -99,8 +101,8 @@ $ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
 
 Evaluation for title + abstract.
 
-```
-$ python eval.py --input brca_pmc_top4.txt --fields title,abstract --output brca_top4_eval_ta.csv
+```bash
+$ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv
 $ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
 8,0.01,2,2,0.3857,0.2335,0.2909,0.2699,0.2784,0.5861
 8,0.08,2,2,0.3866,0.2335,0.2912,0.2691,0.2753,0.5849
@@ -111,8 +113,8 @@ $ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
 
 Evaluation for title.
 
-```
-$ python eval.py --input brca_pmc_top4.txt --fields title --output brca_top4_eval_t.csv
+```bash
+$ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv
 $ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
 8,0.14,0,4,0.2308,0.2264,0.2286,0.2114,0.1748,0.4757
 8,0.14,0,6,0.2581,0.3390,0.2931,0.2695,0.1659,0.4274
@@ -125,7 +127,7 @@ $ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
 
 Since this is a controlled experiment and we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., set k=4 for kmeans).
 
-```
+```bash
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -3
 8,0.08,6,4,0.3579,0.2875,0.3189,0.2936,0.3180,0.5853
 8,0.08,14,4,0.3366,0.2806,0.3060,0.2814,0.2973,0.5684
@@ -144,7 +146,7 @@ $ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -3
 
 What if we look at v-measure-a?
 
-```
+```bash
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
 8,0.34,16,4,0.3672,0.2997,0.3301,0.2967,0.2462,0.5557
 8,0.08,6,4,0.3579,0.2875,0.3189,0.2936,0.3180,0.5853
@@ -163,7 +165,7 @@ $ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
 
 Evaluation for medline data.
 
-```
+```bash
 $ python eval.py --input brca_med_top4.txt.gz --fields title --output brca_med_top4_eval.csv
 
 $ less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -3
