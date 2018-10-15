@@ -156,9 +156,10 @@ def main():
     print()
     print("Clustering...")
     if args.clustering == "maximin":
-        centroids, membership, sim = \
+        _, membership, _ = \
             maximin(csv_dir, docs, args.sim, 
-                    args.cluster, keywords, args.theta)
+                        args.cluster, keywords, args.theta,
+                        args.svd)
         #visualize_network(sim, keywords, membership)
     elif args.clustering == "kmeans":
         membership, _, _, _ = kmeans(docs, args.cluster, keywords, 
@@ -214,7 +215,7 @@ File opener depending on suffix
 '''
 def open_by_suffix(filename):
     if filename.endswith('.gz'):
-        return gzip.open(filename, 'r')
+        return gzip.open(filename, 'rt')
     elif filename.endswith('.bz2'):
         return bz2.BZ2file(filename, 'r')
     else: # assume text file
@@ -394,7 +395,8 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
     # SVD
     cluster_labels = []
     if n_components == 0: # no svd
-        km = KMeans(init='k-means++', n_clusters=k, n_init=10)
+        km = KMeans(init='k-means++', n_clusters=k, n_init=10,
+                    random_state=0)
         km.fit(data)
     else: # apply svd then cluster
         svd_model = TruncatedSVD(n_components=n_components)
@@ -642,10 +644,10 @@ def normalize(mat, axis='document'):
     return mat
 
 '''
-Maximin clustering
+Maximin clustering (old, not used)
 '''
-def maximin(csv_dir, docs, file_sim, cluster, keywords, 
-            verbose=True, theta=0.9):
+def maximin_old(csv_dir, docs, file_sim, cluster, keywords, 
+                theta=0.9, verbose=True):
 
     # add ids to keywords
     keywords.sort()
@@ -709,7 +711,7 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
                                                # similarity
         maximin_id = sim_max.argmin()
         maximin = 1 - sim_max.min() # make similarity to distance
-
+        
         if maximin > theta:
             #print(maximin)
             centroids.append(candidates.pop(\
@@ -743,6 +745,152 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
         membership = membership.tolist()[0]
                 
     return centroids, membership, sim
+
+'''
+Maximin (core)
+'''
+
+def maximin_core(docs, m, cluster="document", theta=0.9, verbose=False):
+    sim = np.array(m.dot(m.transpose()))
+    np.fill_diagonal(sim, -2) # need to set smaller than -1
+    centroids = []
+    candidates = list(range(sim.shape[0]))
+
+    # pick the first centroid
+    centroids.append(candidates.pop(0)) # pick the first
+    #centroids.append(candidates.pop(\
+    #        random.randint(0, len(docs)))) # pick randomly
+
+    # Find next centroid iteratively
+    while True:
+        sim_max = sim[centroids,:].max(axis=0) # take max as this is
+                                               # similarity
+        sim_max[centroids] = 2 # need to be greater than 1
+        maximin_id = sim_max.argmin()
+        maximin = 1 - sim_max.min() # make similarity to distance
+
+        if maximin > theta:
+            centroids.append(candidates.pop(\
+                    candidates.index(maximin_id)))
+        else:
+            break
+
+    # Results
+    print("%d clusters generated" % len(centroids))
+    print()
+
+    # Show clusters
+    if cluster == "document":
+        membership = sim[centroids,:].argmax(axis=0).tolist()
+        if verbose:
+            for i, id in enumerate(centroids):
+                print('Doc %d cluster (%d members):' % \
+                          (id, len([x for x in membership if x==i])))
+                print(docs[id])
+                print()
+    else:
+        membership = sim[centroids,:].argmax(axis=0)
+        keywords = np.asarray([keywords])
+        if verbose:
+            for i, id in enumerate(centroids):
+                print('Term %d cluster (%d members):' % \
+                          (id, (membership==i).sum()))
+                print(keywords[membership==i])
+                print()
+        membership = membership.tolist()[0]
+
+    return centroids, membership, sim
+
+
+'''
+Maximin clustering wrapper
+'''
+def maximin(csv_dir, docs, file_sim, cluster, keywords, 
+            theta=0.9, n_components=0, verbose=True):
+
+    # add ids to keywords
+    keywords.sort()
+    w2id = {c:i for i,c in enumerate(keywords)}
+
+    # Convert to scipy matrix for faster calculation
+    data = []
+    row_idx = []
+    col_idx = []
+    for i in range(len(docs)):
+        data += docs[i].values()
+        col_idx += [w2id[w] for w in docs[i].keys()]
+        row_idx += [i] * len(docs[i])
+
+    m = csr_matrix((data, (row_idx, col_idx)), 
+                   (len(docs), len(keywords)))
+
+    # Compute similarity matrix (cosine similarity)
+    if cluster == "document":
+        pass
+        #m = m / norm(m, axis=1)[:,np.newaxis]
+    else: # assume 'term' if not 'document'
+        #m = m.transpose() / norm(m, axis=0)[:,np.newaxis]
+        m = m.transpose()
+
+    # SVD
+    cluster_labels = []
+    if n_components == 0: # no svd
+        m = m / norm(m, axis=1)[:,np.newaxis]
+        centroids, membership, sim = \
+            maximin_core(docs, m, cluster, theta, verbose)
+    else: # apply svd then cluster
+        svd_model = TruncatedSVD(n_components=n_components)
+        svd_model.fit(m)
+        reduced_m = svd_model.transform(m)
+        reduced_m = reduced_m / \
+            np.linalg.norm(reduced_m, axis=1)[:,np.newaxis]
+        centroids, membership, sim = \
+            maximin_core(docs, reduced_m, cluster, theta, verbose)
+
+    '''
+    # create cluster labels by inverse-transforming
+    # cluster centers and take 5 words with highest values
+    centers = m[centroids]
+    for c in centers:
+        i = np.argpartition(c, -5)[-5:]
+        labels_ = np.array(keywords)[i].tolist()
+        print(labels_)
+        cluster_labels.append(labels_)
+    '''
+
+    if n_components > 0:
+        print("Formed %d clusters after reducing "
+              "to %d dimensions." % (len(set(membership)),
+                                     n_components))
+    else:
+        print("Formed %d clusters w/o SVD." % \
+              len(set(membership)))
+
+        
+    # Write similarity matrix to csv file
+    if file_sim:
+        print("Writing similarity matrix to file...")
+        with open(os.path.join(csv_dir, file_sim), 'wb') as f:
+            # header
+            if cluster == "document":
+                f.write((",".join(\
+                            [str(i) for i in range(len(docs))]))\
+                            .encode('utf8'))
+            else:
+                f.write((",".join(keywords)).encode('utf8'))
+            f.write("\n".encode('utf8'))
+            # matrix
+            for i in range(sim.shape[0]):
+                row = sim[i,:].tolist()[0]
+                f.write((','.join(\
+                            ["{}".format(x) for x in row]))\
+                            .encode('utf8'))
+                f.write("\n".encode('utf8'))
+                if i % int(len(docs)/20) == 0: # progress
+                    print("%d%% finished..." % (i/len(docs)*100))
+                
+    return centroids, membership, sim
+
 
 
 '''
