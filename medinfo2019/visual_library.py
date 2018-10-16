@@ -201,13 +201,15 @@ def evaluate(mesh, membership):
 
     v = metrics.v_measure_score(labels, preds)
     ai = metrics.adjusted_rand_score(labels, preds)
+    ami = metrics.adjusted_mutual_info_score(labels, preds)
     fms = metrics.fowlkes_mallows_score(labels, preds)
 
     print(" V-score      = %f" % v)
     print(" A-RAND-I     = %f" % ai)
+    print(" A-MI         = %f" % ami)
     print(" FMS          = %f" % fms)
 
-    return c, h, vd, v, ai, fms
+    return c, h, vd, v, ai, ami, fms
 
 
 '''
@@ -543,7 +545,7 @@ def read_documents(data_dir, input=None, source=None,
 '''
 Compute tfidf and find key terms
 '''
-def compute_tfidf(docs, df, weight, rank=5):
+def compute_tfidf(docs, df, weight, rank=0):
 
     dfr = dict() # df considering only top R terms per document
     for i in range(len(docs)):
@@ -558,17 +560,20 @@ def compute_tfidf(docs, df, weight, rank=5):
             elif docs[i][w] != 0: # 'binary' if not 'tfidf'
                 docs[i][w] = 1
 
-        # Sort and extract top R terms for this document
-        terms_sorted = sorted(docs[i].items(), reverse=True, 
-                              key=operator.itemgetter(1))
-        top_r = terms_sorted[:rank]
+        
+        # Ignore if rank = 0
+        if rank > 0:
+            # Sort and extract top R terms for this document
+            terms_sorted = sorted(docs[i].items(), reverse=True, 
+                                  key=operator.itemgetter(1))
+            top_r = terms_sorted[:rank]
 
-        # Count new df for only top R
-        for w, _ in top_r:
-            if w in dfr:
-                dfr[w] += 1
-            else:
-                dfr[w] = 1
+            # Count new df for only top R
+            for w, _ in top_r:
+                if w in dfr:
+                    dfr[w] += 1
+                else:
+                    dfr[w] = 1
 
     return docs, dfr
 
