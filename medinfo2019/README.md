@@ -80,122 +80,182 @@ Run an evaluation script for full text. Different combinations of parameters are
 $ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv
 ```
 
-The resulting file has a set of given parameters and evaluation metric values for each line in the following order.
+The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
 
-> r, d, n, alg, k, c, h, vd, v, ai, fms
+> df,r,d,n,k,c,h,vd,v,ari,ami,fms
 
-r and d are VCGS's parameters, n is the number of dimensions (components) for SVD, alg is an clustering algorithm (kmeans or maximin), k is the number of clusters, and the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-a, v = v-measure-b, ai = adjusted rand index, and fms = Fowlkes-Mallows index. 
+where 
 
-v-measure-a and v-measure-b are different in how to treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
+- df is a df cutoff threshold (words with document frequency equal or smaller than df are ignored)
+- r and d are VCGS's parameters
+- n is the number of dimensions (components) for SVD
+- alg is an clustering algorithm (kmeans or maximin)
+- k is the number of clusters
+- the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-d, v = v-measure, ari = adjusted rand index, ami = adjusted mutual information, and fms = Fowlkes-Mallows index.  
 
-Let's look at the five best parameter combinations based on adjusted rand index (ai).
+Notes:
+
+- v-measure-d and v-measure are different in how to treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
+- when df is greater than 1, VCGS is not applied.  This is for investigating the effectiness of VCGS in comparison with DF-based feature selection.
+
+Now let's look at the five best parameter combinations based on adjusted rand index (ari) for medline data (which have only title+abstract).
 
 ```bash
-$ less brca_top4_eval_all.csv | sort -t',' -k10 -nr | head -5
-8,0.08,6,kmeans,6,0.2992,0.2900,0.2946,0.2738,0.3068,0.5642
-8,0.08,2,kmeans,2,0.4177,0.2541,0.3159,0.2950,0.3057,0.6001
-8,0.08,10,kmeans,4,0.3302,0.2624,0.2924,0.2698,0.2899,0.5697
-8,0.08,6,kmeans,4,0.3329,0.2677,0.2968,0.2745,0.2875,0.5680
-8,0.08,8,kmeans,4,0.3284,0.2618,0.2913,0.2681,0.2858,0.5667
+$ python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
+
+$ less brca_med_top4_eval.csv | sort -t',' -k11 -nr | head -5
+1,9,0.14,20,kmeans,4,0.3716,0.2526,0.3007,0.2714,0.2520,0.2272,0.6318
+1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
+1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
+1,9,0.53,8,kmeans,4,0.3994,0.2554,0.3115,0.2813,0.2435,0.2282,0.6392
+1,9,0.53,12,kmeans,4,0.3992,0.2550,0.3113,0.2809,0.2430,0.2278,0.6392
+'''
+
+
+
+$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+1,9,0.14,20,kmeans,4,0.3716,0.2526,0.3007,0.2714,0.2520,0.2272,0.6318
+1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
+1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
+1,9,0.53,8,kmeans,4,0.3994,0.2554,0.3115,0.2813,0.2435,0.2282,0.6392
+1,9,0.53,12,kmeans,4,0.3992,0.2550,0.3113,0.2809,0.2430,0.2278,0.6392
+
+$ less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -5
+1,8,0.27,16,kmeans,6,0.3185,0.3468,0.3320,0.2873,0.2306,0.2763,0.5525
+1,8,0.53,20,kmeans,4,0.3501,0.3154,0.3318,0.2948,0.2256,0.2762,0.5641
+1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
+1,8,0.34,14,kmeans,4,0.3364,0.2984,0.3163,0.2820,0.2293,0.2624,0.5711
+1,9,0.47,4,kmeans,4,0.4247,0.2485,0.3136,0.2836,0.2422,0.2223,0.6498
+
+$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+1,8,0.53,20,kmeans,4,0.3501,0.3154,0.3318,0.2948,0.2256,0.2762,0.5641
+1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
+1,8,0.34,14,kmeans,4,0.3364,0.2984,0.3163,0.2820,0.2293,0.2624,0.5711
+1,9,0.47,4,kmeans,4,0.4247,0.2485,0.3136,0.2836,0.2422,0.2223,0.6498
+1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
+
+```
+
+
+```bash
+$ less brca_top4_eval_all.csv | sort -t',' -k11 -nr | head -5
+1,8,0.08,6,kmeans,6,0.3104,0.3016,0.3060,0.2841,0.3218,0.2758,0.5726
+1,8,0.08,2,kmeans,2,0.4135,0.2514,0.3127,0.2923,0.3038,0.2314,0.5993
+1,8,0.08,14,kmeans,4,0.3456,0.2517,0.2913,0.2742,0.2997,0.2320,0.5862
+1,8,0.08,12,kmeans,4,0.3281,0.2590,0.2895,0.2666,0.2869,0.2364,0.5684
+1,8,0.08,18,kmeans,6,0.3009,0.2702,0.2847,0.2635,0.2819,0.2467,0.5575
 ```
 
 Evaluation for title + abstract.
 
 ```bash
 $ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv
-$ less brca_top4_eval_ta.csv | sort -t',' -k10 -nr | head -5
-8,0.01,2,kmeans,2,0.3847,0.2330,0.2902,0.2682,0.2778,0.5855
-8,0.08,2,kmeans,2,0.3866,0.2335,0.2912,0.2691,0.2753,0.5849
-8,0.27,2,kmeans,2,0.3973,0.2355,0.2957,0.2729,0.2698,0.5877
-8,0.21,2,kmeans,2,0.3940,0.2338,0.2935,0.2695,0.2689,0.5868
-8,0.34,2,kmeans,2,0.4022,0.2352,0.2968,0.2754,0.2641,0.5882
+$ less brca_top4_eval_ta.csv | sort -t',' -k11 -nr | head -5
+1,8,0.01,2,kmeans,2,0.3843,0.2324,0.2896,0.2684,0.2760,0.2117,0.5850
+1,8,0.08,2,kmeans,2,0.3866,0.2335,0.2912,0.2691,0.2753,0.2121,0.5849
+1,8,0.27,2,kmeans,2,0.4062,0.2400,0.3017,0.2789,0.2743,0.2175,0.5913
+1,8,0.21,2,kmeans,2,0.3926,0.2328,0.2923,0.2683,0.2673,0.2096,0.5861
+1,8,0.34,2,kmeans,2,0.4034,0.2360,0.2978,0.2763,0.2652,0.2144,0.5888
 ```
 
 Evaluation for title.
 
 ```bash
 $ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv
-$ less brca_top4_eval_t.csv | sort -t',' -k10 -nr | head -5
-8,0.08,2,maximin,2,0.3069,0.1789,0.2260,0.2033,0.2185,0.5542
-8,0.01,2,maximin,2,0.3041,0.1769,0.2237,0.2015,0.2163,0.5532
-8,0.14,2,maximin,2,0.3062,0.1768,0.2242,0.2016,0.2135,0.5531
-8,0.21,2,maximin,2,0.2976,0.1723,0.2182,0.1961,0.2095,0.5504
-8,0.27,2,maximin,2,0.2948,0.1665,0.2128,0.1911,0.1940,0.5462
+$ less brca_top4_eval_t.csv | sort -t',' -k11 -nr | head -5
+1,8,0.01,2,maximin,2,0.3032,0.1764,0.2230,0.2009,0.2156,0.1574,0.5529
+1,8,0.08,2,maximin,2,0.3033,0.1764,0.2230,0.2005,0.2150,0.1571,0.5526
+1,8,0.14,2,maximin,2,0.3014,0.1747,0.2212,0.1984,0.2124,0.1552,0.5517
+1,8,0.21,2,maximin,2,0.2992,0.1731,0.2193,0.1970,0.2099,0.1540,0.5507
+1,8,0.27,2,maximin,2,0.2891,0.1633,0.2087,0.1868,0.1908,0.1449,0.5443
 ```
 
+Observations:
 
+- Using all fields (title+abstract+fulltext) achieved the best performance in ari, followed by title+abs, then title.
+- Cluster number (k) = 6 performed the best for title+abstract+fulltext, which may imply something. For title+abs and title, k = 2 resulted in good performance.
+- When using only titles, maximin clustering worked better than kmeans.
 
-Since this is a controlled experiment and we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., set k=4 for kmeans).
+Since this is a controlled experiment and we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
 
 ```bash
-$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k10 -nr | head -5
-8,0.08,10,kmeans,4,0.3302,0.2624,0.2924,0.2698,0.2899,0.5697
-8,0.08,6,kmeans,4,0.3329,0.2677,0.2968,0.2745,0.2875,0.5680
-8,0.08,8,kmeans,4,0.3284,0.2618,0.2913,0.2681,0.2858,0.5667
-8,0.08,16,kmeans,4,0.3355,0.2563,0.2906,0.2678,0.2553,0.5604
-8,0.08,20,kmeans,4,0.3390,0.2589,0.2936,0.2704,0.2537,0.5605
+$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+1,8,0.08,14,kmeans,4,0.3456,0.2517,0.2913,0.2742,0.2997,0.2320,0.5862
+1,8,0.08,12,kmeans,4,0.3281,0.2590,0.2895,0.2666,0.2869,0.2364,0.5684
+1,8,0.08,16,kmeans,4,0.3160,0.2356,0.2700,0.2479,0.2732,0.2152,0.5635
+1,8,0.08,8,kmeans,4,0.3086,0.2430,0.2719,0.2523,0.2519,0.2229,0.5501
+1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
 
-$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k10 -nr | head -5
-8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.5168
-8,0.01,14,kmeans,4,0.3154,0.2945,0.3046,0.2822,0.2225,0.5134
-8,0.08,16,kmeans,4,0.3069,0.2888,0.2976,0.2745,0.2181,0.5079
-8,0.01,18,kmeans,4,0.3065,0.2876,0.2967,0.2739,0.2159,0.5083
-8,0.01,12,kmeans,4,0.3116,0.2903,0.3006,0.2788,0.2100,0.5075
+$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
+1,8,0.01,18,kmeans,4,0.3139,0.2934,0.3033,0.2800,0.2223,0.2655,0.5127
+1,8,0.01,16,kmeans,4,0.3107,0.2901,0.3000,0.2771,0.2179,0.2626,0.5103
+1,8,0.01,20,kmeans,4,0.3087,0.2869,0.2974,0.2763,0.2117,0.2611,0.5081
+1,8,0.01,0,kmeans,4,0.2631,0.2659,0.2645,0.2426,0.2091,0.2395,0.4856
 
-less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k10 -nr | head -5
-8,0.21,6,maximin,4,0.1717,0.1874,0.1792,0.1628,0.1847,0.4508
-8,0.14,6,maximin,4,0.1679,0.1839,0.1755,0.1595,0.1825,0.4485
-8,0.40,20,kmeans,4,0.2497,0.2310,0.2400,0.2248,0.1605,0.4906
-8,0.53,8,maximin,4,0.1131,0.1269,0.1196,0.1137,0.1212,0.4018
-8,0.21,10,maximin,4,0.1211,0.1363,0.1283,0.1190,0.1210,0.4018
+$ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+1,8,0.21,6,maximin,4,0.1658,0.1809,0.1730,0.1551,0.1767,0.1488,0.4460
+1,9,0.01,10,kmeans,4,0.1512,0.1241,0.1363,0.1248,0.1396,0.1115,0.4737
+1,8,0.14,20,kmeans,4,0.2283,0.2054,0.2163,0.2035,0.1357,0.1857,0.4850
+1,8,0.01,4,kmeans,4,0.2132,0.2031,0.2080,0.1900,0.1241,0.1802,0.4532
+1,8,0.08,10,maximin,4,0.1481,0.1602,0.1539,0.1384,0.1224,0.1327,0.4090
 ```
 
-What if we look at v-measure-a?
+Observations:
+
+- The tendency (fulltext > abstract > title) didn't change.
+- maximin still works better for title.
+
+What if we look at v-measure-d?
 
 ```bash
-$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k8 -nr | head -5
-8,0.27,20,kmeans,4,0.3641,0.2855,0.3200,0.2912,0.2182,0.5492
-8,0.40,8,kmeans,4,0.3546,0.2869,0.3172,0.2902,0.2454,0.5553
-8,0.47,12,kmeans,4,0.3439,0.2908,0.3151,0.2922,0.1767,0.5201
-8,0.34,10,kmeans,4,0.3518,0.2831,0.3137,0.2838,0.2416,0.5538
-8,0.21,4,kmeans,4,0.3489,0.2832,0.3127,0.2849,0.2513,0.5571
+$ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
+1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
+1,8,0.34,18,kmeans,4,0.3774,0.3041,0.3368,0.3058,0.2346,0.2721,0.5540
+1,8,0.34,16,kmeans,4,0.3669,0.2999,0.3300,0.2982,0.2413,0.2673,0.5535
+1,8,0.21,20,kmeans,4,0.3550,0.2804,0.3133,0.2858,0.2308,0.2525,0.5512
+1,8,0.08,2,kmeans,2,0.4135,0.2514,0.3127,0.2923,0.3038,0.2314,0.5993
 
-$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k8 -nr | head -5
-8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.5168
-8,0.21,16,kmeans,4,0.3167,0.3038,0.3101,0.2846,0.1982,0.4964
-8,0.21,20,kmeans,4,0.3162,0.3038,0.3099,0.2847,0.2041,0.4986
-8,0.60,20,kmeans,4,0.3069,0.3126,0.3097,0.2831,0.1920,0.4768
-8,0.60,18,kmeans,4,0.3055,0.3120,0.3087,0.2831,0.1922,0.4771
+$ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
+1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
+1,8,0.60,0,kmeans,6,0.2832,0.3771,0.3235,0.2877,0.1552,0.2540,0.4182
+1,8,0.21,18,kmeans,4,0.3214,0.3099,0.3156,0.2891,0.2064,0.2775,0.5001
+1,8,0.21,20,kmeans,4,0.3200,0.3069,0.3133,0.2872,0.2046,0.2751,0.5001
+1,8,0.60,16,kmeans,4,0.3092,0.3159,0.3125,0.2862,0.1938,0.2825,0.4773
 
-$ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k8 -nr | head -5
-8,0.40,20,kmeans,4,0.2497,0.2310,0.2400,0.2248,0.1605,0.4906
-8,0.53,14,kmeans,4,0.2303,0.2376,0.2339,0.2146,0.0885,0.4227
-8,0.53,10,kmeans,4,0.2290,0.2362,0.2325,0.2137,0.0863,0.4211
-8,0.14,0,kmeans,4,0.2213,0.2091,0.2151,0.1963,0.1136,0.4501
-8,0.14,14,kmeans,4,0.2164,0.2056,0.2108,0.1920,0.1109,0.4460
+$ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
+1,8,0.14,20,kmeans,6,0.2462,0.3120,0.2752,0.2540,0.1351,0.2308,0.4222
+1,8,0.08,12,kmeans,6,0.2469,0.2545,0.2506,0.2236,0.0959,0.2213,0.4509
+1,8,0.60,20,kmeans,8,0.2099,0.3104,0.2504,0.2283,0.1105,0.1919,0.3784
+1,8,0.21,20,kmeans,8,0.2060,0.3031,0.2453,0.2237,0.1053,0.1885,0.3765
+1,8,0.40,20,kmeans,8,0.2016,0.3122,0.2450,0.2236,0.1101,0.1844,0.3618
 ```
 
-Evaluation for medline data.
+Observations:
 
-**The following will be updated soon**
-
-```bash
-$ python eval.py --input brca_med_top4.txt.gz --fields title --output brca_med_top4_eval.csv
-
-$ less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -3
-9,0.21,18,6,0.3308,0.2908,0.3095,0.2667,0.2636,0.6121
-9,0.14,10,4,0.3748,0.2579,0.3056,0.2758,0.2567,0.6323
-9,0.14,20,4,0.4014,0.2640,0.3185,0.2866,0.2515,0.6359
-
-$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k9 -nr | head -3
-9,0.14,10,4,0.3748,0.2579,0.3056,0.2758,0.2567,0.6323
-9,0.14,20,4,0.4014,0.2640,0.3185,0.2866,0.2515,0.6359
-9,0.53,6,4,0.4033,0.2599,0.3161,0.2854,0.2479,0.6403
-
-$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k7 -nr | head -3
-9,0.14,20,4,0.4014,0.2640,0.3185,0.2866,0.2515,0.6359
-8,0.34,16,4,0.3374,0.2984,0.3167,0.2824,0.2303,0.5724
-9,0.53,6,4,0.4033,0.2599,0.3161,0.2854,0.2479,0.6403
-
+- The tendency didn't change (fulltext > abstract > title) but their differences became smaller.
+- Cluster number tends to be greater (but in a good range)
 
 ```
+$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
+1,8,0.34,18,kmeans,4,0.3774,0.3041,0.3368,0.3058,0.2346,0.2721,0.5540
+1,8,0.34,16,kmeans,4,0.3669,0.2999,0.3300,0.2982,0.2413,0.2673,0.5535
+1,8,0.21,20,kmeans,4,0.3550,0.2804,0.3133,0.2858,0.2308,0.2525,0.5512
+1,8,0.27,20,kmeans,4,0.3505,0.2792,0.3108,0.2809,0.2236,0.2489,0.5472
+
+$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
+1,8,0.21,18,kmeans,4,0.3214,0.3099,0.3156,0.2891,0.2064,0.2775,0.5001
+1,8,0.21,20,kmeans,4,0.3200,0.3069,0.3133,0.2872,0.2046,0.2751,0.5001
+1,8,0.60,16,kmeans,4,0.3092,0.3159,0.3125,0.2862,0.1938,0.2825,0.4773
+1,8,0.60,18,kmeans,4,0.3080,0.3142,0.3110,0.2849,0.1900,0.2809,0.4755
+
+$ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+1,8,0.53,20,kmeans,4,0.2328,0.2424,0.2375,0.2183,0.0958,0.2157,0.4236
+1,8,0.14,20,kmeans,4,0.2283,0.2054,0.2163,0.2035,0.1357,0.1857,0.4850
+1,8,0.14,0,kmeans,4,0.2213,0.2091,0.2151,0.1963,0.1136,0.1853,0.4501
+1,8,0.40,10,kmeans,4,0.2201,0.2064,0.2130,0.1945,0.1037,0.1831,0.4466
+1,8,0.08,8,kmeans,4,0.2179,0.2056,0.2115,0.1939,0.1159,0.1830,0.4512
+```
+
