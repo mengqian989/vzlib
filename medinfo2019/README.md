@@ -340,3 +340,23 @@ Run evaluation script for the medline data, too.
 python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single
 ```
 
+# Evaluation metrics
+
+Need to consider which metric is suitable for our purpose.
+
+The following shows Pearson's correlation coefficient between every pair of metrics.
+
+```R
+> cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
+> x = read.csv("brca_top4_eval_all.csv",header=TRUE,colClasses=cls) 
+> cor(x[,9:13])
+            vd          v        ari        ami         fms
+vd   1.0000000  0.9991308 0.82446750  0.9642236 -0.33461550
+v    0.9991308  1.0000000 0.82628264  0.9628118 -0.33898520
+ari  0.8244675  0.8262826 1.00000000  0.8783778  0.04882348
+ami  0.9642236  0.9628118 0.87837777  1.0000000 -0.21452625
+fms -0.3346155 -0.3389852 0.04882348 -0.2145263  1.00000000
+```
+
+It's found that ami and vd v are strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms is has weak to negative correlations.
+
