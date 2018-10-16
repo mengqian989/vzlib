@@ -47,7 +47,7 @@ wc -l brca_med_top4.txt
 Make sure the distribution of the classes is the same as the above but only top four terms.
 
 ```bash
-$ cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
+cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
   11115 Carcinoma, Ductal, Breast
    3475 Carcinoma, Lobular
    2588 Triple Negative Breast Neoplasms
@@ -57,16 +57,16 @@ $ cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort
 Finally create the data set with full text by adding body text extracted from plos_pmc.xml.
 
 ```bash
-$ python xml2tsv_pmc.py > brca_pmc_top4.txt
+python xml2tsv_pmc.py > brca_pmc_top4.txt
 ```
 
 Count the number of articles and look at the distribution of classes.
 
 ```bash
-$ wc -l brca_pmc_top4.txt
+wc -l brca_pmc_top4.txt
 1932 brca_pmc_top4.txt
 
-$ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
+cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
     935 Carcinoma, Ductal, Breast
     824 Triple Negative Breast Neoplasms
     290 Carcinoma, Lobular
@@ -80,7 +80,7 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
 
 ```bash
-$ python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
+python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
@@ -104,7 +104,7 @@ Notes:
 Now let's look at the five best parameter combinations based on adjusted rand index (ari).
 
 ```bash
-$ less brca_med_top4_eval.csv | sort -t',' -k11 -nr | head -5
+less brca_med_top4_eval.csv | sort -t',' -k11 -nr | head -5
 1,9,0.14,20,kmeans,4,0.3716,0.2526,0.3007,0.2714,0.2520,0.2272,0.6318
 1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
 1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
@@ -123,7 +123,7 @@ Observations:
 What if we look at v-measure-d?
 
 ```bash
-$ less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -5
+less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -5
 1,8,0.27,16,kmeans,6,0.3185,0.3468,0.3320,0.2873,0.2306,0.2763,0.5525
 1,8,0.53,20,kmeans,4,0.3501,0.3154,0.3318,0.2948,0.2256,0.2762,0.5641
 1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
@@ -144,16 +144,18 @@ Observations:
 First, run eval.py script. (We can run them in parallel as follows. Takes about a couple of hours.)
 
 ```bash
-$ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv &
-$ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv &
-$ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv &
+python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv &
+
+python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv &
+
+python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv &
 ```
 
 Let's look at the result based on ARI.
 
 ```bash
 # Evaluation for title+abstract+fulltext
-$ less brca_top4_eval_all.csv | sort -t',' -k11 -nr | head -5
+less brca_top4_eval_all.csv | sort -t',' -k11 -nr | head -5
 1,8,0.08,6,kmeans,6,0.3104,0.3016,0.3060,0.2841,0.3218,0.2758,0.5726
 1,8,0.08,2,kmeans,2,0.4135,0.2514,0.3127,0.2923,0.3038,0.2314,0.5993
 1,8,0.08,14,kmeans,4,0.3456,0.2517,0.2913,0.2742,0.2997,0.2320,0.5862
@@ -161,7 +163,7 @@ $ less brca_top4_eval_all.csv | sort -t',' -k11 -nr | head -5
 1,8,0.08,18,kmeans,6,0.3009,0.2702,0.2847,0.2635,0.2819,0.2467,0.5575
 
 # Evaluation for title+abstract.
-$ less brca_top4_eval_ta.csv | sort -t',' -k11 -nr | head -5
+less brca_top4_eval_ta.csv | sort -t',' -k11 -nr | head -5
 1,8,0.01,2,kmeans,2,0.3843,0.2324,0.2896,0.2684,0.2760,0.2117,0.5850
 1,8,0.08,2,kmeans,2,0.3866,0.2335,0.2912,0.2691,0.2753,0.2121,0.5849
 1,8,0.27,2,kmeans,2,0.4062,0.2400,0.3017,0.2789,0.2743,0.2175,0.5913
@@ -169,7 +171,7 @@ $ less brca_top4_eval_ta.csv | sort -t',' -k11 -nr | head -5
 1,8,0.34,2,kmeans,2,0.4034,0.2360,0.2978,0.2763,0.2652,0.2144,0.5888
 
 # Evaluation for title.
-$ less brca_top4_eval_t.csv | sort -t',' -k11 -nr | head -5
+less brca_top4_eval_t.csv | sort -t',' -k11 -nr | head -5
 1,8,0.01,2,maximin,2,0.3032,0.1764,0.2230,0.2009,0.2156,0.1574,0.5529
 1,8,0.08,2,maximin,2,0.3033,0.1764,0.2230,0.2005,0.2150,0.1571,0.5526
 1,8,0.14,2,maximin,2,0.3014,0.1747,0.2212,0.1984,0.2124,0.1552,0.5517
@@ -187,7 +189,7 @@ Since we know there're four classes in advance, it would be more appropriate to 
 
 ```bash
 # Evaluation for title+abstract+fulltext
-$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.08,14,kmeans,4,0.3456,0.2517,0.2913,0.2742,0.2997,0.2320,0.5862
 1,8,0.08,12,kmeans,4,0.3281,0.2590,0.2895,0.2666,0.2869,0.2364,0.5684
 1,8,0.08,16,kmeans,4,0.3160,0.2356,0.2700,0.2479,0.2732,0.2152,0.5635
@@ -195,7 +197,7 @@ $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
 
 # Evaluation for title+abstract.
-$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
 1,8,0.01,18,kmeans,4,0.3139,0.2934,0.3033,0.2800,0.2223,0.2655,0.5127
 1,8,0.01,16,kmeans,4,0.3107,0.2901,0.3000,0.2771,0.2179,0.2626,0.5103
@@ -203,7 +205,7 @@ $ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.01,0,kmeans,4,0.2631,0.2659,0.2645,0.2426,0.2091,0.2395,0.4856
 
 # Evaluation for title.
-$ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
+less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.21,6,maximin,4,0.1658,0.1809,0.1730,0.1551,0.1767,0.1488,0.4460
 1,9,0.01,10,kmeans,4,0.1512,0.1241,0.1363,0.1248,0.1396,0.1115,0.4737
 1,8,0.14,20,kmeans,4,0.2283,0.2054,0.2163,0.2035,0.1357,0.1857,0.4850
@@ -220,7 +222,7 @@ What if we look at v-measure-d?
 
 ```bash
 # Evaluation for title+abstract+fulltext
-$ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
 1,8,0.34,18,kmeans,4,0.3774,0.3041,0.3368,0.3058,0.2346,0.2721,0.5540
 1,8,0.34,16,kmeans,4,0.3669,0.2999,0.3300,0.2982,0.2413,0.2673,0.5535
@@ -228,7 +230,7 @@ $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.27,20,kmeans,4,0.3505,0.2792,0.3108,0.2809,0.2236,0.2489,0.5472
 
 # Evaluation for title+abstract.
-$ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
 1,8,0.21,18,kmeans,4,0.3214,0.3099,0.3156,0.2891,0.2064,0.2775,0.5001
 1,8,0.21,20,kmeans,4,0.3200,0.3069,0.3133,0.2872,0.2046,0.2751,0.5001
@@ -236,7 +238,7 @@ $ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.60,18,kmeans,4,0.3080,0.3142,0.3110,0.2849,0.1900,0.2809,0.4755
 
 # Evaluation for title.
-$ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
+less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.53,20,kmeans,4,0.2328,0.2424,0.2375,0.2183,0.0958,0.2157,0.4236
 1,8,0.14,20,kmeans,4,0.2283,0.2054,0.2163,0.2035,0.1357,0.1857,0.4850
 1,8,0.14,0,kmeans,4,0.2213,0.2091,0.2151,0.1963,0.1136,0.1853,0.4501
@@ -255,9 +257,11 @@ Observations:
 Some articles are annotated with multiple MeSH terms (out of the four MeSH terms we're focusing on).  They lower the performance to some extent, so let's see how much it improves if we exclude them.
 
 ```bash
-$ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single &
-$ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta_sgl.csv --single &
-$ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t_sgl.csv --single &
+python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single &
+
+python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta_sgl.csv --single &
+
+python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t_sgl.csv --single &
 ```
 
 Results to come!
