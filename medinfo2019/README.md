@@ -258,9 +258,7 @@ Some articles are annotated with multiple MeSH terms (out of the four MeSH terms
 
 ```bash
 python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single &
-
 python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta_sgl.csv --single &
-
 python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t_sgl.csv --single &
 ```
 
@@ -280,6 +278,8 @@ less brca_pmc_top4.txt.gz | cut -f5 | sort | uniq -c
       7 Triple Negative Breast Neoplasms|Carcinoma, Ductal, Breast|Carcinoma, Lobular
       1 Triple Negative Breast Neoplasms|Carcinoma, Lobular
 ```
+
+Here's the top five parameter settings in ari.
 
 ```bash
 # Evaluation for title+abstract+fulltext
@@ -306,3 +306,5 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.08,2,kmeans,4,0.2206,0.2353,0.2277,0.2277,0.1610,0.2187,0.4800
 1,8,0.01,2,kmeans,4,0.2197,0.2341,0.2267,0.2267,0.1598,0.2178,0.4795
 ```
+
+The ari values are increased up to 0.3914.  Although the data size becomes smaller, the results are consistent with the previous ones, so it'll be better to use this data set (for presentation).
