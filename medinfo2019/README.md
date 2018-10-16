@@ -217,6 +217,7 @@ Observations:
 
 - The tendency (fulltext > abstract > title) didn't change.
 - maximin still works better for title.
+- The ari values for abstract+title (0.2259 at the maximum) is similar to the case for the larger data (medline) (0.2520), so we can expect that using full-text data would improve ari for the larger data, too, if they were available. 
 
 What if we look at v-measure-d?
 
@@ -308,3 +309,10 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 ```
 
 The ari values are increased up to 0.3914.  Although the data size becomes smaller, the results are consistent with the previous ones, so it'll be better to use this data set (for presentation).
+
+Run evaluation script for the medline data, too.
+
+```bash
+python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single
+```
+
