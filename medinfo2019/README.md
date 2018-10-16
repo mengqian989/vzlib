@@ -138,7 +138,7 @@ Observations:
 - kmeans still works better.
 - k = 4 still generally works better, which is not expected as v-measure tends to increase with the cluster number.
 
-## Full text vs. abstract (smaller data)
+## Full texts vs. abstracts (smaller data)
 
 First, run eval.py script. (We can run them in parallel as follows. Takes about a couple of hours.)
 
