@@ -11,8 +11,8 @@ So, 39,332 / 224,940 = 17.5% of the articles have full texts.
 Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to the level specified by **target_mesh** variable in xml2tsv_med.py. 
 
 ```bash
-$ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
-$ cut -f 4 brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
+python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
+cut -f 4 brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
   11115 Carcinoma, Ductal, Breast
    3475 Carcinoma, Lobular
    2588 Triple Negative Breast Neoplasms
@@ -33,13 +33,13 @@ Use only top 4 frequent MeSH. (Specify **classes** variables as follows in extra
 Run extract.py again.  (Later found that --major didn't make difference since there were no MeSH terms under the top four MeSH terms in the MeSH tree.  So, --major and --code may be omitted.)
 
 ```bash
-$ python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > brca_med_top4.txt
+python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > brca_med_top4.txt
 ```
 
 This results in 16,576 articles annotated with at least one of the four mesh terms.
 
 ```bash
-$ wc -l brca_med_top4.txt 
+wc -l brca_med_top4.txt 
 16576 brca_med_top4.txt
 ```
 
