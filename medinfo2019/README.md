@@ -74,10 +74,12 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 
 # Experiments
 
-Run an evaluation script for full text. Different combinations of parameters are executed.
+## Abstracts (larger data)
+
+Run an evaluation script for full text. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
 
 ```bash
-$ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv
+$ python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
@@ -101,67 +103,71 @@ Notes:
 Now let's look at the five best parameter combinations based on adjusted rand index (ari) for medline data (which have only title+abstract).
 
 ```bash
-$ python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
-
 $ less brca_med_top4_eval.csv | sort -t',' -k11 -nr | head -5
 1,9,0.14,20,kmeans,4,0.3716,0.2526,0.3007,0.2714,0.2520,0.2272,0.6318
 1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
 1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
 1,9,0.53,8,kmeans,4,0.3994,0.2554,0.3115,0.2813,0.2435,0.2282,0.6392
 1,9,0.53,12,kmeans,4,0.3992,0.2550,0.3113,0.2809,0.2430,0.2278,0.6392
-'''
+```
 
+Observations:
 
+- df = 1 dominates the top ranked ones, which means VCGS is better than DF-based feature selection (further discussion later).
+- kmeans works better than maximin.
+- r = 9, d = 0.53 worked generally good. More investigation is needed to see if performance is sensitive to these parameters (it's not very good property is it's so).
+- SVD seems to be effective but the number of components (n) doesn't seem to have a clear association with the performance.
+- k = 4 worked consistently good, which is expected as we have four underlying classes (mesh terms)
 
-$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
-1,9,0.14,20,kmeans,4,0.3716,0.2526,0.3007,0.2714,0.2520,0.2272,0.6318
-1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
-1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
-1,9,0.53,8,kmeans,4,0.3994,0.2554,0.3115,0.2813,0.2435,0.2282,0.6392
-1,9,0.53,12,kmeans,4,0.3992,0.2550,0.3113,0.2809,0.2430,0.2278,0.6392
+What if we look at v-measure-d?
 
+```bash
 $ less brca_med_top4_eval.csv | sort -t',' -k9 -nr | head -5
 1,8,0.27,16,kmeans,6,0.3185,0.3468,0.3320,0.2873,0.2306,0.2763,0.5525
 1,8,0.53,20,kmeans,4,0.3501,0.3154,0.3318,0.2948,0.2256,0.2762,0.5641
 1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
 1,8,0.34,14,kmeans,4,0.3364,0.2984,0.3163,0.2820,0.2293,0.2624,0.5711
 1,9,0.47,4,kmeans,4,0.4247,0.2485,0.3136,0.2836,0.2422,0.2223,0.6498
-
-$ less brca_med_top4_eval.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
-1,8,0.53,20,kmeans,4,0.3501,0.3154,0.3318,0.2948,0.2256,0.2762,0.5641
-1,9,0.53,6,kmeans,4,0.4038,0.2605,0.3167,0.2860,0.2484,0.2328,0.6405
-1,8,0.34,14,kmeans,4,0.3364,0.2984,0.3163,0.2820,0.2293,0.2624,0.5711
-1,9,0.47,4,kmeans,4,0.4247,0.2485,0.3136,0.2836,0.2422,0.2223,0.6498
-1,9,0.53,20,kmeans,4,0.3995,0.2559,0.3120,0.2815,0.2446,0.2286,0.6394
-
 ```
 
+Observations:
+
+- Overall, we see similar patterns to ari.
+- df = 1 still works better (VCGS is better).
+- r is more stable than d.
+- kmeans still works better.
+- k = 4 still generally works better, which is not expected as v-measure tends to increase with the cluster number.
+
+## Full text vs. abstract (smaller data)
+
+First, run eval.py script. (We can run them in parallel as follows. Takes about a couple of hours.)
 
 ```bash
+$ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv &
+$ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv &
+$ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv &
+```
+
+Let's look at the result based on ARI.
+
+```bash
+# Evaluation for title+abstract+fulltext
 $ less brca_top4_eval_all.csv | sort -t',' -k11 -nr | head -5
 1,8,0.08,6,kmeans,6,0.3104,0.3016,0.3060,0.2841,0.3218,0.2758,0.5726
 1,8,0.08,2,kmeans,2,0.4135,0.2514,0.3127,0.2923,0.3038,0.2314,0.5993
 1,8,0.08,14,kmeans,4,0.3456,0.2517,0.2913,0.2742,0.2997,0.2320,0.5862
 1,8,0.08,12,kmeans,4,0.3281,0.2590,0.2895,0.2666,0.2869,0.2364,0.5684
 1,8,0.08,18,kmeans,6,0.3009,0.2702,0.2847,0.2635,0.2819,0.2467,0.5575
-```
 
-Evaluation for title + abstract.
-
-```bash
-$ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv
+# Evaluation for title+abstract.
 $ less brca_top4_eval_ta.csv | sort -t',' -k11 -nr | head -5
 1,8,0.01,2,kmeans,2,0.3843,0.2324,0.2896,0.2684,0.2760,0.2117,0.5850
 1,8,0.08,2,kmeans,2,0.3866,0.2335,0.2912,0.2691,0.2753,0.2121,0.5849
 1,8,0.27,2,kmeans,2,0.4062,0.2400,0.3017,0.2789,0.2743,0.2175,0.5913
 1,8,0.21,2,kmeans,2,0.3926,0.2328,0.2923,0.2683,0.2673,0.2096,0.5861
 1,8,0.34,2,kmeans,2,0.4034,0.2360,0.2978,0.2763,0.2652,0.2144,0.5888
-```
 
-Evaluation for title.
-
-```bash
-$ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv
+# Evaluation for title.
 $ less brca_top4_eval_t.csv | sort -t',' -k11 -nr | head -5
 1,8,0.01,2,maximin,2,0.3032,0.1764,0.2230,0.2009,0.2156,0.1574,0.5529
 1,8,0.08,2,maximin,2,0.3033,0.1764,0.2230,0.2005,0.2150,0.1571,0.5526
@@ -173,7 +179,7 @@ $ less brca_top4_eval_t.csv | sort -t',' -k11 -nr | head -5
 Observations:
 
 - Using all fields (title+abstract+fulltext) achieved the best performance in ari, followed by title+abs, then title.
-- Cluster number (k) = 6 performed the best for title+abstract+fulltext, which may imply something. For title+abs and title, k = 2 resulted in good performance.
+- Cluster number (k) = 6 performed the best for title+abstract+fulltext. For title+abs and title, k = 2 resulted in good performance.
 - When using only titles, maximin clustering worked better than kmeans.
 
 Since this is a controlled experiment and we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
@@ -208,34 +214,6 @@ Observations:
 
 What if we look at v-measure-d?
 
-```bash
-$ less brca_top4_eval_all.csv | sort -t',' -k9 -nr | head -5
-1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
-1,8,0.34,18,kmeans,4,0.3774,0.3041,0.3368,0.3058,0.2346,0.2721,0.5540
-1,8,0.34,16,kmeans,4,0.3669,0.2999,0.3300,0.2982,0.2413,0.2673,0.5535
-1,8,0.21,20,kmeans,4,0.3550,0.2804,0.3133,0.2858,0.2308,0.2525,0.5512
-1,8,0.08,2,kmeans,2,0.4135,0.2514,0.3127,0.2923,0.3038,0.2314,0.5993
-
-$ less brca_top4_eval_ta.csv | sort -t',' -k9 -nr | head -5
-1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
-1,8,0.60,0,kmeans,6,0.2832,0.3771,0.3235,0.2877,0.1552,0.2540,0.4182
-1,8,0.21,18,kmeans,4,0.3214,0.3099,0.3156,0.2891,0.2064,0.2775,0.5001
-1,8,0.21,20,kmeans,4,0.3200,0.3069,0.3133,0.2872,0.2046,0.2751,0.5001
-1,8,0.60,16,kmeans,4,0.3092,0.3159,0.3125,0.2862,0.1938,0.2825,0.4773
-
-$ less brca_top4_eval_t.csv | sort -t',' -k9 -nr | head -5
-1,8,0.14,20,kmeans,6,0.2462,0.3120,0.2752,0.2540,0.1351,0.2308,0.4222
-1,8,0.08,12,kmeans,6,0.2469,0.2545,0.2506,0.2236,0.0959,0.2213,0.4509
-1,8,0.60,20,kmeans,8,0.2099,0.3104,0.2504,0.2283,0.1105,0.1919,0.3784
-1,8,0.21,20,kmeans,8,0.2060,0.3031,0.2453,0.2237,0.1053,0.1885,0.3765
-1,8,0.40,20,kmeans,8,0.2016,0.3122,0.2450,0.2236,0.1101,0.1844,0.3618
-```
-
-Observations:
-
-- The tendency didn't change (fulltext > abstract > title) but their differences became smaller.
-- Cluster number tends to be greater (but in a good range)
-
 ```
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
@@ -259,3 +237,8 @@ $ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.08,8,kmeans,4,0.2179,0.2056,0.2115,0.1939,0.1159,0.1830,0.4512
 ```
 
+Observations:
+
+- The tendency didn't change (fulltext > abstract > title) but the differences between fulltext between abstract became smaller.
+- r is stable and d is not.
+- 
