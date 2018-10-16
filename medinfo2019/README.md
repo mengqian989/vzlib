@@ -249,3 +249,14 @@ Observations:
 - r is stable and d is not.
 - larger n may need to be explored.
 
+### Evaluate only single-class instances
+
+Some articles are annotated with multiple MeSH terms (out of the four MeSH terms we're focusing on).  They lower the performance to some extent, so let's see how much it improves if we exclude them.
+
+```bash
+$ python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single &
+$ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta_sgl.csv --single &
+$ python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t_sgl.csv --single &
+```
+
+Results to come!
