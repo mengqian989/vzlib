@@ -360,25 +360,7 @@ Here's my thought.
 	consider not only true positives but also true negatives.  I think it's 
 	important to consider true negatives as it indicates cluster separation.
 
-
-
-The following shows Pearson's correlation coefficient between every pair of metrics.
-
-```R
-> cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
-> x = read.csv("brca_top4_eval_all.csv",header=TRUE,colClasses=cls) 
-> cor(x[,9:13])
-            vd          v        ari        ami         fms
-vd   1.0000000  0.9991308 0.82446750  0.9642236 -0.33461550
-v    0.9991308  1.0000000 0.82628264  0.9628118 -0.33898520
-ari  0.8244675  0.8262826 1.00000000  0.8783778  0.04882348
-ami  0.9642236  0.9628118 0.87837777  1.0000000 -0.21452625
-fms -0.3346155 -0.3389852 0.04882348 -0.2145263  1.00000000
-```
-
-ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations.
-
-
+So, AMI and ARI would be the candidates of our evaluation metrics. If we look at the results above sorted by AMI, the tendency changes (i.e., title+abstract > title+abstract+fulltext > title).  The difference may be due to the fact ARI looks at true negatives (hence cluster separation) and full-text data helped to separate different underlying classes. 
 
 ```bash
 less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
@@ -402,3 +384,22 @@ $ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
 1,8,0.21,6,kmeans,4,0.2368,0.2425,0.2396,0.2396,0.1536,0.2349,0.4855
 1,8,0.14,12,kmeans,4,0.2322,0.2340,0.2331,0.2331,0.1334,0.2302,0.4783
 ```
+
+To see their difference empirically, the following computes Pearson's correlation coefficient between every pair of metrics.
+
+```R
+> cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
+> x = read.csv("brca_top4_eval_all.csv",header=TRUE,colClasses=cls) 
+> cor(x[,9:13])
+            vd          v        ari        ami         fms
+vd   1.0000000  0.9991308 0.82446750  0.9642236 -0.33461550
+v    0.9991308  1.0000000 0.82628264  0.9628118 -0.33898520
+ari  0.8244675  0.8262826 1.00000000  0.8783778  0.04882348
+ami  0.9642236  0.9628118 0.87837777  1.0000000 -0.21452625
+fms -0.3346155 -0.3389852 0.04882348 -0.2145263  1.00000000
+```
+
+ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations.
+
+
+
