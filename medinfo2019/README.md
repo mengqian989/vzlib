@@ -185,6 +185,7 @@ Observations:
 Since we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
 
 ```bash
+# Evaluation for title+abstract+fulltext
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.08,14,kmeans,4,0.3456,0.2517,0.2913,0.2742,0.2997,0.2320,0.5862
 1,8,0.08,12,kmeans,4,0.3281,0.2590,0.2895,0.2666,0.2869,0.2364,0.5684
@@ -192,6 +193,7 @@ $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.08,8,kmeans,4,0.3086,0.2430,0.2719,0.2523,0.2519,0.2229,0.5501
 1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
 
+# Evaluation for title+abstract.
 $ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
 1,8,0.01,18,kmeans,4,0.3139,0.2934,0.3033,0.2800,0.2223,0.2655,0.5127
@@ -199,6 +201,7 @@ $ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.01,20,kmeans,4,0.3087,0.2869,0.2974,0.2763,0.2117,0.2611,0.5081
 1,8,0.01,0,kmeans,4,0.2631,0.2659,0.2645,0.2426,0.2091,0.2395,0.4856
 
+# Evaluation for title.
 $ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.21,6,maximin,4,0.1658,0.1809,0.1730,0.1551,0.1767,0.1488,0.4460
 1,9,0.01,10,kmeans,4,0.1512,0.1241,0.1363,0.1248,0.1396,0.1115,0.4737
@@ -214,7 +217,8 @@ Observations:
 
 What if we look at v-measure-d?
 
-```
+```bash
+# Evaluation for title+abstract+fulltext
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.40,20,kmeans,4,0.3815,0.3101,0.3421,0.3114,0.2416,0.2780,0.5567
 1,8,0.34,18,kmeans,4,0.3774,0.3041,0.3368,0.3058,0.2346,0.2721,0.5540
@@ -222,6 +226,7 @@ $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.21,20,kmeans,4,0.3550,0.2804,0.3133,0.2858,0.2308,0.2525,0.5512
 1,8,0.27,20,kmeans,4,0.3505,0.2792,0.3108,0.2809,0.2236,0.2489,0.5472
 
+# Evaluation for title+abstract.
 $ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.08,0,kmeans,4,0.3352,0.3164,0.3255,0.2991,0.2259,0.2845,0.5168
 1,8,0.21,18,kmeans,4,0.3214,0.3099,0.3156,0.2891,0.2064,0.2775,0.5001
@@ -229,6 +234,7 @@ $ less brca_top4_eval_ta.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.60,16,kmeans,4,0.3092,0.3159,0.3125,0.2862,0.1938,0.2825,0.4773
 1,8,0.60,18,kmeans,4,0.3080,0.3142,0.3110,0.2849,0.1900,0.2809,0.4755
 
+# Evaluation for title.
 $ less brca_top4_eval_t.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
 1,8,0.53,20,kmeans,4,0.2328,0.2424,0.2375,0.2183,0.0958,0.2157,0.4236
 1,8,0.14,20,kmeans,4,0.2283,0.2054,0.2163,0.2035,0.1357,0.1857,0.4850
