@@ -1,9 +1,11 @@
 # Data preparation
 
-Got articles for the query "breast neoplasms[MeSH Major Topic]" from pubmed on September 21, 2018 and saved as brca_med.xml.  
+Got articles for the query "**breast neoplasms[MeSH Major Topic]**" from pubmed on September 21, 2018 and saved as brca_med.xml.  
+
 - brca_med.xml contains 224,940 articles.  
 
 Did the same for pmc (as pmc doesn't give mesh terms) and save as brca_pmc.xml. 
+
 - brca_pmc.xml contains 39,332 articles.
 
 So, 39,332 / 224,940 = 17.5% of the articles have full texts.
