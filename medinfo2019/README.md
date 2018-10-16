@@ -264,4 +264,21 @@ python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brc
 python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t_sgl.csv --single &
 ```
 
+Here's the disribution of MeSH terms (and their combinations).  For this experiment, we use only single-class instances (i.e., "124 Breast Neoplasms, Male" and "687 Carcinoma, Ductal, Breast", ...).
+
+```bash
+less brca_pmc_top4.txt.gz | cut -f5 | sort | uniq -c
+    124 Breast Neoplasms, Male
+     15 Breast Neoplasms, Male|Carcinoma, Ductal, Breast
+      1 Breast Neoplasms, Male|Carcinoma, Ductal, Breast|Carcinoma, Lobular
+      1 Breast Neoplasms, Male|Triple Negative Breast Neoplasms
+    687 Carcinoma, Ductal, Breast
+    193 Carcinoma, Ductal, Breast|Carcinoma, Lobular
+     88 Carcinoma, Lobular
+    783 Triple Negative Breast Neoplasms
+     32 Triple Negative Breast Neoplasms|Carcinoma, Ductal, Breast
+      7 Triple Negative Breast Neoplasms|Carcinoma, Ductal, Breast|Carcinoma, Lobular
+      1 Triple Negative Breast Neoplasms|Carcinoma, Lobular
+```
+
 Results to come!
