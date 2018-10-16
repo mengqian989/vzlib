@@ -343,6 +343,24 @@ python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv 
 # Evaluation metrics
 
 Need to consider which metric is suitable for our purpose.
+Here's my thought.
+
+- V-measure:  Not suitable to measure cluster quality as it doesn't 
+	take into account random labeling.
+
+- Fowlkes-Mallows scores:  Not suitable as it doesn't consider true 
+	negatives (pairs not in the same clusters in the predictions and
+	in the ground truth).
+
+- Adjusted mutual information: Preferred as it's adjusted against chance
+	although it focuses on agreements (intersections) of true and predicted
+	clusters.
+
+- Adjusted Rand index:  Desirable as it's adjusted against chance and
+	consider not only true positives but also true negatives.  I think it's 
+	important to consider true negatives as it indicates cluster separation.
+
+
 
 The following shows Pearson's correlation coefficient between every pair of metrics.
 
@@ -360,3 +378,27 @@ fms -0.3346155 -0.3389852 0.04882348 -0.2145263  1.00000000
 
 ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations.
 
+
+
+```bash
+less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
+1,8,0.53,12,kmeans,4,0.3598,0.3289,0.3437,0.3437,0.2091,0.3272,0.5464
+1,8,0.47,14,kmeans,4,0.3228,0.3254,0.3241,0.3241,0.1852,0.3211,0.5141
+1,8,0.53,0,kmeans,4,0.3272,0.3204,0.3238,0.3238,0.2196,0.3187,0.5390
+1,8,0.47,16,kmeans,4,0.3542,0.3181,0.3352,0.3352,0.1891,0.3163,0.5401
+1,8,0.53,10,kmeans,4,0.3237,0.3171,0.3204,0.3204,0.2294,0.3154,0.5438
+
+less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
+1,8,0.27,8,kmeans,4,0.3880,0.3374,0.3609,0.3609,0.3393,0.3356,0.6166
+1,8,0.34,16,kmeans,4,0.3350,0.3546,0.3445,0.3445,0.2182,0.3334,0.5167
+1,8,0.60,0,kmeans,4,0.3341,0.3589,0.3461,0.3461,0.2192,0.3326,0.5139
+1,8,0.27,12,kmeans,4,0.3339,0.3508,0.3422,0.3422,0.2305,0.3323,0.5261
+1,8,0.34,18,kmeans,4,0.3317,0.3499,0.3406,0.3406,0.2171,0.3301,0.5170
+
+$ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
+1,8,0.60,0,kmeans,4,0.2485,0.2868,0.2663,0.2663,0.1266,0.2468,0.4439
+1,8,0.21,0,kmeans,4,0.2379,0.2503,0.2439,0.2439,0.1793,0.2361,0.4925
+1,8,0.34,20,kmeans,4,0.2377,0.2719,0.2536,0.2536,0.1141,0.2360,0.4387
+1,8,0.21,6,kmeans,4,0.2368,0.2425,0.2396,0.2396,0.1536,0.2349,0.4855
+1,8,0.14,12,kmeans,4,0.2322,0.2340,0.2331,0.2331,0.1334,0.2302,0.4783
+```
