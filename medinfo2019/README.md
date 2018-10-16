@@ -114,11 +114,33 @@ less brca_med_top4_eval.csv | sort -t',' -k11 -nr | head -5
 
 Observations:
 
-- df = 1 dominates the top ranked ones, which means VCGS is better than DF-based feature selection (further discussion later).
+- df = 1 dominates the top ranked ones, which means VCGS is better than DF-based feature selection.
 - kmeans works better than maximin.
-- r = 9, d = 0.53 worked generally good. More investigation is needed to see if performance is sensitive to these parameters (it's not very good property is it's so).
+- r = 9, d = 0.53 worked generally good. More investigation is needed to see if performance is sensitive to these parameters (it's not a very good property if it is).
 - SVD seems to be effective but the number of components (n) doesn't seem to have a clear association with the performance.
 - k = 4 worked consistently good, which is expected as we have four underlying classes (mesh terms)
+
+Based on the first observation above, let's see how good the DF-based feature selection is.  The following shows the five best results in ari where minimum DF was set to other than 1.
+
+```bash
+# any number of clusters
+less brca_med_top4_eval.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head -5
+100,na,na,20,kmeans,16,0.1047,0.1051,0.1049,0.0926,0.0921,0.0911,0.5172
+10,na,na,6,kmeans,8,0.1332,0.1768,0.1519,0.1367,0.0868,0.1195,0.4008
+100,na,na,18,kmeans,14,0.0969,0.1065,0.1015,0.0891,0.0850,0.0853,0.4834
+70,na,na,14,kmeans,8,0.1106,0.0952,0.1024,0.0913,0.0844,0.0832,0.5005
+50,na,na,10,kmeans,8,0.1199,0.1018,0.1101,0.0983,0.0807,0.0891,0.4897
+
+# number of clusters = 4
+less brca_med_top4_eval.csv | grep -vP '^1,' | grep ',4,0' | sort -t',' -k11 -nr | head -5
+100,na,na,6,kmeans,4,0.1158,0.0837,0.0972,0.0881,0.0806,0.0745,0.5135
+70,na,na,20,kmeans,4,0.1563,0.0840,0.1093,0.0992,0.0801,0.0749,0.5471
+100,na,na,0,kmeans,4,0.1049,0.0815,0.0918,0.0824,0.0782,0.0720,0.5049
+70,na,na,6,kmeans,4,0.1202,0.0855,0.1000,0.0898,0.0745,0.0755,0.5023
+50,na,na,4,kmeans,4,0.1248,0.0924,0.1062,0.0956,0.0724,0.0819,0.4929
+```
+
+The best ari was found to be 0.0921, which is pretty low.  So VCGS does work!  
 
 What if we look at v-measure-d?
 
