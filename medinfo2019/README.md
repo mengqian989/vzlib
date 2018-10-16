@@ -76,7 +76,7 @@ $ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 
 ## Abstracts (larger data)
 
-Run an evaluation script for full text. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
+Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
 
 ```bash
 $ python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
@@ -98,9 +98,9 @@ where
 Notes:
 
 - v-measure-d and v-measure are different in how to treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
-- when df is greater than 1, VCGS is not applied.  This is for investigating the effectiness of VCGS in comparison with DF-based feature selection.
+- When df is greater than 1, VCGS is not applied.  This is for investigating the effectiness of VCGS in comparison with DF-based feature selection.
 
-Now let's look at the five best parameter combinations based on adjusted rand index (ari) for medline data (which have only title+abstract).
+Now let's look at the five best parameter combinations based on adjusted rand index (ari).
 
 ```bash
 $ less brca_med_top4_eval.csv | sort -t',' -k11 -nr | head -5
@@ -179,10 +179,10 @@ $ less brca_top4_eval_t.csv | sort -t',' -k11 -nr | head -5
 Observations:
 
 - Using all fields (title+abstract+fulltext) achieved the best performance in ari, followed by title+abs, then title.
-- Cluster number (k) = 6 performed the best for title+abstract+fulltext. For title+abs and title, k = 2 resulted in good performance.
+- Optimum cluster number (k) became more incoherent for title+abstract+fulltext and smaller (k = 2) for title+abs and title. It may be because the data set is small and it's more difficult to identify underlying clusters.
 - When using only titles, maximin clustering worked better than kmeans.
 
-Since this is a controlled experiment and we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
+Since we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
 
 ```bash
 $ less brca_top4_eval_all.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
@@ -241,4 +241,5 @@ Observations:
 
 - The tendency didn't change (fulltext > abstract > title) but the differences between fulltext between abstract became smaller.
 - r is stable and d is not.
-- 
+- larger n may need to be explored.
+
