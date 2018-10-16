@@ -12,6 +12,7 @@ Look at the mesh term distribution. Note that only major mesh terms are consider
 
 ```bash
 python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
+
 cut -f 4 brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
   11115 Carcinoma, Ductal, Breast
    3475 Carcinoma, Lobular
