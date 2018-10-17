@@ -479,7 +479,7 @@ def read_json(input, stopwords=[]):
 Read documents
 '''
 def read_documents(data_dir, input=None, source=None, 
-                   stopwords=[], fields=""):
+                   stopwords=[], fields="", single_class=False):
 
     docs = [] # store documents
     df = dict() # document frequency
@@ -510,15 +510,27 @@ def read_documents(data_dir, input=None, source=None,
                 if text == "":
                     text = title+" "+abs+" "+body 
                 terms = tokenize.split(text.lower())
-                mesh.append(m.split('|'))
+                m = m.split('|')
+
+                # for skipping multi-class instances
+                if single_class and len(m) > 1:
+                    continue
+
+                mesh.append(m)
             else:
                 pmid, title, abs, m, _ = line.split('\t')
                 terms = tokenize.split((title+" "+abs).lower())
-                meshes = m.split('|')
+                m = m.split('|')
+
+                # for skipping multi-class instances
+                if single_class and len(m) > 1:
+                    continue
+
                 tmp = []
-                for m in meshes:
-                    tmp.append(m.split('/')[0])
+                for m_ in m:
+                    tmp.append(m_.split('/')[0])
                 mesh.append(tmp)
+
             terms = [w for w in terms if w not in stopwords and \
                          len(w) > 1 and not exclude.match(w)]
             # count df
