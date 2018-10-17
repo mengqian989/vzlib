@@ -399,7 +399,7 @@ ami  0.9642236  0.9628118 0.87837777  1.0000000 -0.21452625
 fms -0.3346155 -0.3389852 0.04882348 -0.2145263  1.00000000
 ```
 
-ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations.  The follwing shows the scatter plots.
+ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations with the others.  The following shows the scatter plot for each pair of metrics.
 
 ```R
 plot(x[,9:13])
