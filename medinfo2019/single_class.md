@@ -32,6 +32,18 @@ less brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c
 
 # Experiments
 
+## Parameters
+
+Tested the combinations of the following parameters:
+
+- Minimal document frequencies: 1, 10, 30, 50, 70, 100
+- R: 3, 5, 7, 9, 11
+- D: 0.01 0.08 0.14 0.21 0.27 0.34 0.40 0.47 0.53 0.60
+- Number of components for SVD: 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+  - When set to 0, SVD is not applied.
+- Clustering algorithms: kNN or maximin
+- Number of clusters for kNN: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+
 ## Abstracts (larger data)
 
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
