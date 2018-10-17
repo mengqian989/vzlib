@@ -29,6 +29,10 @@ parser.add_argument("-f", "--fields",
                     "combination of title, abstract, and body. "
                     "If not specified, all fields are used "
                     "(default: \"\")")
+parser.add_argument('--single',
+                    help='Evaluate only single-class instances.'
+                    '(default: False)',
+                    action='store_true')
 
 args = parser.parse_args()
 
@@ -42,7 +46,8 @@ print("Reading documents...")
 docs, df, w2id, mesh = \
         vl.read_documents("", input=args.input,
                           stopwords=stopwords,
-                          fields=args.fields)
+                          fields=args.fields,
+                          single_class=args.single)
 print("Finished reading %d documents" % len(docs))
 print("%d terms were identified" % len(df))
 
@@ -65,7 +70,7 @@ try different parameter combinations
 
 with open(args.output, "w") as f:
 
-    f.write("df,r,d,n,k,c,h,vd,v,ari,ami,fms\n")
+    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms\n")
 
     '''
     Use VCGS for feature selection
@@ -108,7 +113,12 @@ with open(args.output, "w") as f:
                                    "document", keywords,
                                    theta, svd)
 
-                # output
+                # error check
+                if len(set(membership)) == 1:
+                       print("# clusters = 1.  Skipping...")
+                       continue
+
+                # output                   
                 results = vl.evaluate(mesh_small, membership)
 
                 f.write("%d,%d,%.2f,%d,maximin,%d," % \
@@ -171,6 +181,11 @@ with open(args.output, "w") as f:
                                "document", keywords,
                                theta, svd)
 
+            # error check
+            if len(set(membership)) == 1:
+                   print("# clusters = 1.  Skipping.")
+                   continue
+                   
             # output
             results = vl.evaluate(mesh_small, membership)
 
