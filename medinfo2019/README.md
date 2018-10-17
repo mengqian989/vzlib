@@ -279,7 +279,7 @@ Observations:
 
 ### Evaluate only single-class instances
 
-**I compiled the results in a [different page](single_classes.md).**
+**I compiled the results for single-class instances in a [different page](single_class.md).**
 
 Some articles are annotated with multiple MeSH terms (out of the four MeSH terms we're focusing on).  They lower the performance to some extent, so let's see how much it improves if we exclude them.
 
