@@ -1,4 +1,4 @@
-# Data preparation
+# Data
 
 Got articles for the query "**breast neoplasms[MeSH Major Topic]**" from pubmed on September 21, 2018 and saved as brca_med.xml.  
 
