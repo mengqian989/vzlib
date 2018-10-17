@@ -249,6 +249,9 @@ less brca_top4_eval_ta_sgl.csv | grep ",4,0." | grep -P "^1," | sort -t',' -k9 -
 1,8,0.27,12,kmeans,4,0.3339,0.3508,0.3422,0.3422,0.2305,0.3323,0.5261
 '''
 
+# Evaluation metrics
+
+To see their difference empirically, the following computes Pearson's correlation coefficient between every pair of metrics **by R**, not python.
 
 ```R
 cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
@@ -260,5 +263,14 @@ v   1.00000000 1.00000000 0.7504809 0.9504065 0.06378729
 ari 0.75048089 0.75048089 1.0000000 0.8168620 0.60705975
 ami 0.95040651 0.95040651 0.8168620 1.0000000 0.20693144
 fms 0.06378729 0.06378729 0.6070598 0.2069314 1.00000000
-> plot(x[,9:13])
 ```
+
+ami and vd (or v) are found to be strongly correlated.  ari has relatively strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has very weak to moderate correlations with the others.  The following shows the scatter plot for each pair of metrics, again by R.
+
+```R
+plot(x[,9:13])
+```
+
+<img src="scatter_sgl.png" width="600">
+
+
