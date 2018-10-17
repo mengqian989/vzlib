@@ -279,6 +279,8 @@ Observations:
 
 ### Evaluate only single-class instances
 
+**I compiled the results in a [different page](single_classes.md).**
+
 Some articles are annotated with multiple MeSH terms (out of the four MeSH terms we're focusing on).  They lower the performance to some extent, so let's see how much it improves if we exclude them.
 
 ```bash
@@ -332,13 +334,9 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head -5
 1,8,0.01,2,kmeans,4,0.2197,0.2341,0.2267,0.2267,0.1598,0.2178,0.4795
 ```
 
-The ari values are increased up to 0.3914.  Although the data size becomes smaller, the results are consistent with the previous ones, so it'll be better to use this data set (for presentation).
+The ari values are increased up to 0.3914.  Although the data size becomes smaller, the results are consistent with the previous ones, so it'll be better to use this data set (just for presentation).
 
-Run evaluation script for the medline data, too.
 
-```bash
-python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single
-```
 
 # Evaluation metrics
 
@@ -385,7 +383,7 @@ $ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
 1,8,0.14,12,kmeans,4,0.2322,0.2340,0.2331,0.2331,0.1334,0.2302,0.4783
 ```
 
-To see their difference empirically, the following computes Pearson's correlation coefficient between every pair of metrics.
+To see their difference empirically, the following computes Pearson's correlation coefficient between every pair of metrics **by R**, not python.
 
 ```R
 > cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
@@ -399,7 +397,7 @@ ami  0.9642236  0.9628118 0.87837777  1.0000000 -0.21452625
 fms -0.3346155 -0.3389852 0.04882348 -0.2145263  1.00000000
 ```
 
-ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations with the others.  The following shows the scatter plot for each pair of metrics.
+ami and vd v are found to be strongly correlated.  ari has strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has weak to negative correlations with the others.  The following shows the scatter plot for each pair of metrics, again by R.
 
 ```R
 plot(x[,9:13])
