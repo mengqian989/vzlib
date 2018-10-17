@@ -36,13 +36,19 @@ less brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c
 
 Tested the combinations of the following parameters:
 
-- Minimal document frequencies: 1, 10, 30, 50, 70, 100
-- R: 3, 5, 7, 9, 11
-- D: 0.01 0.08 0.14 0.21 0.27 0.34 0.40 0.47 0.53 0.60
-- Number of components for SVD: 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+- Minimal document frequencies: words with document frequency equal or smaller than df are ignored.
+  - 1, 10, 30, 50, 70, 100
+- R: A parameter for VCGS.
+  - 3, 5, 7, 9, 11
+- D: A parameter for VCGS.
+  - 0.01 0.08 0.14 0.21 0.27 0.34 0.40 0.47 0.53 0.60
+- Number of components (dimensions) for SVD: 
+  - 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
   - When set to 0, SVD is not applied.
-- Clustering algorithms: kNN or maximin
-- Number of clusters for kNN: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+- Clustering algorithms: 
+  - kNN or maximin
+- Number of clusters for kNN: 
+  - 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
 
 ## Abstracts (larger data)
 
@@ -58,11 +64,11 @@ The resulting file has a set of given parameters and evaluation metric values fo
 
 where 
 
-- df is a df cutoff threshold (words with document frequency equal or smaller than df are ignored)
+- df is the minimal document frequency
 - r and d are VCGS's parameters
-- n is the number of dimensions (components) for SVD
+- n is the number of dimensions for SVD
 - alg is an clustering algorithm (kmeans or maximin)
-- k is the number of clusters
+- k is the number of clusters. This is set beforehand for kNN but is determined by the algorithm for maximin. 
 - the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-d, v = v-measure, ari = adjusted rand index, ami = adjusted mutual information, and fms = Fowlkes-Mallows index.  
 
 Notes:
