@@ -237,4 +237,14 @@ Observations:
 
 - The tendency changed (abstract > fulltext > title).
 - r is stable and d is not.
-- For title+abstract, DF-based feature selection worked better than VCGS.
+- For title+abstract, DF-based feature selection worked better than VCGS.  I suspect that this inconsistency is caused by the small data size and shouldn't be paid attention.  The following is the top five results using VCGS.
+
+```bash
+# Evaluation for title+abstract using VCGS.
+less brca_top4_eval_ta_sgl.csv | grep ",4,0." | grep -P "^1," | sort -t',' -k9 -nr | head -5
+1,8,0.27,8,kmeans,4,0.3880,0.3374,0.3609,0.3609,0.3393,0.3356,0.6166
+1,8,0.60,0,kmeans,4,0.3341,0.3589,0.3461,0.3461,0.2192,0.3326,0.5139
+1,8,0.34,16,kmeans,4,0.3350,0.3546,0.3445,0.3445,0.2182,0.3334,0.5167
+1,8,0.53,18,kmeans,4,0.3300,0.3568,0.3429,0.3429,0.2228,0.3284,0.5139
+1,8,0.27,12,kmeans,4,0.3339,0.3508,0.3422,0.3422,0.2305,0.3323,0.5261
+'''
