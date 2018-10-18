@@ -148,7 +148,7 @@ Observations:
 
 ## Full texts vs. abstracts (smaller data)
 
-First, run eval.py script. (We can run them in parallel as follows. Takes about a couple of hours.)
+First, run eval.py script. (We can run them in parallel as follows. Takes less than an hour on miksa3.)
 
 ```bash
 python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single &
@@ -200,9 +200,9 @@ less brca_top4_eval_ta_sgl.csv | sort -t',' -k11 -nr | head
 
 Observations:
 
-- Using all fields (title+abstract+fulltext) achieved the best performance in ARI, followed by title+abs, then title. But the difference between the latter two is small.
-- Optimum number of clusters (k) became somewhat more incoherent (4, 6 and 2) and smaller (2) for title+abs and title. It may be because the data set is small and it's more difficult to identify underlying clusters.
-- When using only titles, maximin clustering worked better than kmeans.
+- Using all fields (title+abstract+fulltext) achieved the best performance in ARI, followed by title+abs, then title.
+- When using only titles, DF-based feature selection worked better than VCGS. This would be due to the small number of words from titles (and thus not many keywords were identified by VCGS).  This tendency is also seen in title+abstract.
+- kmeans generally works better than maximin.
 
 Since we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
 
@@ -251,7 +251,10 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head
 Observations:
 
 - The tendency (fulltext > abstract > title) didn't change.
-- Now, kmeans dominates the top 5 for title, too.
+- kmeans performs better than maximin.
+- LSA generally helps.
+- R is less sensitive than D, which means it's difficult to find good D value).
+- VCGS doesn't work for titles (only).
 
 What if we look at v-measure-d?
 
@@ -309,18 +312,7 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
 Observations:
 
 - The tendency changed (abstract > fulltext > title).
-- r is stable and d is not.
-- For title+abstract, DF-based feature selection worked better than VCGS.  I suspect that this inconsistency is caused by the small data size and shouldn't be paid attention.  The following is the top five results using VCGS.
 
-```bash
-# Evaluation for title+abstract using VCGS.
-less brca_top4_eval_ta_sgl.csv | grep ",4,0." | grep -P "^1," | sort -t',' -k9 -nr | head -5
-1,8,0.27,8,kmeans,4,0.3880,0.3374,0.3609,0.3609,0.3393,0.3356,0.6166
-1,8,0.60,0,kmeans,4,0.3341,0.3589,0.3461,0.3461,0.2192,0.3326,0.5139
-1,8,0.34,16,kmeans,4,0.3350,0.3546,0.3445,0.3445,0.2182,0.3334,0.5167
-1,8,0.53,18,kmeans,4,0.3300,0.3568,0.3429,0.3429,0.2228,0.3284,0.5139
-1,8,0.27,12,kmeans,4,0.3339,0.3508,0.3422,0.3422,0.2305,0.3323,0.5261
-'''
 
 # Evaluation metrics
 
