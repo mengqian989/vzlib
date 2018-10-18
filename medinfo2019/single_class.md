@@ -38,17 +38,17 @@ Tested the combinations of the following parameters:
 
 - Minimal document frequencies: words with document frequency equal or smaller than df are ignored.
   - 1, 10, 30, 50, 70, 100
-- R: A parameter for VCGS.
-  - 3, 5, 7, 9, 11
-- D: A parameter for VCGS.
+- R: Parameter for VCGS.
+  - 5, 6, 7, 8, 9, 10
+- D: Parameter for VCGS.
   - 0.01 0.08 0.14 0.21 0.27 0.34 0.40 0.47 0.53 0.60
 - Number of components (dimensions) for SVD: 
-  - 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+  - 0, 4, 8, 12, 16, 20
   - When set to 0, SVD is not applied.
 - Clustering algorithms: 
   - kNN or maximin
 - Number of clusters for kNN: 
-  - 2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+  - 2, 4, 6, 8, 10
 
 ## Abstracts (larger data)
 
