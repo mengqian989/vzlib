@@ -11,6 +11,7 @@ import operator
 import math
 import gzip, bz2
 import random
+import copy
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -557,26 +558,27 @@ def read_documents(data_dir, input=None, source=None,
 '''
 Compute tfidf and find key terms
 '''
-def compute_tfidf(docs, df, weight, rank=0):
+def compute_tfidf(docs, df, weight, rank=5):
+
+    docs_ = copy.deepcopy(docs) # make copy
 
     dfr = dict() # df considering only top R terms per document
     for i in range(len(docs)):
         for w in docs[i]:
-            # set infrequent term's tf to 0
+            # delete low DF term
             if w not in df:
-                docs[i][w] = 0
+                del docs_[i][w]
                 continue
             # tfidf
             if weight == 'tfidf':
-                docs[i][w] *= math.log(len(docs)/df[w])
-            elif docs[i][w] != 0: # 'binary' if not 'tfidf'
-                docs[i][w] = 1
-
+                docs_[i][w] *= math.log(len(docs)/df[w])
+            else: # 'binary' if not 'tfidf'
+                docs_[i][w] = 1
         
         # Ignore if rank = 0
         if rank > 0:
             # Sort and extract top R terms for this document
-            terms_sorted = sorted(docs[i].items(), reverse=True, 
+            terms_sorted = sorted(docs_[i].items(), reverse=True, 
                                   key=operator.itemgetter(1))
             top_r = terms_sorted[:rank]
 
@@ -587,7 +589,7 @@ def compute_tfidf(docs, df, weight, rank=0):
                 else:
                     dfr[w] = 1
 
-    return docs, dfr
+    return docs_, dfr
 
 
 '''
@@ -621,6 +623,7 @@ def output_keywords(num_docs, dfr, df, p_docs=0.5, html=False):
                           key=operator.itemgetter(1))
     if not html:
         print("term\tDF\tDFR")
+
     keywords = []
     dfs = []
     dfrs = []
@@ -629,16 +632,17 @@ def output_keywords(num_docs, dfr, df, p_docs=0.5, html=False):
             break
         if w not in df:
             continue
-        if not html:
-            print("%s\t%d\t%d" % (w, df[w], dfr[w]))
+
         keywords.append(w)
         dfs.append(df[w])
         dfrs.append(dfr[w])
 
-    d = pd.DataFrame({"Term": keywords, "DF": dfs, "DFR": dfrs},
-                     columns=["Term", "DF", "DFR"])
-    
+        if not html:
+            print("%s\t%d\t%d" % (w, df[w], dfr[w]))
+        
     if html:
+        d = pd.DataFrame({"Term": keywords, "DF": dfs, "DFR": dfrs},
+                         columns=["Term", "DF", "DFR"])
         display(HTML(d.to_html(index=False)))
 
     return keywords
@@ -1012,8 +1016,26 @@ def update(docs, keywords, mesh=[]):
 
     return docs_new, mesh_new
 
+
+'''
+Delete low-df words
+'''
+def del_lowdf(df,mindf=1):
+    inf = []
+    for w in df:
+        if df[w] <= mindf:
+            inf.append(w)
+    for w in inf:
+        del df[w]
+
+    print("%d terms were removed" % len(inf))
+
+
 '''
 main
 '''
 if __name__ == "__main__":
     main()
+
+
+    
