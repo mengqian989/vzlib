@@ -80,75 +80,92 @@ Now let's look at the five best parameter combinations based on adjusted rand in
 
 ```bash
 #  any number of clusters
-less brca_med_top4_eval_sgl.csv | sort -t',' -k11 -nr | head -5
-1,9,0.27,20,kmeans,4,0.5777,0.3748,0.4547,0.4547,0.4332,0.3746,0.7460
-1,9,0.14,18,kmeans,4,0.4658,0.3038,0.3677,0.3677,0.3849,0.3035,0.7162
-1,8,0.01,14,kmeans,6,0.3946,0.4463,0.4188,0.4188,0.3696,0.3943,0.6389
-1,9,0.53,10,maximin,6,0.2867,0.3593,0.3189,0.3189,0.3629,0.2864,0.6082
+less brca_med_top4_eval_sgl.csv | sort -t',' -k11 -nr | head
+1,8,0.01,20,kmeans,6,0.4046,0.4555,0.4285,0.4285,0.3790,0.4043,0.6456
+1,7,0.01,12,kmeans,6,0.3968,0.4492,0.4214,0.4214,0.3732,0.3965,0.6410
+1,9,0.01,8,kmeans,6,0.3786,0.4366,0.4055,0.4055,0.3700,0.3783,0.6357
+1,7,0.27,0,kmeans,4,0.4116,0.3764,0.3932,0.3932,0.3698,0.3763,0.6577
+1,5,0.14,0,kmeans,4,0.4110,0.3678,0.3882,0.3882,0.3695,0.3676,0.6619
+1,10,0.01,8,kmeans,6,0.3767,0.4352,0.4038,0.4038,0.3681,0.3765,0.6343
+1,6,0.14,0,kmeans,4,0.4010,0.3652,0.3823,0.3823,0.3671,0.3650,0.6571
+1,5,0.08,0,kmeans,4,0.3934,0.3634,0.3778,0.3778,0.3644,0.3632,0.6528
+1,7,0.14,20,kmeans,4,0.4005,0.3632,0.3809,0.3809,0.3637,0.3630,0.6561
 1,8,0.21,0,kmeans,4,0.3947,0.3639,0.3787,0.3787,0.3629,0.3637,0.6521
 
 #  number of clusters = 4
-less brca_med_top4_eval_sgl.csv | grep ,4,0'' | sort -t',' -k11 -nr | head -5
-1,9,0.27,20,kmeans,4,0.5777,0.3748,0.4547,0.4547,0.4332,0.3746,0.7460
-1,9,0.14,18,kmeans,4,0.4658,0.3038,0.3677,0.3677,0.3849,0.3035,0.7162
+less brca_med_top4_eval_sgl.csv | grep ',4,0' | sort -t',' -k11 -nr | head 
+1,7,0.27,0,kmeans,4,0.4116,0.3764,0.3932,0.3932,0.3698,0.3763,0.6577
+1,5,0.14,0,kmeans,4,0.4110,0.3678,0.3882,0.3882,0.3695,0.3676,0.6619
+1,6,0.14,0,kmeans,4,0.4010,0.3652,0.3823,0.3823,0.3671,0.3650,0.6571
+1,5,0.08,0,kmeans,4,0.3934,0.3634,0.3778,0.3778,0.3644,0.3632,0.6528
+1,7,0.14,20,kmeans,4,0.4005,0.3632,0.3809,0.3809,0.3637,0.3630,0.6561
 1,8,0.21,0,kmeans,4,0.3947,0.3639,0.3787,0.3787,0.3629,0.3637,0.6521
-1,8,0.27,20,kmeans,4,0.3990,0.3577,0.3772,0.3772,0.3527,0.3575,0.6517
-1,8,0.14,8,kmeans,4,0.3921,0.3605,0.3757,0.3757,0.3523,0.3603,0.6471
+1,6,0.08,20,kmeans,4,0.3970,0.3590,0.3771,0.3771,0.3611,0.3588,0.6554
+1,6,0.21,0,kmeans,4,0.4009,0.3584,0.3785,0.3785,0.3556,0.3582,0.6540
+1,10,0.34,0,kmeans,4,0.3938,0.3584,0.3752,0.3752,0.3523,0.3582,0.6484
+1,5,0.14,20,kmeans,4,0.4026,0.3537,0.3766,0.3766,0.3522,0.3535,0.6557
 ```
 
 Observations:
 
-- df = 1 dominates the top ranked ones, which means VCGS is better than DF-based feature selection.
-- kmeans generally works better than maximin.
-- r = 8~9 worked good. On the other hand, good d value seems random.  More investigation is needed to see if how sensitive the performance is to these parameters.
-- SVD seems to be effective.  More investigation is needed to see the relation between the number of components (n) and performance.
-- k = 4 (and 6) produced high ARI, which is expected as we have four underlying classes (mesh terms)
+- df = 1 dominates the top 10, which means VCGS is better than DF-based feature selection.
+- kmeans works better than maximin.
+- Good r and d values seem more or less random and may be difficult to find optimum settings.  More investigation is needed to see how sensitive the performance is to these parameters.
+- SVD does not give much advantage especially when we look at the cases with n=4.
+- k = 4 and 6 produced high ARI, which are the same as or close to the same number of underlying classes (mesh terms)
 
 Based on the first observation above, let's see how good the DF-based feature selection is.  The following shows the five best results in ari where minimum DF was set to other than 1.
 
 ```bash
 # any number of clusters
 less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head -5
-less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head -5
-10,na,na,4,kmeans,4,0.2107,0.1859,0.1975,0.1975,0.1410,0.1856,0.5146
-50,na,na,10,kmeans,8,0.1537,0.1394,0.1462,0.1462,0.1316,0.1388,0.5230
-100,na,na,20,kmeans,6,0.1464,0.1072,0.1238,0.1238,0.1303,0.1067,0.5657
-70,na,na,18,kmeans,14,0.1167,0.1402,0.1273,0.1273,0.1267,0.1157,0.5003
-70,na,na,20,kmeans,12,0.1291,0.1294,0.1292,0.1292,0.1259,0.1281,0.5290
+100,na,na,16,kmeans,4,0.3655,0.3472,0.3561,0.3561,0.3338,0.3470,0.6286
+10,na,na,20,kmeans,6,0.3503,0.4604,0.3979,0.3979,0.2841,0.3500,0.5478
+10,na,na,0,kmeans,6,0.3408,0.4679,0.3944,0.3944,0.2530,0.3405,0.5183
+30,na,na,0,kmeans,6,0.3392,0.4670,0.3930,0.3930,0.2524,0.3390,0.5172
+50,na,na,0,kmeans,6,0.3442,0.4705,0.3975,0.3975,0.2523,0.3439,0.5200
 
 # number of clusters = 4
 less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | grep ',4,0' | sort -t',' -k11 -nr | head -5
-10,na,na,4,kmeans,4,0.2107,0.1859,0.1975,0.1975,0.1410,0.1856,0.5146
-100,na,na,20,kmeans,4,0.1902,0.0984,0.1297,0.1297,0.1182,0.0981,0.5990
-50,na,na,4,kmeans,4,0.1629,0.1350,0.1476,0.1476,0.1137,0.1347,0.5106
-10,na,na,10,kmeans,4,0.1783,0.1478,0.1616,0.1616,0.1080,0.1475,0.5040
-100,na,na,12,kmeans,4,0.1733,0.1030,0.1292,0.1292,0.1069,0.1027,0.5655
+100,na,na,16,kmeans,4,0.3655,0.3472,0.3561,0.3561,0.3338,0.3470,0.6286
+100,na,na,20,kmeans,4,0.3449,0.3609,0.3527,0.3527,0.2459,0.3447,0.5493
+100,na,na,12,kmeans,4,0.3349,0.3520,0.3432,0.3432,0.2440,0.3347,0.5470
+70,na,na,20,kmeans,4,0.3432,0.3569,0.3499,0.3499,0.2422,0.3431,0.5490
+70,na,na,16,kmeans,4,0.3400,0.3544,0.3471,0.3471,0.2420,0.3398,0.5482
 ```
 
 The best ari was found to be 0.1410, which is pretty low.  So VCGS does work!  
 
-Just out of curiosity, what if we look at v-measure-d?
+Just out of curiosity, what if we look at v-measure-d or ami?
 
 ```bash
-less brca_med_top4_eval_sgl.csv | sort -t',' -k9 -nr | head -5
-1,9,0.27,20,kmeans,4,0.5777,0.3748,0.4547,0.4547,0.4332,0.3746,0.7460
-1,8,0.01,14,kmeans,6,0.3946,0.4463,0.4188,0.4188,0.3696,0.3943,0.6389
-1,9,0.21,16,kmeans,6,0.4111,0.3856,0.3979,0.3979,0.3550,0.3853,0.6688
-1,8,0.08,0,kmeans,6,0.3417,0.4695,0.3955,0.3955,0.2518,0.3414,0.5177
-1,8,0.14,20,kmeans,6,0.3433,0.4658,0.3953,0.3953,0.2483,0.3431,0.5194
+# v-measure-d
+less brca_med_top4_eval_sgl.csv | sort -t',' -k9 -nr | grep ',4,0' | head -5
+1,7,0.27,0,kmeans,4,0.4116,0.3764,0.3932,0.3932,0.3698,0.3763,0.6577
+1,6,0.47,0,kmeans,4,0.4034,0.3747,0.3885,0.3885,0.3241,0.3745,0.6274
+1,5,0.14,0,kmeans,4,0.4110,0.3678,0.3882,0.3882,0.3695,0.3676,0.6619
+1,6,0.60,0,kmeans,4,0.3870,0.3817,0.3844,0.3844,0.2932,0.3816,0.5945
+1,6,0.47,16,kmeans,4,0.3966,0.3698,0.3827,0.3827,0.3139,0.3696,0.6207
+
+# ami
+less brca_med_top4_eval_sgl.csv | sort -t',' -k12 -nr | grep ',4,0' | head -5
+1,6,0.60,0,kmeans,4,0.3870,0.3817,0.3844,0.3844,0.2932,0.3816,0.5945
+1,7,0.27,0,kmeans,4,0.4116,0.3764,0.3932,0.3932,0.3698,0.3763,0.6577
+1,6,0.47,0,kmeans,4,0.4034,0.3747,0.3885,0.3885,0.3241,0.3745,0.6274
+1,6,0.47,8,kmeans,4,0.3911,0.3732,0.3820,0.3820,0.3024,0.3731,0.6086
+1,7,0.53,12,kmeans,4,0.3933,0.3707,0.3817,0.3817,0.3080,0.3705,0.6148
 ```
 
 Observations:
 
 - Overall, we see similar patterns to ari.
-- df = 1 still works better (VCGS is better).
-- r is more stable than d.
-- kmeans still works better.
-- k = 4 or 6 still generally works better, which is not expected as v-measure tends to increase with the number of clusters.
+  - df = 1 still works better (VCGS is better).
+  - kmeans still works better.
+  - LSA is not effective (nor harmful).
 
 ## Full texts vs. abstracts (smaller data)
 
-First, run eval.py script. (We can run them in parallel as follows. Takes less than an hour on miksa3.)
+The aim of the following experiments is to show, if any, the advantage of full-text data over abstracts for clustering biomedical articles.  First, run eval.py script. (We can run them in parallel as follows. Takes less than an hour on miksa3.)
 
 ```bash
 python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single &
@@ -201,10 +218,11 @@ less brca_top4_eval_ta_sgl.csv | sort -t',' -k11 -nr | head
 Observations:
 
 - Using all fields (title+abstract+fulltext) achieved the best performance in ARI, followed by title+abs, then title.
-- When using only titles, DF-based feature selection worked better than VCGS. This would be due to the small number of words from titles (and thus not many keywords were identified by VCGS).  This tendency is also seen in title+abstract.
+- When using only titles, DF-based feature selection worked better than VCGS. This would be due to the small number of words from titles (therefore not many keywords were identified by VCGS).  This tendency is also seen in title+abstract.
 - kmeans generally works better than maximin.
+- LSA's effectiveness is not very clear.
 
-Since we know there're four classes in advance, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
+Since we know there're four underlying classes, it would be more appropriate to compare the three cases above only for four clusters (i.e., only look at k=4).
 
 ```bash
 # Evaluation for title+abstract+fulltext
@@ -254,37 +272,23 @@ Observations:
 - kmeans performs better than maximin.
 - LSA generally helps.
 - R is less sensitive than D, which means it's difficult to find good D value).
-- VCGS doesn't work for titles (only).
-
-What if we look at v-measure-d?
+- VCGS doesn't work for titles (only).  If we look at the cases where VCGS was used... 
 
 ```bash
-# Evaluation for title+abstract+fulltext
-less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
-1,5,0.01,0,kmeans,4,0.3724,0.3243,0.3467,0.3467,0.3277,0.3226,0.6104
-1,8,0.08,12,kmeans,4,0.3801,0.3158,0.3450,0.3450,0.3707,0.3140,0.6357
-1,6,0.08,8,kmeans,4,0.3853,0.3094,0.3432,0.3432,0.3999,0.3076,0.6559
-1,10,0.60,20,kmeans,4,0.3512,0.3320,0.3414,0.3414,0.2294,0.3303,0.5494
-1,7,0.40,0,kmeans,4,0.3300,0.3494,0.3394,0.3394,0.2150,0.3283,0.5189
-
-# Evaluation for title+abstract.
-less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
-70,na,na,6,kmeans,4,0.5718,0.2795,0.3754,0.3754,0.2093,0.2776,0.6541
-70,na,na,4,kmeans,4,0.5643,0.2787,0.3731,0.3731,0.2080,0.2768,0.6524
-70,na,na,18,kmeans,4,0.5687,0.2743,0.3701,0.3701,0.2033,0.2724,0.6523
-70,na,na,10,kmeans,4,0.5631,0.2734,0.3681,0.3681,0.2047,0.2715,0.6524
-70,na,na,16,kmeans,4,0.5667,0.2724,0.3679,0.3679,0.2017,0.2705,0.6519
-
-# Evaluation for title.
-less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k9 -nr | head -5
-50,na,na,20,kmeans,4,0.3104,0.3690,0.3372,0.3372,0.2009,0.3089,0.4826
-70,na,na,4,kmeans,4,0.3182,0.3560,0.3360,0.3360,0.2708,0.3166,0.5421
-50,na,na,0,kmeans,4,0.3080,0.3669,0.3349,0.3349,0.2050,0.3066,0.4847
-100,na,na,4,kmeans,4,0.3048,0.3681,0.3334,0.3334,0.2669,0.3033,0.5220
-50,na,na,16,kmeans,4,0.3062,0.3639,0.3326,0.3326,0.1974,0.3047,0.4804
+less brca_top4_eval_t_sgl.csv | grep ",4,0." | grep -P '^1,' | sort -t',' -k11 -nr | head
+1,7,0.53,0,kmeans,4,0.2583,0.2690,0.2636,0.2636,0.2003,0.2565,0.5099
+1,9,0.47,0,kmeans,4,0.2669,0.2738,0.2703,0.2703,0.1968,0.2651,0.5125
+1,10,0.47,0,kmeans,4,0.2667,0.2729,0.2698,0.2698,0.1949,0.2649,0.5123
+1,6,0.40,8,maximin,4,0.1588,0.1871,0.1718,0.1718,0.1913,0.1570,0.4762
+1,8,0.21,0,kmeans,4,0.2379,0.2503,0.2439,0.2439,0.1793,0.2361,0.4925
+1,7,0.21,0,kmeans,4,0.2371,0.2493,0.2430,0.2430,0.1775,0.2352,0.4916
+1,6,0.21,0,kmeans,4,0.2350,0.2478,0.2413,0.2413,0.1773,0.2332,0.4911
+1,8,0.53,12,kmeans,4,0.2373,0.2422,0.2398,0.2398,0.1654,0.2354,0.4951
+1,6,0.60,16,kmeans,4,0.2427,0.2461,0.2444,0.2444,0.1651,0.2408,0.4982
+1,10,0.01,8,maximin,4,0.1334,0.1521,0.1421,0.1421,0.1647,0.1315,0.4640
 ```
 
-And adjusted mutual information?
+What if the results are sorted by adjusted mutual information?
 
 ```bash
 less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
