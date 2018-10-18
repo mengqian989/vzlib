@@ -52,17 +52,6 @@ print("Finished reading %d documents" % len(docs))
 print("%d terms were identified" % len(df))
 
 
-# Delete low-df words
-def del_lowdf(df, mindf=1):
-    inf = []
-    for w in df:
-        if df[w] <= mindf:
-            inf.append(w)
-    for w in inf:
-        del df[w]
-
-    print("%d terms were removed" % len(inf))
-    return df
     
 '''
 try different parameter combinations
@@ -76,14 +65,15 @@ with open(args.output, "w") as f:
     Use VCGS for feature selection
     '''
 
-    for rank in range(8, 10):  # rank is R in vcgs
+    # Discard low DF terms
+    mindf = 1
+    vl.del_lowdf(df, mindf)
+    
+    for rank in range(5,11):  # rank is R in vcgs
 
-        mindf = 1
-        df = del_lowdf(df, mindf)
-        
         # Compute tfidf and find key terms
         docs_, dfr = vl.compute_tfidf(docs, df, "tfidf", rank)
-
+        
         for p_docs in linspace(0.01, 0.6, 10): # p_docs is D in vcgs
 
             # Sort and output results (discovered keywords)
@@ -102,7 +92,7 @@ with open(args.output, "w") as f:
 
             # clustering
 
-            for svd in range(0, 21, 2):  # dimensionality
+            for svd in range(0, 21, 4):  # dimensionality
                 if svd >= len(keywords): # error check
                     break
 
@@ -127,7 +117,7 @@ with open(args.output, "w") as f:
                 f.write("\n")
 
                 # kmeans
-                for n_clusters in range(2, 21, 2):
+                for n_clusters in range(2, 11, 2):
                     if n_clusters >= len(docs_small): # error check
                         break
                     membership, _, _, _ = \
@@ -150,10 +140,10 @@ with open(args.output, "w") as f:
 
     # Remove terms whose df is lower than mindf
     for mindf in [10, 30, 50, 70, 100]:
-        df = del_lowdf(df, mindf)
+        vl.del_lowdf(df, mindf)
         
-        # Compute tfidf
-        docs_, _ = vl.compute_tfidf(docs, df, "tfidf")
+        # Compute tfidf. Use rank=0 to disable VCGS
+        docs_, _ = vl.compute_tfidf(docs, df, "tfidf", rank=0)
 
         # Use words remaining in df as keywords
         keywords = list(df.keys())
@@ -170,7 +160,7 @@ with open(args.output, "w") as f:
 
         # clustering
 
-        for svd in range(0, 21, 2):  # dimensionality
+        for svd in range(0, 21, 4):  # dimensionality
             if svd >= len(keywords): # error check
                 break
 
@@ -195,7 +185,7 @@ with open(args.output, "w") as f:
             f.write("\n")
 
             # kmeans
-            for n_clusters in range(2, 21, 2):
+            for n_clusters in range(2, 11, 2):
                 if n_clusters >= len(docs_small): # error check
                     break
                 membership, _, _, _ = \
