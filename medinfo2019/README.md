@@ -230,7 +230,7 @@ Observations:
 
 ### Evaluate only single-class instances
 
-**I compiled the results for single-class instances in a [different page](single_class.md).**
+*I compiled the results for single-class instances in a [different page](single_class.md).*
 
 
 # Evaluation metrics
