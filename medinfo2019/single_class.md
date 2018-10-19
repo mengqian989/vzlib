@@ -320,7 +320,7 @@ Observations:
 
 # Evaluation metrics
 
-To see their difference empirically, the following computes Pearson's correlation coefficient between every pair of metrics **by R**, not python.
+To see the difference among different evaluation metrics empirically, the following shows Pearson's correlation coefficient between every pair of metrics **by R**, not python.
 
 ```R
 cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
