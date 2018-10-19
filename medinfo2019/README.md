@@ -82,7 +82,7 @@ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
 
 ```bash
-python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv
+nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval.csv &
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
@@ -168,11 +168,9 @@ Observations:
 First, run eval.py script. (We can run them in parallel as follows. Takes about a couple of hours.)
 
 ```bash
-python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv &
-
-python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv &
-
-python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv &
+nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all.csv &
+nice python eval.py --input brca_pmc_top4.txt.gz --fields title,abstract --output brca_top4_eval_ta.csv &
+nice python eval.py --input brca_pmc_top4.txt.gz --fields title --output brca_top4_eval_t.csv &
 ```
 
 Let's look at the result based on ARI.
