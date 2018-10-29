@@ -1,5 +1,7 @@
 # Data set creation
 
+This document explains how the data set for this project was created.
+
 ## Getting data
 
 Get plos abstracts for "neoplasms by site[MeSH Major Topic]" and save as
