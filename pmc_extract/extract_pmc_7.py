@@ -48,7 +48,7 @@ logging.basicConfig(filename='.extract_pmc.log',
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--input", default='/Users/mikawang/works/Health Informatics/work/plos/PMC6085126.nxml',
+parser.add_argument("--input", default='/Users/mikawang/works/Health Informatics/work/plos/PMC5694943.nxml.gz',
 
                     help="input file/dir (default: data/pmc20180503)")
 
@@ -419,7 +419,9 @@ for file in files:
 
                 elif e.tag == 'aff' or \
                     root.find('front/article-meta/contrib-group/aff') != None:
-                                
+                    
+                    aff_id = ''    
+                        
                     if e.tag == 'aff':
                         
                         e_1 = e
@@ -504,15 +506,15 @@ for file in files:
                 
                             if e_.tag == 'year' and e_.text != None:
                 
-                                e_year = e_.text
+                                e_year = escape(regex.sub(' ', e_.text))
                 
                             elif e_.tag == 'month' and e_.text != None:
                                 
-                                e_month = e_.text
+                                e_month = escape(regex.sub(' ', e_.text))
 
                             elif e_.tag == 'day' and e_.text != None:
                                 
-                                e_day = e_.text
+                                e_day = escape(regex.sub(' ', e_.text))
             
 
                 # get categories
@@ -619,13 +621,15 @@ for file in files:
 
             # extract all text within <body>
 
-            #body = ' '.join(e_body.itertext())
+            if e_body != None:
+            
+                body = ' '.join(e_body.itertext())
 
-            body = escape(regex.sub(' ', body))
+                body = escape(regex.sub(' ', body))
 
-            if args.verbose >= 3:
-
-                print(body)
+                if args.verbose >= 3:
+    
+                    print(body)
 
 
 
@@ -725,9 +729,11 @@ for file in files:
                 e_day = '-' + e_day
     
             pub_date = e_year + e_month + e_day
+            pub_date = regex.sub('', pub_date)
 
             
             pub_date_facet = e_year + e_month
+            pub_date_facet = regex.sub('', pub_date_facet)
             
 
 
@@ -736,6 +742,8 @@ for file in files:
             subj_ = ""
 
             for s in subj:
+                
+                s = escape(regex.sub(' ', s))
 
                 subj_ += f_subj + s + close
 
