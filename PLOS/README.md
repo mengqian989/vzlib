@@ -8,14 +8,14 @@ Extract text
 
 ```bash
 gzip plos_pmc.xml.gz
-python extract.py --input plos_med.xml.gz --generalize --major --code > plos_med.txt
+python xml2tsv_med.py --input plos_med.xml.gz --generalize --major --code > plos_med.txt
 ```
 
 Repeat for pmc and pubmed databases (as 
 pmc doesn't contain MeSH terms) and save as plos_pmc.xml.
 
 ```bash
-cut -f 4 plos_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
+cut -f 4 plos_med.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
    5561 Digestive System Neoplasms
    2700 Breast Neoplasms
    2512 Urogenital Neoplasms
@@ -34,7 +34,7 @@ cut -f 4 plos_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
       9 Splenic Neoplasms
 ```
 
-Use only top 6 frequent MeSH. (Specify the classes in extract.py.)
+Use only top 6 frequent MeSH. (Specify the classes in xml2tsv_med.py.)
 
 > classes = {"Digestive System Neoplasms",
 >            "Breast Neoplasms",
@@ -43,10 +43,10 @@ Use only top 6 frequent MeSH. (Specify the classes in extract.py.)
 >            "Endocrine Gland Neoplasms",
 >            "Head and Neck Neoplasms"}
 
-Run extract.py again.
+Run xml2tsv_med.py again.
 
 ```bash
-python extract.py --input plos_med.xml.gz --generalize --major --code --restrict > plos_med_top6.txt
+python xml2tsv_med.py --input plos_med.xml.gz --generalize --major --code --restrict > plos_med_top6.txt
 ```
 
 There're 12,244 articles annotated with at least one of the classes.
@@ -68,7 +68,7 @@ cut -f 4 plos_med_top6.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -
    1367 Head and Neck Neoplasms
 ```
 
-Note that the numbers are different from plos_med.txt because duplicates have been eliminated here.  If we look at the number of lines (articles), they're the same.
+Note that the numbers are different from plos_med.txt because duplicates have been eliminated in creating plos_med_top6.txt.  If we look at the number of lines (articles), they're the same.
 
 ```
 less plos_med.txt | grep "Digestive System Neoplasms" | wc -l
@@ -80,12 +80,12 @@ less plos_med_top6.txt | grep "Digestive System Neoplasms" | wc -l
 Finally create the data set with full text by adding body text extracted from plos_pmc.xml.
 
 ```bash
-python extract_pmc.py > plos_top6.txt
+python xml2tsv_pmc.py > plos_top6.txt
 ```
 
 Count the number of articles to make sure it didn't change.
 
-```
+```bash
 wc -l plos_top6.txt
 12244 plos_top6.txt
 ```
