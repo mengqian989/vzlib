@@ -1,18 +1,28 @@
 # Data set creation
 
-Get plos articles for "neoplasms by site[MeSH Major Topic]" and save as
-plos_med.xml.  
+## Getting data
+
+Get plos abstracts for "neoplasms by site[MeSH Major Topic]" and save as
+plos_med.xml and plos_pmc.xml using the following query on Pubmed and PMC, respectively.
+
 > ("plos one"[Journal] OR "plos pathogens"[Journal] OR "plos neglected tropical diseases" OR "plos biology"[Journal] OR "plos medicine"[Journal] OR "plos computational biology"[Journal] OR "plos genetics"[Journal]) AND "neoplasms by site"[MeSH Major Topic]
 
-Extract text 
+Compress the data.
 
 ```bash
-gzip plos_pmc.xml.gz
+gzip plos_med.xml
+gzip plos_pmc.xml
+```
+
+## Deciding classes to focus on 
+
+Extract MeSH terms (as well as other textual information).
+
+```bash
 python xml2tsv_med.py --input plos_med.xml.gz --generalize --major --code > plos_med.txt
 ```
 
-Repeat for pmc and pubmed databases (as 
-pmc doesn't contain MeSH terms) and save as plos_pmc.xml.
+Check to see what and how many MeSH terms are annotated.
 
 ```bash
 cut -f 4 plos_med.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
@@ -34,7 +44,9 @@ cut -f 4 plos_med.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
       9 Splenic Neoplasms
 ```
 
-Use only top 6 frequent MeSH. (Specify the classes in xml2tsv_med.py.)
+## Extracting data
+
+Use only top 6 frequent MeSH (by specifying the classes in xml2tsv_med.py).
 
 > classes = {"Digestive System Neoplasms",
 >            "Breast Neoplasms",
@@ -43,7 +55,7 @@ Use only top 6 frequent MeSH. (Specify the classes in xml2tsv_med.py.)
 >            "Endocrine Gland Neoplasms",
 >            "Head and Neck Neoplasms"}
 
-Run xml2tsv_med.py again.
+Run xml2tsv_med.py again with the following options.
 
 ```bash
 python xml2tsv_med.py --input plos_med.xml.gz --generalize --major --code --restrict > plos_med_top6.txt
@@ -76,6 +88,8 @@ less plos_med.txt | grep "Digestive System Neoplasms" | wc -l
 less plos_med_top6.txt | grep "Digestive System Neoplasms" | wc -l
 4321
 ```
+
+## Adding full-text data (body text)
 
 Finally create the data set with full text by adding body text extracted from plos_pmc.xml.
 
