@@ -1,6 +1,6 @@
 # Data set creation
 
-This document explains how the data set for this project was created (on Oct 30, 2018).
+This document explains how the data set for this project was created (on Sep 15, 2018).
 
 ## Getting data
 
