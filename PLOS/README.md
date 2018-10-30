@@ -7,7 +7,7 @@ This document explains how the data set for this project was created.
 Get plos abstracts for "neoplasms by site[MeSH Major Topic]" and save as
 plos_med.xml and plos_pmc.xml using the following query on Pubmed and PMC, respectively.
 
-> ("plos one"[Journal] OR "plos pathogens"[Journal] OR "plos neglected tropical diseases" OR "plos biology"[Journal] OR "plos medicine"[Journal] OR "plos computational biology"[Journal] OR "plos genetics"[Journal]) AND "neoplasms by site"[MeSH Major Topic]
+> ("plos one"[Journal] OR "plos pathogens"[Journal] OR "plos neglected tropical diseases"[Journal] OR "plos biology"[Journal] OR "plos medicine"[Journal] OR "plos computational biology"[Journal] OR "plos genetics"[Journal]) AND "neoplasms by site"[MeSH Major Topic]
 
 Compress the data.
 
