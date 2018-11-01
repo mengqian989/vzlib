@@ -4,26 +4,26 @@ Data set size (total number of documents).
 
 ```bash
 # medline
-less brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  wc -l
+zcat brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  wc -l
 14075
 
 # pmc
-less brca_pmc_top4.txt.gz | cut -f4 | grep -v '|' |  wc -l
-1899
+zcat brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  wc -l
+1682
 ```
 
 Distribution of classes (MeSH terms).
 
 ```bash
 # medline
-less brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  sort | uniq -c 
+zcat brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  sort | uniq -c 
    1653 Breast Neoplasms, Male
    8644 Carcinoma, Ductal, Breast
    1341 Carcinoma, Lobular
    2437 Triple Negative Breast Neoplasms
 
 # pmc
-less brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c 
+zcat brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c 
     124 Breast Neoplasms, Male
     687 Carcinoma, Ductal, Breast
      88 Carcinoma, Lobular

@@ -1,11 +1,13 @@
 # Data set creation
 
+This document explains how the data set for this project was created (on Sep 15, 2018).
+
 ## Getting data
 
 Get plos abstracts for "neoplasms by site[MeSH Major Topic]" and save as
 plos_med.xml and plos_pmc.xml using the following query on Pubmed and PMC, respectively.
 
-> ("plos one"[Journal] OR "plos pathogens"[Journal] OR "plos neglected tropical diseases" OR "plos biology"[Journal] OR "plos medicine"[Journal] OR "plos computational biology"[Journal] OR "plos genetics"[Journal]) AND "neoplasms by site"[MeSH Major Topic]
+> ("plos one"[Journal] OR "plos pathogens"[Journal] OR "plos neglected tropical diseases"[Journal] OR "plos biology"[Journal] OR "plos medicine"[Journal] OR "plos computational biology"[Journal] OR "plos genetics"[Journal]) AND "neoplasms by site"[MeSH Major Topic]
 
 Compress the data.
 
@@ -14,7 +16,7 @@ gzip plos_med.xml
 gzip plos_pmc.xml
 ```
 
-## Deciding classes to focus on 
+## Deciding classes to use 
 
 Extract MeSH terms (as well as other textual information).
 
@@ -103,3 +105,14 @@ Count the number of articles to make sure it didn't change.
 wc -l plos_top6.txt
 12244 plos_top6.txt
 ```
+
+## Format
+
+The resulting file, plos_top6.txt, has the following format.
+
+> PMID  Title  Abstract  Body_text  MeSH_terms
+
+The fields are tab-delimted.  If an article is annotated with multiple MeSH terms, the MeSH terms are concatanated with a vertical bar in between (e.g., "MeSH_A|MeSH_B").  The following shows an example article.
+
+> 17951913  Systemic chemotherapy and...  We report a case of...  Choroidal metastases occur most frequently...  Breast Neoplasms, Male
+ 
