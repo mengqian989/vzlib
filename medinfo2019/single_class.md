@@ -324,14 +324,14 @@ To see the difference among different evaluation metrics empirically, the follow
 
 ```R
 cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
-> x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls) 
-> cor(x[,9:13])
-            vd          v       ari       ami        fms
-vd  1.00000000 1.00000000 0.7504809 0.9504065 0.06378729
-v   1.00000000 1.00000000 0.7504809 0.9504065 0.06378729
-ari 0.75048089 0.75048089 1.0000000 0.8168620 0.60705975
-ami 0.95040651 0.95040651 0.8168620 1.0000000 0.20693144
-fms 0.06378729 0.06378729 0.6070598 0.2069314 1.00000000
+x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls) 
+cor(x[,9:13])
+           vd         v       ari       ami       fms
+vd  1.0000000 1.0000000 0.7603266 0.9333792 0.3347924
+v   1.0000000 1.0000000 0.7603266 0.9333792 0.3347924
+ari 0.7603266 0.7603266 1.0000000 0.7269075 0.7756461
+ami 0.9333792 0.9333792 0.7269075 1.0000000 0.3483514
+fms 0.3347924 0.3347924 0.7756461 0.3483514 1.0000000
 ```
 
 ami and vd (or v) are found to be strongly correlated.  ari has relatively strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has very weak to moderate correlations with the others.  The following shows the scatter plot for each pair of metrics, again by R.
@@ -342,4 +342,29 @@ plot(x[,9:13])
 
 <img src="scatter_sgl.png" width="600">
 
+Focusing on only V-measure, ARI and AMI...
 
+```R
+panel.cor <- function(x, y, digits = 3, cex.cor, ...)
+{
+ usr <- par("usr"); on.exit(par(usr))
+ par(usr = c(0, 1, 0, 1))
+ # correlation coefficient
+ r <- cor(x, y)
+ txt <- format(c(r, 0.123456789), digits = digits)[1]
+ txt <- paste("r = ", txt, sep = "")
+ text(0.5, 0.6, txt, cex=1.5)
+
+ # p-value calculation
+ p <- cor.test(x, y)$p.value
+ txt2 <- format(c(p, 0.123456789), digits = digits)[1]
+ txt2 <- paste("p = ", txt2, sep = "")
+ if(p<0.01) txt2 <- expression(paste(p <= 0.01, sep = ""))
+ text(0.5, 0.4, txt2, cex=1.5)
+}
+quartz("",6,5) # this is for Mac
+par(mar=c(5,4,1,1))
+pairs(x[,c(10,11,12)], upper.panel = panel.cor)
+```
+
+<img src="scatter_three.png" width="600">
