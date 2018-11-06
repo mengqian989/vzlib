@@ -368,3 +368,22 @@ pairs(x[,c(10,11,12)], upper.panel = panel.cor)
 ```
 
 <img src="scatter_three.png" width="600">
+
+```R
+cls <- c(r="numeric", d="numeric", n="numeric", ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
+x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls,na.strings = "na")
+
+x[x$df == 1 & x$alg == "kmeans" & x$n > 0 & x$k == 4, c(2,3,4,11)] -> y
+colnames(y) = c("R", "P", "n", "ARI")
+
+quartz("",6,5) # this is for Mac
+par(mar=c(5,4,1,1))
+
+# relation among R and P and ARI
+sp = ggplot(data=y, mapping=aes(x=R, y=P, color=ARI, size=ARI)) + geom_jitter(alpha=.7)
+sp+scale_color_gradient(low="white", high="red") + theme_bw() + theme(panel.grid=element_blank())
+
+# relation between n and ARI
+sp2 = ggplot(data=y, mapping=aes(x=factor(n), y=ARI)) + geom_boxplot()
+sp2 + geom_jitter(alpha=.5, color="tomato") + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(paste("Number of dimensions ", italic(n))))
+```
