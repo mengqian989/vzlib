@@ -380,10 +380,10 @@ quartz("",6,5) # this is for Mac
 par(mar=c(5,4,1,1))
 
 # relation among R and P and ARI
-sp = ggplot(data=y, mapping=aes(x=R, y=P, color=ARI, size=ARI)) + geom_jitter(alpha=.7)
-sp+scale_color_gradient(low="white", high="red") + theme_bw() + theme(panel.grid=element_blank())
+sp = ggplot(data=y, mapping=aes(x=R, y=P, color=ARI, size=ARI)) + geom_jitter(alpha=.7, width=0.2, height=0.01)
+sp+scale_color_gradient(low="white", high="red") + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(italic(R)),y=expression(italic(P)))
 
 # relation between n and ARI
 sp2 = ggplot(data=y, mapping=aes(x=factor(n), y=ARI)) + geom_boxplot()
-sp2 + geom_jitter(alpha=.5, color="tomato") + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(paste("Number of dimensions ", italic(n))))
+sp2 + geom_jitter(alpha=.5, color="tomato", height=0) + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(paste("Number of dimensions ", italic(n))))
 ```
