@@ -369,7 +369,7 @@ pairs(x[,c(10,11,12)], upper.panel = panel.cor)
 
 <img src="scatter_three.png" width="400">
 
-How do r and d affect cluster quality? 
+How do r and d affect cluster quality? Note that P is used to refer to d below.
 
 ```R
 cls <- c(r="numeric", d="numeric", n="numeric", ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
