@@ -31,6 +31,8 @@ import plotly as py
 import plotly.graph_objs as go
 #py.offline.init_notebook_mode()
 
+import matplotlib.pyplot as plt
+
 #import igraph as ig
 
 
@@ -106,6 +108,13 @@ def main():
                         help="Mesh term file corresponding to "
                         "the input. Needed for PMC file "
                         "(default: None)")
+    parser.add_argument('--single',
+                        help='Evaluate only single-class instances.'
+                        '(default: False)',
+                        action='store_true')
+    parser.add_argument('--visualize',
+                        help='Visualize results. (default: False)',
+                        action='store_true')
 
 
     args = parser.parse_args()
@@ -118,7 +127,8 @@ def main():
     print("Reading documents...")
     docs, df, w2id, mesh = read_documents(data_dir, 
                                           input=args.input,
-                                          stopwords=stopwords)
+                                          stopwords=stopwords,
+                                          single_class=args.single)
     print("Finished reading %d documents" % len(docs))
     print("%d terms were identified" % len(df))
 
@@ -170,13 +180,94 @@ def main():
         evaluate(mesh, membership)
         
         
-    '''
     # visualization
-    print()
-    print("Visualizing...")
+    if visualize:
+        print()
+        print("Visualizing...")
+        visualize(docs, args.cluster, mesh, membership, keywords)
+        
+
+def visualize(docs, what_to_cluster, true_labels, preds, keywords):
+
+    # add ids to keywords
+    keywords.sort()
+    w2id = {c:i for i,c in enumerate(keywords)}
+
+    # add ids to true labels (mesh). only the first 
+    # cluster label is considered.
+    m2id = {m:i for i,m in enumerate(set([x[0] for x in true_labels]))}
+    id2m = {i:m for m,i in m2id.items()}
+    true_labels = [m2id[m[0]] for m in true_labels]
     
-    visualize(data, centroids, membership)
+    # confusion matrix
+    cm = metrics.confusion_matrix(true_labels, preds)
+    print("Confusion matrix")
+    print(cm)
+
+    # find larget match
+    h = {i:x for i,x in enumerate(cm.argmax(axis=1))}
+    preds = [h[x] for x in preds]
+    
+    # Convert to scipy matrix for faster calculation
+    data = []
+    row_idx = []
+    col_idx = []
+    for i in range(len(docs)):
+        data += docs[i].values()
+        col_idx += [w2id[w] for w in docs[i].keys()]
+        row_idx += [i] * len(docs[i])
+
+    data = csr_matrix((data, (row_idx, col_idx)), 
+                      (len(docs), len(keywords)))
+
+    # Normalize
+    if what_to_cluster == "document":
+        data = data / norm(data, axis=1)[:,np.newaxis]
+    elif what_to_cluster == "term":
+        data = data.transpose() / norm(data, axis=0)[:,np.newaxis]
+
+    # SVD
+    cluster_labels = []
+
+    svd_model = TruncatedSVD(n_components=2)
+    svd_model.fit(data)
+    reduced_data = svd_model.transform(data)
+
+    # sample data points to avoid clatters
+    indices = random.sample(range(len(preds)), 1000)
+    indices.sort()
+    preds = np.array(preds)[indices]
+    true_labels = np.array(true_labels)[indices]
+    reduced_data = reduced_data[indices]
+
+    # Create a plot with subplots in a grid of 1X2
+    fig, ax = plt.subplots(1, 2, figsize=(8, 4))
+
+    # Add scatterplots to the subplots
+    colors = ['C0', 'C1', 'C2', 'C3']
+    for i in range(len(m2id)):
+        indices = true_labels == i
+        ax[0].scatter(reduced_data[indices, 0], reduced_data[indices, 1], c=colors[i], alpha=.3, edgecolors='none', label=id2m[i])
+
+    ax[1].scatter(reduced_data[:, 0], reduced_data[:, 1], c=[colors[x] for x in preds], alpha=.3, edgecolors='none')
+    ax[0].set_title('Actual MeSH clusters')
+    ax[1].set_title('Predicted clusters')
+
+    # add legend
+    legends = [id2m[x] for x in range(len(id2m))]
+    print(legends)
+    ax[0].legend(loc='upper left', prop={'size': 6})
+
     '''
+    leg = ax[0].get_legend()
+    leg.legendHandles[0].set_color('tab:blue')
+    leg.legendHandles[1].set_color('tab:orange')
+    leg.legendHandles[2].set_color('tab:green')
+    leg.legendHandles[3].set_color('tab:red')
+    '''
+
+    # Show the plots
+    plt.show()
 
 '''
 Evaluation
