@@ -229,7 +229,8 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     # SVD
     cluster_labels = []
 
-    svd_model = TruncatedSVD(n_components=2)
+    svd_model = TruncatedSVD(n_components=2,
+                             random_state=42)
     svd_model.fit(data)
     reduced_data = svd_model.transform(data)
 
@@ -493,12 +494,13 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
                     random_state=0)
         km.fit(data)
     else: # apply svd then cluster
-        svd_model = TruncatedSVD(n_components=n_components)
+        svd_model = TruncatedSVD(n_components=n_components,
+                                 random_state=42)
         svd_model.fit(data)
         reduced_data = svd_model.transform(data)
         kwd_vecs = svd_model.transform(kwd_vecs)
         km = KMeans(init='k-means++', n_clusters=k, 
-                    n_init=10).fit(reduced_data)
+                    n_init=10, random_state=0).fit(reduced_data)
 
         # create cluster labels by inverse-transforming
         # cluster centers and take 5 words with highest values
@@ -951,7 +953,8 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
         centroids, membership, sim = \
             maximin_core(docs, m, cluster, theta, verbose)
     else: # apply svd then cluster
-        svd_model = TruncatedSVD(n_components=n_components)
+        svd_model = TruncatedSVD(n_components=n_components,
+                                 random_state=42)
         svd_model.fit(m)
         reduced_m = svd_model.transform(m)
         reduced_m = reduced_m / \
