@@ -304,6 +304,6 @@ ami and vd v are found to be strongly correlated.  ari has relatively strong cor
 plot(x[,9:13])
 ```
 
-<img src="scatter.png" width="600">
+<img src="figs/scatter.png" width="600">
 
 
