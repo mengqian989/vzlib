@@ -17,9 +17,9 @@ logging.basicConfig(filename='.eval.log',
 # Parse commandline arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--input", 
-                    default='data/plos_top6_100.txt.gz', 
+                    default='brca_med_top4_10k.txt.gz', 
                     help="Input file (default: "
-                    "data/plos_top6_100.txt.gz)")
+                    "brca_med_top4_10k.txt.gz)")
 parser.add_argument("-o", "--output", 
                     default='eval_output.csv', 
                     help="Output file (default: eval_output.csv)")
@@ -29,6 +29,26 @@ parser.add_argument("-f", "--fields",
                     "combination of title, abstract, and body. "
                     "If not specified, all fields are used "
                     "(default: \"\")")
+parser.add_argument("-r", "--rank", 
+                    default="5,6,7,8,9,10", 
+                    help="Rank R value(s) to be used, separated "
+                    "by comma. (default: \"5,6,7,8,9,10\")")
+parser.add_argument("-n", "--dimensions", 
+                    default="0,4,8,12,16,20", 
+                    help="Number of components for SVD, separated "
+                    "by comma. (default: \"0,4,8,12,16,20\")")
+parser.add_argument("-t", "--theta", 
+                    default="0.9", 
+                    help="Theta values to be used for maximin, "
+                    "separated by comma. (default: \"0.9\")")
+parser.add_argument("-k", "--kmeans", 
+                    default="4", 
+                    help="k values to be used for kmeans, "
+                    "separated by comma. (default: \"4\")")
+parser.add_argument("-d", "--df", 
+                    default="10,30,50,70,100", 
+                    help="minimum df values to be considered, "
+                    "separated by comma. (default: \"10,30,50,70,100\")")
 parser.add_argument('--single',
                     help='Evaluate only single-class instances.'
                     '(default: False)',
@@ -69,12 +89,16 @@ with open(args.output, "w") as f:
     mindf = 1
     vl.del_lowdf(df, mindf)
     
-    for rank in range(5,11):  # rank is R in vcgs
+    # rank is R in vcgs
+    for rank in [int(x) for x in args.rank.split(',')]:
+        if rank == -1:
+            break
 
         # Compute tfidf and find key terms
         docs_, dfr = vl.compute_tfidf(docs, df, "tfidf", rank)
         
-        for p_docs in linspace(0.01, 0.6, 10): # p_docs is D in vcgs
+        # p_docs is D in vcgs
+        for p_docs in linspace(0.01, 0.6, 10): 
 
             # Sort and output results (discovered keywords)
             keywords = vl.output_keywords(len(docs_), dfr, df, p_docs)
@@ -91,35 +115,43 @@ with open(args.output, "w") as f:
                   (len(docs_), len(docs_small)))
 
             # clustering
-
-            for svd in range(0, 21, 4):  # dimensionality
-                if svd >= len(keywords): # error check
+            for svd in [int(x) for x in args.dimensions.split(',')]:
+                # error check
+                if svd == -1 or svd >= len(keywords): 
                     break
 
                 # maximin
-                theta = 0.9
-                _, membership, _ = \
+                for theta in [float(x) for x in args.theta.split(',')]:
+                    if theta < 0:
+                        break
+
+                    _, membership, _ = \
                         vl.maximin(csv_dir, docs_small, "", 
                                    "document", keywords,
                                    theta, svd)
 
-                # error check
-                if len(set(membership)) == 1:
-                       print("# clusters = 1.  Skipping...")
-                       continue
+                    # error check
+                    if len(set(membership)) == 1:
+                           print("# clusters = 1.  Skipping...")
+                           continue
 
-                # output                   
-                results = vl.evaluate(mesh_small, membership)
+                    # output                   
+                    results = vl.evaluate(mesh_small, membership)
 
-                f.write("%d,%d,%.2f,%d,maximin,%d," % \
-                            (mindf,rank, p_docs, svd, len(set(membership))))
-                f.write(",".join(["{:6.4f}".format(x) for x in results]))
-                f.write("\n")
+                    f.write("%d,%d,%.2f,%d,maximin,%d," % \
+                                (mindf,rank, p_docs, svd, 
+                                 len(set(membership))))
+                    f.write(",".join(["{:6.4f}".format(x) \
+                                          for x in results]))
+                    f.write("\n")
 
                 # kmeans
-                for n_clusters in range(2, 11, 2):
-                    if n_clusters >= len(docs_small): # error check
+                for n_clusters in [int(x) for x in args.kmeans.split(',')]:
+                    # error check
+                    if n_clusters == -1 or \
+                            n_clusters >= len(docs_small): 
                         break
+
                     membership, _, _, _ = \
                         vl.kmeans(docs_small,
                                   "document", keywords, svd,
@@ -139,7 +171,11 @@ with open(args.output, "w") as f:
     '''
 
     # Remove terms whose df is lower than mindf
-    for mindf in [10, 30, 50, 70, 100]:
+    for mindf in [int(x) for x in args.df.split(',')]:
+        
+        if mindf == -1:
+            break
+
         vl.del_lowdf(df, mindf)
         
         # Compute tfidf. Use rank=0 to disable VCGS
@@ -160,34 +196,41 @@ with open(args.output, "w") as f:
 
         # clustering
 
-        for svd in range(0, 21, 4):  # dimensionality
-            if svd >= len(keywords): # error check
+        for svd in [int(x) for x in args.dimensions.split(',')]:
+            # error check
+            if svd == -1 or svd >= len(keywords): 
                 break
 
             # maximin
-            theta = 0.9
-            _, membership, _ = \
-                    vl.maximin(csv_dir, docs_small, "", 
-                               "document", keywords,
-                               theta, svd)
+            for theta in [float(x) for x in args.theta.split(',')]:
+                if theta < 0:
+                    break
 
-            # error check
-            if len(set(membership)) == 1:
-                   print("# clusters = 1.  Skipping.")
-                   continue
-                   
-            # output
-            results = vl.evaluate(mesh_small, membership)
+                _, membership, _ = \
+                        vl.maximin(csv_dir, docs_small, "", 
+                                   "document", keywords,
+                                   theta, svd)
 
-            f.write("%d,na,na,%d,maximin,%d," % \
-                        (mindf, svd, len(set(membership))))
-            f.write(",".join(["{:6.4f}".format(x) for x in results]))
-            f.write("\n")
+                # error check
+                if len(set(membership)) == 1:
+                       print("# clusters = 1.  Skipping.")
+                       continue
+
+                # output
+                results = vl.evaluate(mesh_small, membership)
+
+                f.write("%d,na,na,%d,maximin,%d," % \
+                            (mindf, svd, len(set(membership))))
+                f.write(",".join(["{:6.4f}".format(x) for x in results]))
+                f.write("\n")
 
             # kmeans
-            for n_clusters in range(2, 11, 2):
-                if n_clusters >= len(docs_small): # error check
+            for n_clusters in [int(x) for x in args.kmeans.split(',')]:
+                # error check
+                if n_clusters == -1 or \
+                        n_clusters >= len(docs_small): 
                     break
+
                 membership, _, _, _ = \
                     vl.kmeans(docs_small,
                               "document", keywords, svd,
@@ -200,5 +243,3 @@ with open(args.output, "w") as f:
                             (mindf, svd, n_clusters))
                 f.write(",".join(["{:6.4f}".format(x) for x in results]))
                 f.write("\n")
-
-        
