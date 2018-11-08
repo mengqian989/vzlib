@@ -340,7 +340,7 @@ ami and vd (or v) are found to be strongly correlated.  ari has relatively stron
 plot(x[,9:13])
 ```
 
-<img src="scatter_sgl.png" width="600">
+<img src="figs/scatter_sgl.png" width="600">
 
 Focusing on only V-measure, ARI and AMI...
 
@@ -367,7 +367,7 @@ par(mar=c(5,4,1,1))
 pairs(x[,c(10,11,12)], upper.panel = panel.cor)
 ```
 
-<img src="scatter_three.png" width="400">
+<img src="figs/scatter_three.png" width="400">
 
 How do r and d affect cluster quality? Note that P is used to refer to d below.
 
@@ -384,7 +384,7 @@ sp = ggplot(data=y, mapping=aes(x=R, y=P, color=ARI, size=ARI)) + geom_jitter(al
 sp+scale_color_gradient(low="white", high="red") + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(italic(R)),y=expression(italic(P)))
 ```
 
-<img src="r_and_p_abs.png" width="400">
+<img src="figs/r_and_p_abs.png" width="400">
 
 How about n (number of dimensions)?
 
@@ -401,7 +401,7 @@ sp2 = ggplot(data=y, mapping=aes(x=factor(n), y=ARI)) + geom_boxplot()
 sp2 + geom_jitter(alpha=.5, color="tomato", height=0) + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(paste("Number of dimensions ", italic(n))))
 ```
 
-<img src="n_and_ari.png" width="400">
+<img src="figs/n_and_ari.png" width="400">
 
 What if we look at only a certain range of r and d?
 
@@ -418,4 +418,4 @@ sp3 = ggplot(data=y, mapping=aes(x=factor(n), y=ARI)) + geom_boxplot()
 sp3 + geom_jitter(alpha=.5, color="tomato", height=0, size=3) + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(paste("Number of dimensions ", italic(n))))
 ```
 
-<img src="n_and_ari_with_limited_range_of_R_and_P.png" width="400">
+<img src="figs/n_and_ari_with_limited_range_of_R_and_P.png" width="400">
