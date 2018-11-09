@@ -377,10 +377,18 @@ x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls,na.strings=
 x[x$df == 1 & x$alg == "kmeans" & x$n > 0 & x$k == 4, c(2,3,4,11)] -> y
 colnames(y) = c("R", "P", "n", "ARI")
 
+library(magrittr) # for pipe operator
+library(dplyr)    # for grouping
+
+# compute mean by group
+ag <- y %>% 
+        group_by(R, P) %>% 
+        summarise(ARI = mean(ARI))
+
+# plot
 quartz("",6,5) # this is for Mac
 par(mar=c(5,4,1,1))
-
-sp = ggplot(data=y, mapping=aes(x=R, y=P, color=ARI, size=ARI)) + geom_jitter(alpha=.7, width=0.2, height=0.01)
+sp = ggplot(data=ag, mapping=aes(x=factor(R), y=factor(P), color=ARI)) + geom_point(alpha=.9, size=ag$ARI*40)
 sp+scale_color_gradient(low="white", high="red") + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(italic(R)),y=expression(italic(P)))
 ```
 
