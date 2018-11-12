@@ -48,11 +48,11 @@ logging.basicConfig(filename='.extract_pmc.log',
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--input", default='/Users/mikawang/works/Health Informatics/work/plos/PMC5694943.nxml.gz',
+parser.add_argument("--input", default='data/pmc20180503',
 
                     help="input file/dir (default: data/pmc20180503)")
 
-parser.add_argument("--output", default='/Users/mikawang/Desktop/data/pmc_xml',
+parser.add_argument("--output", default='pmc_xml',
 
                     help="output directory (default: pmc_xml)")
 
@@ -237,6 +237,8 @@ for file in files:
     aff_pool = []
     
     not_match = []
+    
+    aff_set = []
 
     affiliate = dict()
 
@@ -412,58 +414,151 @@ for file in files:
                             aff_pool += aff
                         #author_dict = dict(author_) 
                         # in the format of {'Smith, Jane': ['aff002', 'aff003']}
-
-
+                    aff_id = ''
+                    
+                    #get affiliate when aff is under contrib-group
+                    
+                    for e_ in e.findall('aff'):
+                        
+                        aff_set = e_ 
+                
+                        aff_id = ''
+                
+                        if aff_set != []:
+                        
+                            if 'id' in aff_set.attrib:
+                               
+                               aff_id = aff_set.attrib['id']
+                               
+                            elif ''.join(aff_set.itertext()) != '':
+                                
+                               aff_id = 'aff_only'   
+                               
+                            label = ''
+                               
+                            for e_2 in aff_set:
+                               
+                               if 'label' in e_2.tag and e_2.text != None:
+                                   
+                                   label = e_2.text
+                
+                            if aff_id in aff_pool or \
+                               aff_id.startswith('aff') or \
+                                   aff_id.startswith('Aff'):
+                                       
+                               if aff_set.find('institution-wrap') != None:
+                                   
+                                   aff_set_1 = aff_set.find('institution-wrap')
+                                   
+                                   aff_wrap = ''
+                                   
+                                   for e_1 in aff_set_1:
+                                       
+                                       if e_1.tag == 'institution' and e_1.text != None:
+                                           
+                                           aff_wrap += e_1.text
+                                    
+                                   aff_wrap = escape(regex.sub(' ', aff_wrap)) 
+                                   affiliate[aff_id] = aff_wrap 
+                                   
+                                       
+                               elif aff_set.find('institution') != None:
+                                   
+                                   affiliate[aff_id] = \
+                                        ''.join(aff_set.find('institution').itertext())
+                                        
+                                   affiliate[aff_id] = \
+                                       escape(regex.sub(' ', affiliate[aff_id]))          
+                       
+                               
+                               elif aff_set.find('addr-line') != None:
+                                   
+                                   affiliate[aff_id] = \
+                                        ''.join(aff_set.find('addr-line').itertext())
+                                        
+                                   affiliate[aff_id] = \
+                                       escape(regex.sub(' ', affiliate[aff_id]))
+                                        # in the format of {'aff002': 'UNC-CH'}
+                               
+                               elif ''.join(aff_set.itertext()) != None:
+                                   
+                                   aff_ =  ''.join(aff_set.itertext())
+                                   
+                                   label = re.escape(label)
+                                   
+                                   if re.findall(label, aff_) != []:
+                                       
+                                       index = re.search(label, aff_).end()
+                                   
+                                       aff_ = aff_[index:]
+                                   
+                                   aff_ = escape(regex.sub(' ', aff_))
+                                   
+                                   affiliate[aff_id] = aff_ 
+                            
+                    
                 # get affiliation
 
-
-                elif e.tag == 'aff' or \
-                    root.find('front/article-meta/contrib-group/aff') != None:
+                elif e.tag == 'aff':
                     
                     aff_id = ''    
                         
-                    if e.tag == 'aff':
-                        
-                        e_1 = e
+                    aff_set = e
                     
-                    else:
-                        e_1 = root.find('front/article-meta/contrib-group/aff')
-            
-                    
-                    if 'id' in e_1.attrib:
+                    if 'id' in aff_set.attrib:
+               
+                       aff_id = aff_set.attrib['id']
                        
-                       aff_id = e_1.attrib['id']
-                       
-                    elif ''.join(e_1.itertext()) != '':
+                    elif ''.join(aff_set.itertext()) != '':
                         
                        aff_id = 'aff_only'   
                        
                     label = ''
                        
-                    for e_ in e_1:
+                    for e_ in aff_set:
                        
                        if 'label' in e_.tag and e_.text != None:
                            
                            label = e_.text
                            
                            
-
+        
                     if aff_id in aff_pool or \
                        aff_id.startswith('aff') or \
                            aff_id.startswith('Aff'):
                        
-                       if e_1.find('addr-line') != None:
+                       if aff_set.find('institution-wrap') != None:
+                           
+                           aff_wrap = ''
+                           
+                           for e_ in aff_set:
+                               
+                               if 'institution' in e_.tag and e_.text != None:
+                                   
+                                   aff_wrap += e_.text
+                            
+                           affiliate[aff_id] = aff_wrap
+                                        
+                       elif aff_set.find('institution') != None:
                            
                            affiliate[aff_id] = \
-                                ''.join(e_1.find('addr-line').itertext())
+                                ''.join(aff_set.find('institution').itertext())
+                                
+                           affiliate[aff_id] = \
+                               escape(regex.sub(' ', affiliate[aff_id]))          
+                               
+                       elif aff_set.find('addr-line') != None:
+                           
+                           affiliate[aff_id] = \
+                                ''.join(aff_set.find('addr-line').itertext())
                                 
                            affiliate[aff_id] = \
                                escape(regex.sub(' ', affiliate[aff_id]))
                                 # in the format of {'aff002': 'UNC-CH'}
                        
-                       elif ''.join(e_1.itertext()) != None:
+                       elif ''.join(aff_set.itertext()) != None:
                            
-                           aff_ =  ''.join(e_1.itertext())
+                           aff_ =  ''.join(aff_set.itertext())
                            
                            label = re.escape(label)
                            
@@ -475,12 +570,10 @@ for file in files:
                            
                            aff_ = escape(regex.sub(' ', aff_))
                            
-                           affiliate[aff_id] = aff_                                                                     
-                   
+                           affiliate[aff_id] = aff_ 
+                       
 
                 # get publication date
-
-                
 
                 elif e.tag == 'pub-date' :
                     
@@ -506,15 +599,21 @@ for file in files:
                 
                             if e_.tag == 'year' and e_.text != None:
                 
-                                e_year = escape(regex.sub(' ', e_.text))
+                                e_year = e_.text
+                                
+                                #e_year = escape(regex.sub(' ', e_.text))
                 
                             elif e_.tag == 'month' and e_.text != None:
                                 
-                                e_month = escape(regex.sub(' ', e_.text))
+                                e_month = e_.text
+                                
+                                #e_month = escape(regex.sub(' ', e_.text))
 
                             elif e_.tag == 'day' and e_.text != None:
                                 
-                                e_day = escape(regex.sub(' ', e_.text))
+                                e_day = e_.text
+                                
+                                #e_day = escape(regex.sub(' ', e_.text))
             
 
                 # get categories
@@ -601,10 +700,7 @@ for file in files:
                 print('\n'.join([str((x, affiliate[x])) \
                                  for x in affiliate]))
 
-
-
-
-
+    
             # get body element. skip if not found 
 
             e_body = root.find('body')
