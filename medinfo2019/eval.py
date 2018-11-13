@@ -85,7 +85,7 @@ try different parameter combinations
 
 with open(args.output, "w") as f:
 
-    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms\n")
+    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prec\n")
 
     '''
     Use VCGS for feature selection
