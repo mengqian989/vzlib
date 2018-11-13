@@ -33,19 +33,25 @@ parser.add_argument("-r", "--rank",
                     default="5,6,7,8,9,10", 
                     help="Rank R value(s) to be used, separated "
                     "by comma. (default: \"5,6,7,8,9,10\")")
+parser.add_argument("-d", "--relative_df", 
+                    default="0.05,0.10,0.15,0.20,0.25,0.30,"
+                    "0.35,0.40,0.45,0.55", 
+                    help="Relative DF value(s) to be used, separated "
+                    "by comma. (default: \"0.05,0.10,0.15,0.20,0.25,0.30,"
+                    "0.35,0.40,0.45,0.55\")")
 parser.add_argument("-n", "--dimensions", 
                     default="0,4,8,12,16,20", 
                     help="Number of components for SVD, separated "
                     "by comma. (default: \"0,4,8,12,16,20\")")
 parser.add_argument("-t", "--theta", 
-                    default="0.9", 
+                    default="0.8,0.9,0.99", 
                     help="Theta values to be used for maximin, "
-                    "separated by comma. (default: \"0.9\")")
+                    "separated by comma. (default: \"0.8,0.9,0.99\")")
 parser.add_argument("-k", "--kmeans", 
                     default="4", 
                     help="k values to be used for kmeans, "
                     "separated by comma. (default: \"4\")")
-parser.add_argument("-d", "--df", 
+parser.add_argument("--df", 
                     default="10,30,50,70,100", 
                     help="minimum df values to be considered, "
                     "separated by comma. (default: \"10,30,50,70,100\")")
@@ -98,7 +104,7 @@ with open(args.output, "w") as f:
         docs_, dfr = vl.compute_tfidf(docs, df, "tfidf", rank)
         
         # p_docs is D in vcgs
-        for p_docs in linspace(0.01, 0.6, 10): 
+        for p_docs in [float(x) for x in args.relative_df.split(',')]:
 
             # Sort and output results (discovered keywords)
             keywords = vl.output_keywords(len(docs_), dfr, df, p_docs)
