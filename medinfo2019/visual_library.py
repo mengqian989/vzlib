@@ -299,6 +299,7 @@ def compute_precision(mesh, membership):
 
     # confusion matrix
     cm = metrics.confusion_matrix(labels, membership)
+    cm = cm[:len(id2m)]
     # find largest match
     k2c = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     preds = [k2c[x] for x in membership]
@@ -324,7 +325,7 @@ def evaluate(mesh, membership):
     # precision (Javed's version of homogeneity)
     prec = compute_precision(mesh, membership)
     print(" Precision    = %f" % prec)
-    
+
     # v-score (variant for multilabels)
     c = compute_completeness(mesh, membership)
     h = compute_homogeneity(mesh, membership)
@@ -963,6 +964,10 @@ def maximin_core(docs, m, cluster="document", theta=0.9, verbose=False):
                 print()
         membership = membership.tolist()[0]
 
+    # renumber membership
+    m2id = {m:i for i,m in enumerate(set(membership))}
+    membership = [m2id[m] for m in membership]
+        
     return centroids, membership, sim
 
 
