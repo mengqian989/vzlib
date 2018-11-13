@@ -104,6 +104,12 @@ def main():
                         help="Number of components in applying SVD. "
                         "Not applied if 0 "
                         "(default: 0)")
+    parser.add_argument("-f", "--fields", 
+                        default="", 
+                        help="Text fields to be used. One or any "
+                        "combination of title, abstract, and body. "
+                        "If not specified, all fields are used "
+                        "(default: \"\")")
     parser.add_argument("--mesh", default=None, 
                         help="Mesh term file corresponding to "
                         "the input. Needed for PMC file "
@@ -128,6 +134,7 @@ def main():
     docs, df, w2id, mesh = read_documents(data_dir, 
                                           input=args.input,
                                           stopwords=stopwords,
+                                          fields=args.fields,
                                           single_class=args.single)
     print("Finished reading %d documents" % len(docs))
     print("%d terms were identified" % len(df))
@@ -201,13 +208,23 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     
     # confusion matrix
     cm = metrics.confusion_matrix(true_labels, preds)
+    print()
     print("Confusion matrix")
     print(cm)
 
-    # find larget match
-    h = {i:x for i,x in enumerate(cm.argmax(axis=1))}
+    # find largest match
+    h = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     preds = [h[x] for x in preds]
-    
+
+    # aligned confusion matrix
+    print()
+    print("#col #row max homogeneity")
+    sum_ho = 0.0
+    for i in h:
+        ho = cm[h[i],i]/cm[:,i].sum()
+        sum_ho += ho
+        print(i, h[i], cm[h[i],i], "%.3f" % (ho))
+
     # Convert to scipy matrix for faster calculation
     data = []
     row_idx = []
@@ -235,11 +252,15 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     reduced_data = svd_model.transform(data)
 
     # sample data points to avoid clatters
-    indices = random.sample(range(len(preds)), 1000)
-    indices.sort()
-    preds = np.array(preds)[indices]
-    true_labels = np.array(true_labels)[indices]
-    reduced_data = reduced_data[indices]
+    preds = np.array(preds)
+    true_labels = np.array(true_labels)
+
+    if len(preds) > 1000:
+        indices = random.sample(range(len(preds)), 1000)
+        indices.sort()
+        preds = preds[indices]
+        true_labels = true_labels[indices]
+        reduced_data = reduced_data[indices]
 
     # Create a plot with subplots in a grid of 1X2
     fig, ax = plt.subplots(1, 2, figsize=(8, 4))
@@ -250,7 +271,10 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
         indices = true_labels == i
         ax[0].scatter(reduced_data[indices, 0], reduced_data[indices, 1], c=colors[i], alpha=.3, edgecolors='none', label=id2m[i])
 
-    ax[1].scatter(reduced_data[:, 0], reduced_data[:, 1], c=[colors[x] for x in preds], alpha=.3, edgecolors='none')
+    for i in range(len(m2id)):
+        indices = preds == i
+        ax[1].scatter(reduced_data[indices, 0], reduced_data[indices, 1], c=colors[i], alpha=.3, edgecolors='none')
+
     ax[0].set_title('Actual MeSH clusters')
     ax[1].set_title('Predicted clusters')
 
@@ -259,16 +283,33 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     print(legends)
     ax[0].legend(loc='upper left', prop={'size': 6})
 
-    '''
-    leg = ax[0].get_legend()
-    leg.legendHandles[0].set_color('tab:blue')
-    leg.legendHandles[1].set_color('tab:orange')
-    leg.legendHandles[2].set_color('tab:green')
-    leg.legendHandles[3].set_color('tab:red')
-    '''
-
     # Show the plots
     plt.show()
+
+'''
+Precision (Jave's version of homogeneity)
+'''
+def compute_precision(mesh, membership):
+
+    # add ids to true labels (mesh). only the first 
+    # cluster label is considered.
+    m2id = {m:i for i,m in enumerate(set([x[0] for x in mesh]))}
+    id2m = {i:m for m,i in m2id.items()}
+    labels = [m2id[m[0]] for m in mesh]
+
+    # confusion matrix
+    cm = metrics.confusion_matrix(labels, membership)
+    # find largest match
+    k2c = {i:x for i,x in enumerate(cm.argmax(axis=0))}
+    preds = [k2c[x] for x in membership]
+    # compute homogeneity
+    sum_h = 0.0
+    for i in k2c:
+        h = cm[k2c[i],i]/cm[:,i].sum()
+        sum_h += h
+        #print(i, "%.3f" % (h))
+
+    return sum_h / len(k2c)
 
 '''
 Evaluation
@@ -280,11 +321,19 @@ def evaluate(mesh, membership):
               "Cannot evaluate the clusters.")
         return
 
+    # precision (Javed's version of homogeneity)
+    prec = compute_precision(mesh, membership)
+    print(" Precision    = %f" % prec)
+    
+    # v-score (variant for multilabels)
     c = compute_completeness(mesh, membership)
     h = compute_homogeneity(mesh, membership)
     vd = (2*h*c)/(h+c)
     print(" VD-score     = %f" % vd)
 
+    # other metrics
+
+    # treat a multi-labeled instance as multiple instances
     preds = []
     labels = []
     for i, l in enumerate(mesh):
@@ -292,6 +341,7 @@ def evaluate(mesh, membership):
             labels.append(l_)
             preds.append(membership[i])
 
+    # compute
     v = metrics.v_measure_score(labels, preds)
     ai = metrics.adjusted_rand_score(labels, preds)
     ami = metrics.adjusted_mutual_info_score(labels, preds)
@@ -302,7 +352,7 @@ def evaluate(mesh, membership):
     print(" A-MI         = %f" % ami)
     print(" FMS          = %f" % fms)
 
-    return c, h, vd, v, ai, ami, fms
+    return c, h, vd, v, ai, ami, fms, prec
 
 
 '''
