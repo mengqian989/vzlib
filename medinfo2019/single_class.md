@@ -41,7 +41,7 @@ Tested the combinations of the following parameters:
 - R: Parameter for VCGS.
   - 5, 6, 7, 8, 9, 10
 - D: Parameter for VCGS.
-  - 0.01 0.08 0.14 0.21 0.27 0.34 0.40 0.47 0.53 0.60
+  - 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.55
 - Number of components (dimensions) for SVD: 
   - 0, 4, 8, 12, 16, 20
   - When set to 0, SVD is not applied.
@@ -49,18 +49,20 @@ Tested the combinations of the following parameters:
   - kNN or maximin
 - Number of clusters for kNN: 
   - 2, 4, 6, 8, 10
-
+- Theta for maximin:
+  - 0.8, 0.9, 0.99
+  
 ## Abstracts (larger data)
 
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
 
 ```bash
-python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single
+nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
 
-> df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms
+> df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prec
 
 where 
 
@@ -70,6 +72,7 @@ where
 - alg is an clustering algorithm (kmeans or maximin)
 - k is the number of clusters. This is set beforehand for kNN but is determined by the algorithm for maximin. 
 - the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-d, v = v-measure, ari = adjusted rand index, ami = adjusted mutual information, and fms = Fowlkes-Mallows index.  
+- Precision is a variant of homogeneity (from Javed's JASIST paper)
 
 Notes:
 
