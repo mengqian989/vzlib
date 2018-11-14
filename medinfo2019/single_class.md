@@ -76,12 +76,13 @@ where
 
 Notes:
 
-- v-measure-d and v-measure are different in how to treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
+- v-measure-d and v-measure are different in how they treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
 - When df is greater than 1 (e.g., 10), VCGS is not applied, meaning that terms with document frequencies greater than this parameter are all treated as keywords.  This is for investigating the effectiness of VCGS in comparison with DF-based feature selection.
 
 Now let's look at the five best parameter combinations based on adjusted rand index (ARI).
 
 ```bash
+# ranking by ari 
 less brca_med_top4_eval_sgl.csv | sort -t',' -k11 -nr | head
 1,6,0.25,0,kmeans,4,0.4203,0.3812,0.3998,0.3998,0.3726,0.3810,0.6608,0.8236
 1,5,0.20,0,kmeans,4,0.4236,0.3772,0.3990,0.3990,0.3713,0.3770,0.6636,0.8252
@@ -93,17 +94,34 @@ less brca_med_top4_eval_sgl.csv | sort -t',' -k11 -nr | head
 1,8,0.30,0,kmeans,4,0.4035,0.3642,0.3828,0.3828,0.3586,0.3640,0.6537,0.8155
 1,7,0.30,0,kmeans,4,0.4043,0.3662,0.3843,0.3843,0.3581,0.3660,0.6526,0.8177
 1,5,0.15,0,kmeans,4,0.3962,0.3596,0.3770,0.3770,0.3569,0.3594,0.6521,0.8074
-```
 
 Observations:
 
+- good ami seems to come with good prec, but the opposite doesn't hold.
 - df = 1 dominates the top 10, which means VCGS is better than DF-based feature selection.
 - kmeans works better than maximin.
 - Good r and d values seem more or less random and may be difficult to find optimum settings.  More investigation is needed to see how sensitive the performance is to these parameters.
-- SVD does not give much advantage especially when we look at the cases with n=4.
-- k = 4 and 6 produced high ARI, which are the same as or close to the same number of underlying classes (mesh terms)
+- SVD gives no advantage.
 
-Based on the first observation above, let's see how good the DF-based feature selection is.  The following shows the five best results in ari where minimum DF was set to other than 1.
+Let's look at precision-sorted results.
+
+# ranking by prec
+less brca_med_top4_eval_sgl.csv | grep kmeans | sort -t',' -k14 -nr | head
+1,7,0.20,0,kmeans,4,0.3490,0.3160,0.3317,0.3317,0.2391,0.3143,0.5600,0.8274
+1,8,0.15,16,kmeans,4,0.3168,0.2677,0.2902,0.2902,0.1676,0.2658,0.5345,0.8273
+1,5,0.35,20,kmeans,4,0.2240,0.2043,0.2137,0.2137,0.0332,0.2022,0.4556,0.8258
+1,5,0.30,20,kmeans,4,0.2240,0.2043,0.2137,0.2137,0.0332,0.2022,0.4556,0.8258
+1,7,0.45,20,kmeans,4,0.2338,0.2239,0.2287,0.2287,0.0591,0.2219,0.4560,0.8257
+1,7,0.40,16,kmeans,4,0.2287,0.2139,0.2211,0.2211,0.0524,0.2119,0.4582,0.8255
+1,8,0.15,20,kmeans,4,0.3094,0.2698,0.2883,0.2883,0.2029,0.2680,0.5447,0.8252
+1,5,0.20,16,kmeans,4,0.3423,0.2908,0.3145,0.3145,0.1508,0.2890,0.5322,0.8231
+1,7,0.15,20,kmeans,4,0.3589,0.2717,0.3092,0.3092,0.2076,0.2697,0.5717,0.8216
+1,6,0.35,12,kmeans,4,0.3467,0.3077,0.3260,0.3260,0.1816,0.3059,0.5382,0.8192
+```
+
+Good ami seems to come with good prec, but the opposite doesn't hold.
+
+Then, let's see how good the DF-based feature selection is.  The following shows the ten best results in ari where minimum DF was set to other than 1.
 
 ```bash
 less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head
@@ -119,9 +137,9 @@ less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head
 50,na,na,20,kmeans,4,0.2598,0.2715,0.2655,0.2655,0.1854,0.2596,0.5133,0.7098
 ```
 
-The best ari was found to be 0.1410, which is pretty low.  So VCGS does work!  
+Their ari was found to be around 0.2 (except for 0.3374), which is pretty low.  So VCGS does work!  
 
-Just out of curiosity, what if we look at v-measure-d or ami?
+How about v-measure or ami?
 
 ```bash
 # v-measure
@@ -146,7 +164,8 @@ Observations:
 - Overall, we see similar patterns to ari.
   - df = 1 still works better (VCGS is better).
   - kmeans still works better.
-  - LSA is not effective (nor harmful).
+- LSA is sometimes effective.
+- Two results (ranking) are quite similar.
 
 ## Full texts vs. abstracts (smaller data)
 
