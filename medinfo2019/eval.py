@@ -2,6 +2,7 @@
 Evaluation script
 """
 
+import re
 import logging, argparse
 from numpy import linspace
 
@@ -59,18 +60,31 @@ parser.add_argument('--single',
                     help='Evaluate only single-class instances.'
                     '(default: False)',
                     action='store_true')
+parser.add_argument('--balance',
+                    help='Balance the data. (default: False)',
+                    action='store_true')
 
 args = parser.parse_args()
 
 logging.info(args)
 
+
 # Read stopword list
 stopwords = vl.read_stopwords()            
+
+
+# Balance the data
+if args.balance and re.search("(plos|pmc|med)", args.input):
+    vl.balance_data(file=args.input)
+    input_file = ".balanced_"+args.input
+else:
+    input_file = args.input
+
 
 # Read documents
 print("Reading documents...")
 docs, df, w2id, mesh = \
-        vl.read_documents("", input=args.input,
+        vl.read_documents("", input=input_file,
                           stopwords=stopwords,
                           fields=args.fields,
                           single_class=args.single)
