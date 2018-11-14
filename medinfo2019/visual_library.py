@@ -121,6 +121,9 @@ def main():
     parser.add_argument('--visualize',
                         help='Visualize results. (default: False)',
                         action='store_true')
+    parser.add_argument('--balance',
+                        help='Balance the data. (default: False)',
+                        action='store_true')
 
 
     args = parser.parse_args()
@@ -129,10 +132,17 @@ def main():
     # Read stopword list
     stopwords = read_stopwords()            
 
+    # Balance the result
+    if args.balance and re.search("(plos|pmc|med)", args.input):
+        balance_data(file=args.input)
+        input_file = ".balanced_"+args.input
+    else:
+        input_file = args.input
+
     # Read documents
     print("Reading documents...")
     docs, df, w2id, mesh = read_documents(data_dir, 
-                                          input=args.input,
+                                          input=input_file,
                                           stopwords=stopwords,
                                           fields=args.fields,
                                           single_class=args.single)
@@ -188,12 +198,52 @@ def main():
         
         
     # visualization
-    if visualize:
+    if args.visualize:
         print()
         print("Visualizing...")
         visualize(docs, args.cluster, mesh, membership, keywords)
         
+'''
+make balanced data
+'''
+def balance_data(file=None):
 
+    # store data temporarily
+    data = dict()
+
+    # read file
+    with open_by_suffix(file) as f:
+        for line in f:
+            if "plos" in file or "pmc" in file:
+                _, _, _, _, m = \
+                    line.rstrip().split('\t')
+            else:
+                _, _, _, m, _ = line.split('\t')
+
+            # for skipping multi-class instances
+            m = m.split('|')
+            if len(m) > 1:
+                continue
+
+            if m[0] in data:
+                data[m[0]].append(line)
+            else:
+                data[m[0]] = [line]
+
+    min = sys.maxsize
+    for k in data:
+        if len(data[k]) < min:
+            min = len(data[k])
+
+    # write
+    with gzip.open(".balanced_"+file, "wt") as f:
+        for k in data:
+            f.write(''.join(data[k][0:min]))
+
+
+'''
+visualize actual and predicted clusters.
+'''
 def visualize(docs, what_to_cluster, true_labels, preds, keywords):
 
     # add ids to keywords
