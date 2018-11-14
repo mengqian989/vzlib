@@ -288,7 +288,17 @@ To see the difference among different evaluation metrics empirically, the follow
 ```R
 cls <- c(h="numeric",ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric",prec="numeric") 
 
-# all
+# abstract data 
+x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls) 
+cor(x[,10:14],use="pairwise.complete.obs")
+             v       ari       ami       fms      prec
+v    1.0000000 0.8870610 0.9703003 0.7242510 0.6578350
+ari  0.8870610 1.0000000 0.9200020 0.8509830 0.4773953
+ami  0.9703003 0.9200020 1.0000000 0.8349414 0.5920434
+fms  0.7242510 0.8509830 0.8349414 1.0000000 0.2706669
+prec 0.6578350 0.4773953 0.5920434 0.2706669 1.0000000
+
+# all fields from full-text data
 x = read.csv("brca_top4_eval_all_sgl.csv",header=TRUE,colClasses=cls) 
 cor(x[,10:14],use="pairwise.complete.obs")
               v       ari        ami         fms       prec
@@ -298,7 +308,7 @@ ami   0.9617369 0.8714710 1.00000000  0.03414898  0.4890915
 fms  -0.1673712 0.2454719 0.03414898  1.00000000 -0.2401213
 prec  0.5505961 0.1331978 0.48909152 -0.24012131  1.0000000
 
-# title and abstract
+# title and abstract fields from full-text data
 x = read.csv("brca_top4_eval_ta_sgl.csv",header=TRUE,colClasses=cls) 
 cor(x[,10:14],use="pairwise.complete.obs")
              v       ari       ami        fms       prec
@@ -308,7 +318,7 @@ ami  0.9710298 0.9445469 1.0000000 0.44942350 0.68373387
 fms  0.2643589 0.6100828 0.4494235 1.00000000 0.07285057
 prec 0.8138047 0.5296492 0.6837339 0.07285057 1.00000000
 
-# title
+# title field from full-text data
 x = read.csv("brca_top4_eval_t_sgl.csv",header=TRUE,colClasses=cls) 
 cor(x[,10:14],use="pairwise.complete.obs")
              v       ari       ami       fms      prec
