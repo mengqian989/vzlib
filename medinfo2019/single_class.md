@@ -37,7 +37,7 @@ zcat brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c
 Tested the combinations of the following parameters:
 
 - Minimal document frequencies: words with document frequency equal or smaller than df are ignored.
-  - 1, 10, 30, 50, 70, 100
+  - 10, 30, 50, 70, 100
 - R: Parameter for VCGS.
   - 5, 6, 7, 8, 9, 10
 - D: Parameter for VCGS.
@@ -48,7 +48,7 @@ Tested the combinations of the following parameters:
 - Clustering algorithms: 
   - kNN or maximin
 - Number of clusters for kNN: 
-  - 2, 4, 6, 8, 10
+  - 4
 - Theta for maximin:
   - 0.8, 0.9, 0.99
   
