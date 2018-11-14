@@ -132,7 +132,7 @@ def main():
     # Read stopword list
     stopwords = read_stopwords()            
 
-    # Balance the result
+    # Balance the data
     if args.balance and re.search("(plos|pmc|med)", args.input):
         balance_data(file=args.input)
         input_file = ".balanced_"+args.input
