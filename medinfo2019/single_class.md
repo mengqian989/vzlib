@@ -79,7 +79,7 @@ Notes:
 - v-measure-d and v-measure are different in how they treat multi-label cases.  The former treats (A, M1) and (A, M2) with evenly divided importance in evaluation, and the latter treats them as independent instances in evaluation.
 - When df is greater than 1 (e.g., 10), VCGS is not applied, meaning that terms with document frequencies greater than this parameter are all treated as keywords.  This is for investigating the effectiness of VCGS in comparison with DF-based feature selection.
 
-Now let's look at the five best parameter combinations based on adjusted rand index (ARI).
+Now let's look at the 10 best parameter combinations based on adjusted rand index (ARI).
 
 ```bash
 # ranking by ari 
@@ -94,10 +94,11 @@ less brca_med_top4_eval_sgl.csv | sort -t',' -k11 -nr | head
 1,8,0.30,0,kmeans,4,0.4035,0.3642,0.3828,0.3828,0.3586,0.3640,0.6537,0.8155
 1,7,0.30,0,kmeans,4,0.4043,0.3662,0.3843,0.3843,0.3581,0.3660,0.6526,0.8177
 1,5,0.15,0,kmeans,4,0.3962,0.3596,0.3770,0.3770,0.3569,0.3594,0.6521,0.8074
+```
 
 Observations:
 
-- good ami seems to come with good prec, but the opposite doesn't hold.
+- good ami seems to come with good prec (but the opposite doesn't hold; see below).
 - df = 1 dominates the top 10, which means VCGS is better than DF-based feature selection.
 - kmeans works better than maximin.
 - Good r and d values seem more or less random and may be difficult to find optimum settings.  More investigation is needed to see how sensitive the performance is to these parameters.
@@ -105,6 +106,7 @@ Observations:
 
 Let's look at precision-sorted results.
 
+```bash
 # ranking by prec
 less brca_med_top4_eval_sgl.csv | grep kmeans | sort -t',' -k14 -nr | head
 1,7,0.20,0,kmeans,4,0.3490,0.3160,0.3317,0.3317,0.2391,0.3143,0.5600,0.8274
@@ -119,9 +121,7 @@ less brca_med_top4_eval_sgl.csv | grep kmeans | sort -t',' -k14 -nr | head
 1,6,0.35,12,kmeans,4,0.3467,0.3077,0.3260,0.3260,0.1816,0.3059,0.5382,0.8192
 ```
 
-Good ami seems to come with good prec, but the opposite doesn't hold.
-
-Then, let's see how good the DF-based feature selection is.  The following shows the ten best results in ari where minimum DF was set to other than 1.
+Then, let's see how good the DF-based feature selection is.  The following shows the 10 best results in ari where minimum DF was set to other than 1.
 
 ```bash
 less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head
@@ -182,16 +182,16 @@ Let's look at the result based on ARI.
 ```bash
 # Evaluation for title+abstract+fulltext
 less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head
-1,6,0.08,8,kmeans,4,0.3853,0.3094,0.3432,0.3432,0.3999,0.3076,0.6559
-1,8,0.08,4,kmeans,4,0.3311,0.3124,0.3215,0.3215,0.3934,0.3107,0.6370
-1,9,0.08,4,kmeans,4,0.3227,0.3073,0.3148,0.3148,0.3858,0.3055,0.6311
-1,10,0.08,4,kmeans,4,0.3180,0.3066,0.3122,0.3122,0.3787,0.3048,0.6254
-1,7,0.08,8,kmeans,4,0.3678,0.2960,0.3280,0.3280,0.3772,0.2941,0.6426
-1,8,0.08,12,kmeans,4,0.3801,0.3158,0.3450,0.3450,0.3707,0.3140,0.6357
-1,9,0.08,8,kmeans,4,0.3449,0.2759,0.3065,0.3065,0.3560,0.2739,0.6310
-1,7,0.08,12,kmeans,4,0.3531,0.2771,0.3105,0.3105,0.3468,0.2751,0.6277
-1,9,0.08,20,kmeans,4,0.3291,0.2577,0.2891,0.2891,0.3362,0.2557,0.6214
-1,5,0.01,0,kmeans,4,0.3724,0.3243,0.3467,0.3467,0.3277,0.3226,0.6104
+1,6,0.10,20,kmeans,4,0.3802,0.2989,0.3347,0.3347,0.4028,0.2971,0.6597,0.6873
+1,6,0.10,8,kmeans,4,0.3855,0.3096,0.3434,0.3434,0.3999,0.3078,0.6559,0.6979
+1,8,0.10,4,kmeans,4,0.3233,0.3084,0.3157,0.3157,0.3880,0.3066,0.6323,0.7161
+1,7,0.10,8,kmeans,4,0.3712,0.2986,0.3310,0.3310,0.3856,0.2967,0.6476,0.6940
+1,9,0.10,4,kmeans,4,0.3175,0.3051,0.3111,0.3111,0.3819,0.3033,0.6276,0.7151
+1,7,0.10,12,kmeans,4,0.3829,0.3181,0.3475,0.3475,0.3770,0.3163,0.6393,0.7053
+1,10,0.10,4,kmeans,4,0.3095,0.3002,0.3048,0.3048,0.3703,0.2984,0.6194,0.7217
+1,9,0.10,16,kmeans,4,0.3430,0.2661,0.2997,0.2997,0.3632,0.2642,0.6382,0.6712
+1,8,0.10,20,kmeans,4,0.3749,0.3110,0.3400,0.3400,0.3601,0.3092,0.6299,0.7037
+1,10,0.10,8,kmeans,4,0.3408,0.2741,0.3038,0.3038,0.3493,0.2722,0.6266,0.6856
 
 # Evaluation for title+abstract.
 less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head 
@@ -223,19 +223,11 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k11 -nr | head
 Observations:
 
 - Using all fields (title+abstract+fulltext) achieved the best performance in ARI, followed by title+abs, then title.
-- When using only titles, DF-based feature selection worked better than VCGS. This would be due to the small number of words from titles (therefore not many keywords were identified by VCGS).  This tendency is also seen in title+abstract.
+- When using only titles, DF-based feature selection worked better than VCGS in most cases. This would be due to the small number of words from titles (therefore not many keywords were identified by VCGS).  This tendency is also seen in title+abstract.
 - kmeans generally works better than maximin.
-- LSA's effectiveness is not very clear.
+- LSA is often found effective maybe due to the smaller size of data?
 
-Observations:
-
-- The tendency (fulltext > abstract > title) didn't change.
-- kmeans performs better than maximin.
-- LSA generally helps.
-- R is less sensitive than D, which means it's difficult to find good D value).
-- VCGS doesn't work for titles (only).  If we look at the cases where VCGS was used... 
-
-Sorted by precision.
+Sort by precision.
 
 ```bash
 less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
@@ -260,7 +252,7 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
 70,na,na,4,kmeans,4,0.3176,0.3555,0.3355,0.3355,0.2712,0.3160,0.5421,0.8011
 ```
 
-Sorted by adjusted mutual information?
+Sort by adjusted mutual information.
 
 ```bash
 less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
@@ -287,23 +279,44 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
 
 Observations:
 
-- The tendency changed (abstract > fulltext > title).
-
+- For both metrics, the tendency changed (abstract > fulltext > title).
 
 # Evaluation metrics
 
 To see the difference among different evaluation metrics empirically, the following shows Pearson's correlation coefficient between every pair of metrics **by R**, not python.
 
 ```R
-cls <- c(ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
-x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls) 
-cor(x[,9:13])
-           vd         v       ari       ami       fms
-vd  1.0000000 1.0000000 0.7603266 0.9333792 0.3347924
-v   1.0000000 1.0000000 0.7603266 0.9333792 0.3347924
-ari 0.7603266 0.7603266 1.0000000 0.7269075 0.7756461
-ami 0.9333792 0.9333792 0.7269075 1.0000000 0.3483514
-fms 0.3347924 0.3347924 0.7756461 0.3483514 1.0000000
+cls <- c(h="numeric",ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric",prec="numeric") 
+
+# all
+x = read.csv("brca_top4_eval_all_sgl.csv",header=TRUE,colClasses=cls) 
+cor(x[,10:14],use="pairwise.complete.obs")
+              v       ari        ami         fms       prec
+v     1.0000000 0.8328906 0.96173695 -0.16737120  0.5505961
+ari   0.8328906 1.0000000 0.87147100  0.24547187  0.1331978
+ami   0.9617369 0.8714710 1.00000000  0.03414898  0.4890915
+fms  -0.1673712 0.2454719 0.03414898  1.00000000 -0.2401213
+prec  0.5505961 0.1331978 0.48909152 -0.24012131  1.0000000
+
+# title and abstract
+x = read.csv("brca_top4_eval_ta_sgl.csv",header=TRUE,colClasses=cls) 
+cor(x[,10:14],use="pairwise.complete.obs")
+             v       ari       ami        fms       prec
+v    1.0000000 0.8897720 0.9710298 0.26435889 0.81380472
+ari  0.8897720 1.0000000 0.9445469 0.61008277 0.52964917
+ami  0.9710298 0.9445469 1.0000000 0.44942350 0.68373387
+fms  0.2643589 0.6100828 0.4494235 1.00000000 0.07285057
+prec 0.8138047 0.5296492 0.6837339 0.07285057 1.00000000
+
+# title
+x = read.csv("brca_top4_eval_t_sgl.csv",header=TRUE,colClasses=cls) 
+cor(x[,10:14],use="pairwise.complete.obs")
+             v       ari       ami       fms      prec
+v    1.0000000 0.3878568 0.9533737 0.3894954 0.8564203
+ari  0.3878568 1.0000000 0.4905749 0.6928299 0.1304839
+ami  0.9533737 0.4905749 1.0000000 0.6086753 0.7288949
+fms  0.3894954 0.6928299 0.6086753 1.0000000 0.2382257
+prec 0.8564203 0.1304839 0.7288949 0.2382257 1.0000000
 ```
 
 ami and vd (or v) are found to be strongly correlated.  ari has relatively strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has very weak to moderate correlations with the others.  The following shows the scatter plot for each pair of metrics, again by R.
