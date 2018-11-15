@@ -57,7 +57,7 @@ parser.add_argument("--df",
                     help="minimum df values to be considered, "
                     "separated by comma. (default: \"10,30,50,70,100\")")
 parser.add_argument('--single',
-                    help='Evaluate only single-class instances.'
+                    help='Evaluate only single-class instances. '
                     '(default: False)',
                     action='store_true')
 parser.add_argument('--balance',
@@ -99,7 +99,7 @@ try different parameter combinations
 
 with open(args.output, "w") as f:
 
-    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prec\n")
+    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prt,sc\n")
 
     '''
     Use VCGS for feature selection
@@ -145,7 +145,7 @@ with open(args.output, "w") as f:
                     if theta < 0:
                         break
 
-                    _, membership, _ = \
+                    _, membership, _, sc = \
                         vl.maximin(csv_dir, docs_small, "", 
                                    "document", keywords,
                                    theta, svd)
@@ -157,6 +157,8 @@ with open(args.output, "w") as f:
 
                     # output                   
                     results = vl.evaluate(mesh_small, membership)
+                    print(" Silhouette   = %f" % sc)
+                    results = results + (sc,)
 
                     f.write("%d,%d,%.2f,%d,maximin,%d," % \
                                 (mindf,rank, p_docs, svd, 
@@ -172,13 +174,15 @@ with open(args.output, "w") as f:
                             n_clusters >= len(docs_small): 
                         break
 
-                    membership, _, _, _ = \
+                    membership, _, _, _, sc = \
                         vl.kmeans(docs_small,
                                   "document", keywords, svd,
                                   n_clusters)
 
                     # output
                     results = vl.evaluate(mesh_small, membership)
+                    print(" Silhouette   = %f" % sc)
+                    results = results + (sc,)
 
                     f.write("%d,%d,%.2f,%d,kmeans,%d," % \
                                 (mindf,rank, p_docs, svd, n_clusters))
@@ -226,7 +230,7 @@ with open(args.output, "w") as f:
                 if theta < 0:
                     break
 
-                _, membership, _ = \
+                _, membership, _, sc = \
                         vl.maximin(csv_dir, docs_small, "", 
                                    "document", keywords,
                                    theta, svd)
@@ -238,6 +242,8 @@ with open(args.output, "w") as f:
 
                 # output
                 results = vl.evaluate(mesh_small, membership)
+                print(" Silhouette   = %f" % sc)
+                results = results + (sc,)
 
                 f.write("%d,na,na,%d,maximin,%d," % \
                             (mindf, svd, len(set(membership))))
@@ -251,13 +257,15 @@ with open(args.output, "w") as f:
                         n_clusters >= len(docs_small): 
                     break
 
-                membership, _, _, _ = \
+                membership, _, _, _, sc = \
                     vl.kmeans(docs_small,
                               "document", keywords, svd,
                               n_clusters)
 
                 # output
                 results = vl.evaluate(mesh_small, membership)
+                print(" Silhouette   = %f" % sc)
+                results = results + (sc,)
 
                 f.write("%d,na,na,%d,kmeans,%d," % \
                             (mindf, svd, n_clusters))
