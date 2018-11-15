@@ -184,14 +184,14 @@ def main():
     print()
     print("Clustering...")
     if args.clustering == "maximin":
-        _, membership, _ = \
+        _, membership, _, _ = \
             maximin(csv_dir, docs, args.sim, 
                         args.cluster, keywords, args.theta,
                         args.svd)
         #visualize_network(sim, keywords, membership)
     elif args.clustering == "kmeans":
-        membership, _, _, _ = kmeans(docs, args.cluster, keywords, 
-                                  args.svd, args.n_clusters)
+        membership, _, _, _, _ = kmeans(docs, args.cluster, keywords, 
+                                        args.svd, args.n_clusters)
 
     if args.cluster == "document" and len(mesh) > 0:
         evaluate(mesh, membership)
@@ -374,7 +374,7 @@ def evaluate(mesh, membership):
 
     # precision (Javed's version of homogeneity)
     prec = compute_precision(mesh, membership)
-    print(" Precision    = %f" % prec)
+    print(" Purity-macro = %f" % prec)
 
     # v-score (variant for multilabels)
     c = compute_completeness(mesh, membership)
@@ -594,6 +594,10 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
         km = KMeans(init='k-means++', n_clusters=k, n_init=10,
                     random_state=0)
         km.fit(data)
+        # compute Silhouette Coefficient
+        sc = metrics.silhouette_score(data, km.labels_, 
+                                      metric='cosine')
+
     else: # apply svd then cluster
         svd_model = TruncatedSVD(n_components=n_components,
                                  random_state=42)
@@ -602,6 +606,9 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
         kwd_vecs = svd_model.transform(kwd_vecs)
         km = KMeans(init='k-means++', n_clusters=k, 
                     n_init=10, random_state=0).fit(reduced_data)
+        # compute Silhouette Coefficient
+        sc = metrics.silhouette_score(reduced_data, km.labels_, 
+                                      metric='cosine')
 
         # create cluster labels by inverse-transforming
         # cluster centers and take 5 words with highest values
@@ -618,7 +625,8 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
     else:
         print("Formed %d clusters w/o SVD." % k)
 
-    return km.labels_.tolist(), km.cluster_centers_, kwd_vecs, cluster_labels
+    return km.labels_.tolist(), km.cluster_centers_,\
+        kwd_vecs, cluster_labels, sc
     
 
 '''
@@ -1017,8 +1025,12 @@ def maximin_core(docs, m, cluster="document", theta=0.9, verbose=False):
     # renumber membership
     m2id = {m:i for i,m in enumerate(set(membership))}
     membership = [m2id[m] for m in membership]
+
+    # compute Silhouette Coefficient
+    sc = metrics.silhouette_score(1-sim, membership, 
+                                  metric='precomputed')
         
-    return centroids, membership, sim
+    return centroids, membership, sim, sc
 
 
 '''
