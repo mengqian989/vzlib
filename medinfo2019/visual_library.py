@@ -336,8 +336,9 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     # Show the plots
     plt.show()
 
+
 '''
-Precision (Jave's version of homogeneity)
+Precision (Javed's version of homogeneity)
 '''
 def compute_precision(mesh, membership):
 
@@ -349,18 +350,19 @@ def compute_precision(mesh, membership):
 
     # confusion matrix
     cm = metrics.confusion_matrix(labels, membership)
-    cm = cm[:len(id2m)]
+    cm = cm[:len(set(membership))]
     # find largest match
     k2c = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     preds = [k2c[x] for x in membership]
     # compute homogeneity
     sum_h = 0.0
-    for i in k2c:
+    for i in range(cm.shape[0]):
         h = cm[k2c[i],i]/cm[:,i].sum()
         sum_h += h
         #print(i, "%.3f" % (h))
 
-    return sum_h / len(k2c)
+    return sum_h / cm.shape[0]
+
 
 '''
 Evaluation
@@ -1067,7 +1069,7 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
     cluster_labels = []
     if n_components == 0: # no svd
         m = m / norm(m, axis=1)[:,np.newaxis]
-        centroids, membership, sim = \
+        centroids, membership, sim, sc = \
             maximin_core(docs, m, cluster, theta, verbose)
     else: # apply svd then cluster
         svd_model = TruncatedSVD(n_components=n_components,
@@ -1076,7 +1078,7 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
         reduced_m = svd_model.transform(m)
         reduced_m = reduced_m / \
             np.linalg.norm(reduced_m, axis=1)[:,np.newaxis]
-        centroids, membership, sim = \
+        centroids, membership, sim, sc = \
             maximin_core(docs, reduced_m, cluster, theta, verbose)
 
     '''
@@ -1121,7 +1123,7 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
                 if i % int(len(docs)/20) == 0: # progress
                     print("%d%% finished..." % (i/len(docs)*100))
                 
-    return centroids, membership, sim
+    return centroids, membership, sim, sc
 
 
 
