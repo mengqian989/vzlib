@@ -72,7 +72,7 @@ where
 - alg is an clustering algorithm (kmeans or maximin)
 - k is the number of clusters. This is set beforehand for kNN but is determined by the algorithm for maximin. 
 - the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-d, v = v-measure, ari = adjusted rand index, ami = adjusted mutual information, and fms = Fowlkes-Mallows index.  
-- Precision is a variant of homogeneity (from Javed's JASIST paper)
+- Precision is a variant of homogeneity (from Javed's JASIST paper). It's also similar to purity; purity is weighted by cluster size (micro-average) but Javed's homogeneity is not (i.e., macro-averge).
 
 Notes:
 
