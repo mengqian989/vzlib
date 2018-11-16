@@ -41,7 +41,7 @@ Tested the combinations of the following parameters:
 - R: Parameter for VCGS.
   - 5, 6, 7, 8, 9, 10
 - D: Parameter for VCGS.
-  - 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.55
+  - 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0
 - Number of components (dimensions) for SVD: 
   - 0, 4, 8, 12, 16, 20
   - When set to 0, SVD is not applied.
