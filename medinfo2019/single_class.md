@@ -62,7 +62,7 @@ nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
 
-> df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prec
+> df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prt,sc
 
 where 
 
@@ -71,8 +71,8 @@ where
 - n is the number of dimensions for SVD
 - alg is an clustering algorithm (kmeans or maximin)
 - k is the number of clusters. This is set beforehand for kNN but is determined by the algorithm for maximin. 
-- the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-d, v = v-measure, ari = adjusted rand index, ami = adjusted mutual information, and fms = Fowlkes-Mallows index.  
-- Precision is a variant of homogeneity (from Javed's JASIST paper). It's also similar to purity; purity is weighted by cluster size (micro-average) but Javed's homogeneity is not (i.e., macro-averge).
+- the rest are evaluation measures: c = completeness, h = homogeneity, vd = v-measure-d, v = v-measure, ari = adjusted rand index, ami = adjusted mutual information, fms = Fowlkes-Mallows index, prt = macro-averaged purity, and sc is silhouette coefficient.  
+- Macro-averaged purity is the homogeneity used in Javed's JASIST paper. Note that purity is weighted by cluster size (micro-average) and Javed's homogeneity is macro-averged.
 
 Notes:
 
