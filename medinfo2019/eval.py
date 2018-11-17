@@ -4,6 +4,7 @@ Evaluation script
 
 import re
 import logging, argparse
+import numpy as np
 from numpy import linspace
 
 import visual_library as vl
@@ -99,7 +100,7 @@ try different parameter combinations
 
 with open(args.output, "w") as f:
 
-    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prt,sc\n")
+    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prt,sc,sct\n")
 
     '''
     Use VCGS for feature selection
@@ -145,9 +146,10 @@ with open(args.output, "w") as f:
                     if theta < 0:
                         break
 
-                    _, membership, _, sc = \
+                    _, membership, _, sc, sct = \
                         vl.maximin(csv_dir, docs_small, "", 
                                    "document", keywords,
+                                   np.array(mesh_small).ravel(), 
                                    theta, svd)
 
                     # error check
@@ -157,8 +159,9 @@ with open(args.output, "w") as f:
 
                     # output                   
                     results = vl.evaluate(mesh_small, membership)
+                    results = results + (sc,sct,)
                     print(" Silhouette   = %f" % sc)
-                    results = results + (sc,)
+                    print(" Silhouette_t = %f" % sct)
 
                     f.write("%d,%d,%.2f,%d,maximin,%d," % \
                                 (mindf,rank, p_docs, svd, 
@@ -170,19 +173,20 @@ with open(args.output, "w") as f:
                 # kmeans
                 for n_clusters in [int(x) for x in args.kmeans.split(',')]:
                     # error check
-                    if n_clusters == -1 or \
+                    if n_clusters < 0 or \
                             n_clusters >= len(docs_small): 
                         break
 
-                    membership, _, _, _, sc = \
+                    membership, _, _, _, sc, sct = \
                         vl.kmeans(docs_small,
                                   "document", keywords, svd,
-                                  n_clusters)
+                                  n_clusters, np.array(mesh_small).ravel())
 
                     # output
                     results = vl.evaluate(mesh_small, membership)
+                    results = results + (sc, sct,)
                     print(" Silhouette   = %f" % sc)
-                    results = results + (sc,)
+                    print(" Silhouette_t = %f" % sct)
 
                     f.write("%d,%d,%.2f,%d,kmeans,%d," % \
                                 (mindf,rank, p_docs, svd, n_clusters))
@@ -230,9 +234,10 @@ with open(args.output, "w") as f:
                 if theta < 0:
                     break
 
-                _, membership, _, sc = \
+                _, membership, _, sc, sct = \
                         vl.maximin(csv_dir, docs_small, "", 
                                    "document", keywords,
+                                   np.array(mesh_small).ravel(),
                                    theta, svd)
 
                 # error check
@@ -242,8 +247,9 @@ with open(args.output, "w") as f:
 
                 # output
                 results = vl.evaluate(mesh_small, membership)
+                results = results + (sc, sct,)
                 print(" Silhouette   = %f" % sc)
-                results = results + (sc,)
+                print(" Silhouette_t = %f" % sct)
 
                 f.write("%d,na,na,%d,maximin,%d," % \
                             (mindf, svd, len(set(membership))))
@@ -257,15 +263,16 @@ with open(args.output, "w") as f:
                         n_clusters >= len(docs_small): 
                     break
 
-                membership, _, _, _, sc = \
+                membership, _, _, _, sc, sct = \
                     vl.kmeans(docs_small,
                               "document", keywords, svd,
-                              n_clusters)
+                              n_clusters, np.array(mesh_small).ravel())
 
                 # output
                 results = vl.evaluate(mesh_small, membership)
+                results = results + (sc, sct,)
                 print(" Silhouette   = %f" % sc)
-                results = results + (sc,)
+                print(" Silhouette_t = %f" % sct)
 
                 f.write("%d,na,na,%d,kmeans,%d," % \
                             (mindf, svd, n_clusters))
