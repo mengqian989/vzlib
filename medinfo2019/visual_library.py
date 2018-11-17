@@ -184,16 +184,19 @@ def main():
     print()
     print("Clustering...")
     if args.clustering == "maximin":
-        _, membership, _, _ = \
+        _, membership, _, sc, sct = \
             maximin(csv_dir, docs, args.sim, 
-                        args.cluster, keywords, args.theta,
-                        args.svd)
+                    args.cluster, keywords, np.array(mesh).ravel(),
+                    args.theta, args.svd)
         #visualize_network(sim, keywords, membership)
     elif args.clustering == "kmeans":
-        membership, _, _, _, _ = kmeans(docs, args.cluster, keywords, 
-                                        args.svd, args.n_clusters)
+        membership, _, _, _, sc, sct = kmeans(docs, args.cluster, keywords, 
+                                              args.svd, args.n_clusters,
+                                              np.array(mesh).ravel())
 
     if args.cluster == "document" and len(mesh) > 0:
+        print(" Silhouette   = %f" % sc)
+        print(" Silhouette_t = %f" % sct)
         evaluate(mesh, membership)
         
         
@@ -338,9 +341,9 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
 
 
 '''
-Precision (Javed's version of homogeneity)
+Macro-averaged purity (Javed's version of homogeneity)
 '''
-def compute_precision(mesh, membership):
+def compute_macro_purity(mesh, membership):
 
     # add ids to true labels (mesh). only the first 
     # cluster label is considered.
@@ -375,8 +378,8 @@ def evaluate(mesh, membership):
         return
 
     # precision (Javed's version of homogeneity)
-    prec = compute_precision(mesh, membership)
-    print(" Purity-macro = %f" % prec)
+    prt = compute_macro_purity(mesh, membership)
+    print(" Purity-macro = %f" % prt)
 
     # v-score (variant for multilabels)
     c = compute_completeness(mesh, membership)
@@ -405,7 +408,7 @@ def evaluate(mesh, membership):
     print(" A-MI         = %f" % ami)
     print(" FMS          = %f" % fms)
 
-    return c, h, vd, v, ai, ami, fms, prec
+    return c, h, vd, v, ai, ami, fms, prt
 
 
 '''
@@ -555,7 +558,7 @@ def compute_homogeneity(labels, pred):
 '''
 kmeans
 '''
-def kmeans(docs, what_to_cluster, keywords, n_components, k):
+def kmeans(docs, what_to_cluster, keywords, n_components, k, true_labels):
 
     # add ids to keywords
     keywords.sort()
@@ -599,18 +602,27 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
         # compute Silhouette Coefficient
         sc = metrics.silhouette_score(data, km.labels_, 
                                       metric='cosine')
+        sct = metrics.silhouette_score(data, true_labels, 
+                                       metric='cosine')
 
     else: # apply svd then cluster
         svd_model = TruncatedSVD(n_components=n_components,
                                  random_state=42)
         svd_model.fit(data)
         reduced_data = svd_model.transform(data)
+
+        # Normalize again
+        reduced_data = reduced_data / \
+                       np.linalg.norm(reduced_data, axis=1)[:,np.newaxis]
+
         kwd_vecs = svd_model.transform(kwd_vecs)
         km = KMeans(init='k-means++', n_clusters=k, 
                     n_init=10, random_state=0).fit(reduced_data)
         # compute Silhouette Coefficient
         sc = metrics.silhouette_score(reduced_data, km.labels_, 
                                       metric='cosine')
+        sct = metrics.silhouette_score(reduced_data, true_labels, 
+                                       metric='cosine')
 
         # create cluster labels by inverse-transforming
         # cluster centers and take 5 words with highest values
@@ -628,7 +640,7 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k):
         print("Formed %d clusters w/o SVD." % k)
 
     return km.labels_.tolist(), km.cluster_centers_,\
-        kwd_vecs, cluster_labels, sc
+        kwd_vecs, cluster_labels, sc, sct
     
 
 '''
@@ -868,114 +880,14 @@ def normalize(mat, axis='document'):
         pass
     return mat
 
-'''
-Maximin clustering (old, not used)
-'''
-def maximin_old(csv_dir, docs, file_sim, cluster, keywords, 
-                theta=0.9, verbose=True):
-
-    # add ids to keywords
-    keywords.sort()
-    w2id = {c:i for i,c in enumerate(keywords)}
-
-    # Convert to scipy matrix for faster calculation
-    data = []
-    row_idx = []
-    col_idx = []
-    for i in range(len(docs)):
-        data += docs[i].values()
-        col_idx += [w2id[w] for w in docs[i].keys()]
-        row_idx += [i] * len(docs[i])
-
-    m = csr_matrix((data, (row_idx, col_idx)), 
-                   (len(docs), len(keywords)))
-
-    # Compute similarity matrix (cosine similarity)
-    if cluster == "document":
-        m = m / norm(m, axis=1)[:,np.newaxis]
-        sim = m * m.transpose()
-    else: # assume 'term' if not 'document'
-        m = m.transpose() / norm(m, axis=0)[:,np.newaxis]
-        sim = m * m.transpose()
-
-    # Write similarity matrix to csv file
-    if file_sim:
-        print("Writing similarity matrix to file...")
-        with open(os.path.join(csv_dir, file_sim), 'wb') as f:
-            # header
-            if cluster == "document":
-                f.write((",".join(\
-                            [str(i) for i in range(len(docs))]))\
-                            .encode('utf8'))
-            else:
-                f.write((",".join(keywords)).encode('utf8'))
-            f.write("\n".encode('utf8'))
-            # matrix
-            for i in range(sim.shape[0]):
-                row = sim[i,:].tolist()[0]
-                f.write((','.join(\
-                            ["{}".format(x) for x in row]))\
-                            .encode('utf8'))
-                f.write("\n".encode('utf8'))
-                if i % int(len(docs)/20) == 0: # progress
-                    print("%d%% finished..." % (i/len(docs)*100))
-
-
-    # Maximin
-    centroids = []
-    candidates = list(range(sim.shape[0]))
-
-    # pick the first centroid
-    centroids.append(candidates.pop(0)) # pick the first
-    #centroids.append(candidates.pop(\
-    #        random.randint(0, len(docs)))) # pick randomly
-
-    # Find next centroid iteratively
-    while True:
-        sim_max = sim[centroids,:].max(axis=0) # take max as this is
-                                               # similarity
-        maximin_id = sim_max.argmin()
-        maximin = 1 - sim_max.min() # make similarity to distance
-        
-        if maximin > theta:
-            #print(maximin)
-            centroids.append(candidates.pop(\
-                    candidates.index(maximin_id)))
-            #print(centroids)
-        else:
-            break
-
-    # Results
-    print("%d clusters generated" % len(centroids))
-    print()
-
-    # Show clusters
-    if cluster == "document":
-        membership = sim[centroids,:].argmax(axis=0).tolist()[0]
-        if verbose:
-            for i, id in enumerate(centroids):
-                print('Doc %d cluster (%d members):' % \
-                          (id, len([x for x in membership if x==i])))
-                print(docs[id])
-                print()
-    else:
-        membership = sim[centroids,:].argmax(axis=0)
-        keywords = np.asarray([keywords])
-        if verbose:
-            for i, id in enumerate(centroids):
-                print('Term %d cluster (%d members):' % \
-                          (id, (membership==i).sum()))
-                print(keywords[membership==i])
-                print()
-        membership = membership.tolist()[0]
-                
-    return centroids, membership, sim
 
 '''
 Maximin (core)
 '''
 
-def maximin_core(docs, m, cluster="document", theta=0.9, verbose=False):
+def maximin_core(docs, m, true_labels, what_to_cluster="document",
+                 theta=0.9, verbose=False):
+
     sim = np.array(m.dot(m.transpose()))
     np.fill_diagonal(sim, -2) # need to set smaller than -1
     centroids = []
@@ -1005,7 +917,7 @@ def maximin_core(docs, m, cluster="document", theta=0.9, verbose=False):
     print()
 
     # Show clusters
-    if cluster == "document":
+    if what_to_cluster == "document":
         membership = sim[centroids,:].argmax(axis=0).tolist()
         if verbose:
             for i, id in enumerate(centroids):
@@ -1028,17 +940,21 @@ def maximin_core(docs, m, cluster="document", theta=0.9, verbose=False):
     m2id = {m:i for i,m in enumerate(set(membership))}
     membership = [m2id[m] for m in membership]
 
-    # compute Silhouette Coefficient
-    sc = metrics.silhouette_score(1-sim, membership, 
-                                  metric='precomputed')
-        
-    return centroids, membership, sim, sc
+    # compute Silhouette Coefficient. can't use sim
+    # since diagonals were changed.
+    sc = metrics.silhouette_score(m, membership, 
+                                  metric='cosine')
+    sct = metrics.silhouette_score(m, true_labels, 
+                                   metric='cosine')
+
+    return centroids, membership, sim, sc, sct
 
 
 '''
 Maximin clustering wrapper
 '''
-def maximin(csv_dir, docs, file_sim, cluster, keywords, 
+def maximin(csv_dir, docs, file_sim, cluster, keywords,
+            true_labels,
             theta=0.9, n_components=0, verbose=True):
 
     # add ids to keywords
@@ -1060,26 +976,28 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
     # Compute similarity matrix (cosine similarity)
     if cluster == "document":
         pass
-        #m = m / norm(m, axis=1)[:,np.newaxis]
     else: # assume 'term' if not 'document'
-        #m = m.transpose() / norm(m, axis=0)[:,np.newaxis]
         m = m.transpose()
+
+    # normalization
+    m = m / norm(m, axis=1)[:,np.newaxis]
 
     # SVD
     cluster_labels = []
     if n_components == 0: # no svd
-        m = m / norm(m, axis=1)[:,np.newaxis]
-        centroids, membership, sim, sc = \
-            maximin_core(docs, m, cluster, theta, verbose)
+        centroids, membership, sim, sc, sct = \
+            maximin_core(docs, m, true_labels, cluster, theta, verbose)
     else: # apply svd then cluster
         svd_model = TruncatedSVD(n_components=n_components,
                                  random_state=42)
         svd_model.fit(m)
         reduced_m = svd_model.transform(m)
+        # normalization
         reduced_m = reduced_m / \
             np.linalg.norm(reduced_m, axis=1)[:,np.newaxis]
-        centroids, membership, sim, sc = \
-            maximin_core(docs, reduced_m, cluster, theta, verbose)
+        centroids, membership, sim, sc, sct = \
+            maximin_core(docs, reduced_m, true_labels, cluster,
+                         theta, verbose)
 
     '''
     # create cluster labels by inverse-transforming
@@ -1122,8 +1040,8 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
                 f.write("\n".encode('utf8'))
                 if i % int(len(docs)/20) == 0: # progress
                     print("%d%% finished..." % (i/len(docs)*100))
-                
-    return centroids, membership, sim, sc
+
+    return centroids, membership, sim, sc, sct
 
 
 
