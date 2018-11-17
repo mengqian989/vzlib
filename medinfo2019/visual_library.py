@@ -611,13 +611,16 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k, true_labels):
         svd_model.fit(data)
         reduced_data = svd_model.transform(data)
 
+        '''
         # Normalize again
         reduced_data = reduced_data / \
                        np.linalg.norm(reduced_data, axis=1)[:,np.newaxis]
+        '''
 
         kwd_vecs = svd_model.transform(kwd_vecs)
         km = KMeans(init='k-means++', n_clusters=k, 
                     n_init=10, random_state=0).fit(reduced_data)
+        
         # compute Silhouette Coefficient
         sc = metrics.silhouette_score(reduced_data, km.labels_, 
                                       metric='cosine')
@@ -885,7 +888,7 @@ def normalize(mat, axis='document'):
 Maximin (core)
 '''
 
-def maximin_core(docs, m, true_labels, what_to_cluster="document",
+def maximin_core(docs, m, what_to_cluster="document",
                  theta=0.9, verbose=False):
 
     sim = np.array(m.dot(m.transpose()))
@@ -944,10 +947,8 @@ def maximin_core(docs, m, true_labels, what_to_cluster="document",
     # since diagonals were changed.
     sc = metrics.silhouette_score(m, membership, 
                                   metric='cosine')
-    sct = metrics.silhouette_score(m, true_labels, 
-                                   metric='cosine')
 
-    return centroids, membership, sim, sc, sct
+    return centroids, membership, sim, sc
 
 
 '''
@@ -985,18 +986,24 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
     # SVD
     cluster_labels = []
     if n_components == 0: # no svd
-        centroids, membership, sim, sc, sct = \
-            maximin_core(docs, m, true_labels, cluster, theta, verbose)
+        # compute silhouette score
+        sct = metrics.silhouette_score(m, true_labels, 
+                                       metric='cosine')
+        centroids, membership, sim, sc = \
+            maximin_core(docs, m, cluster, theta, verbose)
     else: # apply svd then cluster
         svd_model = TruncatedSVD(n_components=n_components,
                                  random_state=42)
         svd_model.fit(m)
         reduced_m = svd_model.transform(m)
+        # compute silhouette score (before normalization)
+        sct = metrics.silhouette_score(reduced_m, true_labels, 
+                                       metric='cosine')
         # normalization
         reduced_m = reduced_m / \
             np.linalg.norm(reduced_m, axis=1)[:,np.newaxis]
-        centroids, membership, sim, sc, sct = \
-            maximin_core(docs, reduced_m, true_labels, cluster,
+        centroids, membership, sim, sc = \
+            maximin_core(docs, reduced_m, cluster,
                          theta, verbose)
 
     '''
