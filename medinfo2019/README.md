@@ -77,6 +77,8 @@ cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
 
 # Experiments
 
+*The results below are not maintained well. Please see [single-class experiments](single_class.md) for more updated results.*
+
 ## Abstracts (larger data)
 
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about 10 hours to complete.)
