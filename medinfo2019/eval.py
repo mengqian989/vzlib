@@ -100,7 +100,7 @@ try different parameter combinations
 
 with open(args.output, "w") as f:
 
-    f.write("df,r,d,n,alg,k,c,h,vd,v,ari,ami,fms,prt,sc,sct\n")
+    f.write("df,r,d,n,alg,theta,k,c,h,vd,v,ari,ami,fms,prt,sc,sct\n")
 
     '''
     Use VCGS for feature selection
@@ -163,8 +163,8 @@ with open(args.output, "w") as f:
                     print(" Silhouette   = %f" % sc)
                     print(" Silhouette_t = %f" % sct)
 
-                    f.write("%d,%d,%.2f,%d,maximin,%d," % \
-                                (mindf,rank, p_docs, svd, 
+                    f.write("%d,%d,%.2f,%d,maximin,%.2f,%d," % \
+                                (mindf,rank, p_docs, svd, theta, 
                                  len(set(membership))))
                     f.write(",".join(["{:.4f}".format(x) \
                                           for x in results]))
@@ -188,7 +188,7 @@ with open(args.output, "w") as f:
                     print(" Silhouette   = %f" % sc)
                     print(" Silhouette_t = %f" % sct)
 
-                    f.write("%d,%d,%.2f,%d,kmeans,%d," % \
+                    f.write("%d,%d,%.2f,%d,kmeans,nan,%d," % \
                                 (mindf,rank, p_docs, svd, n_clusters))
                     f.write(",".join(["{:.4f}".format(x) for x in results]))
                     f.write("\n")
@@ -251,8 +251,8 @@ with open(args.output, "w") as f:
                 print(" Silhouette   = %f" % sc)
                 print(" Silhouette_t = %f" % sct)
 
-                f.write("%d,nan,nan,%d,maximin,%d," % \
-                            (mindf, svd, len(set(membership))))
+                f.write("%d,nan,nan,%d,maximin,%.2f,%d," % \
+                            (mindf, svd, theta, len(set(membership))))
                 f.write(",".join(["{:.4f}".format(x) for x in results]))
                 f.write("\n")
 
@@ -274,7 +274,7 @@ with open(args.output, "w") as f:
                 print(" Silhouette   = %f" % sc)
                 print(" Silhouette_t = %f" % sct)
 
-                f.write("%d,nan,nan,%d,kmeans,%d," % \
+                f.write("%d,nan,nan,%d,kmeans,nan,%d," % \
                             (mindf, svd, n_clusters))
                 f.write(",".join(["{:.4f}".format(x) for x in results]))
                 f.write("\n")
