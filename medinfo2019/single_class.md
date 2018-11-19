@@ -340,6 +340,7 @@ x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls,na.strings=
 x[x$df == 1 & x$alg == "kmeans" & x$n > 0 & x$k == 4, c(2,3,4,11)] -> y
 colnames(y) = c("R", "P", "n", "ARI")
 
+library(ggplot2)
 library(magrittr) # for pipe operator
 library(dplyr)    # for grouping
 
