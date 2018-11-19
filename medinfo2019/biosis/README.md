@@ -2,7 +2,7 @@
 
 This data set was created as follows:
 
-1. Using their web search interface, queried the following phrases (using double quotations before and after them):
+1. Using their web search interface, queried each of the following phrases (using double quotations before and after them) as "topic":
 
 * Carcinoma, Lobular
 * Breast Neoplasms, Male
