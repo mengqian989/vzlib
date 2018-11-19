@@ -166,7 +166,7 @@ with open(args.output, "w") as f:
                     f.write("%d,%d,%.2f,%d,maximin,%d," % \
                                 (mindf,rank, p_docs, svd, 
                                  len(set(membership))))
-                    f.write(",".join(["{:6.4f}".format(x) \
+                    f.write(",".join(["{:.4f}".format(x) \
                                           for x in results]))
                     f.write("\n")
 
@@ -190,7 +190,7 @@ with open(args.output, "w") as f:
 
                     f.write("%d,%d,%.2f,%d,kmeans,%d," % \
                                 (mindf,rank, p_docs, svd, n_clusters))
-                    f.write(",".join(["{:6.4f}".format(x) for x in results]))
+                    f.write(",".join(["{:.4f}".format(x) for x in results]))
                     f.write("\n")
 
     
@@ -251,9 +251,9 @@ with open(args.output, "w") as f:
                 print(" Silhouette   = %f" % sc)
                 print(" Silhouette_t = %f" % sct)
 
-                f.write("%d,na,na,%d,maximin,%d," % \
+                f.write("%d,nan,nan,%d,maximin,%d," % \
                             (mindf, svd, len(set(membership))))
-                f.write(",".join(["{:6.4f}".format(x) for x in results]))
+                f.write(",".join(["{:.4f}".format(x) for x in results]))
                 f.write("\n")
 
             # kmeans
@@ -274,7 +274,7 @@ with open(args.output, "w") as f:
                 print(" Silhouette   = %f" % sc)
                 print(" Silhouette_t = %f" % sct)
 
-                f.write("%d,na,na,%d,kmeans,%d," % \
+                f.write("%d,nan,nan,%d,kmeans,%d," % \
                             (mindf, svd, n_clusters))
-                f.write(",".join(["{:6.4f}".format(x) for x in results]))
+                f.write(",".join(["{:.4f}".format(x) for x in results]))
                 f.write("\n")
