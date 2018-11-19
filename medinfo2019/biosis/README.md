@@ -20,7 +20,7 @@ Note that the interface allows us download only 500 records at once, so it may n
 The number of records for class.
 
 Class | Number of records
------ | -----------------
+------|:----------------:
 Carcinoma, Lobular | 1410
 Breast Neoplasms, Male | 496
 Hereditary Breast and Ovarian Cancer Syndrome | 114
