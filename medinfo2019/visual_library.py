@@ -945,8 +945,11 @@ def maximin_core(docs, m, what_to_cluster="document",
 
     # compute Silhouette Coefficient. can't use sim
     # since diagonals were changed.
-    sc = metrics.silhouette_score(m, membership, 
-                                  metric='cosine')
+    if len(set(membership)) < 2:
+        sc = float('nan')
+    else:
+        sc = metrics.silhouette_score(m, membership, 
+                                      metric='cosine')
 
     return centroids, membership, sim, sc
 
