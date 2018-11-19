@@ -101,11 +101,11 @@ less brca_med_top4_eval_sgl.csv | sort -t',' -k11 -nr | head
 
 Observations:
 
-- good ami seems to come with good prec (but the opposite doesn't hold; see below).
+- good ari seems to come with relatively good prt (but the opposite doesn't hold; see below).
 - df = 1 dominates the top 10, which means VCGS is better than DF-based feature selection.
-- kmeans works better than maximin.
+- kmeans works better than maximin except for the best result.
 - Good r and d values seem more or less random and may be difficult to find optimum settings.  More investigation is needed to see how sensitive the performance is to these parameters.
-- SVD gives no advantage.
+- SVD gives no advantage for highly performing results except for the best result.
 
 Let's look at prt-sorted results.
 
@@ -124,6 +124,7 @@ less brca_med_top4_eval_sgl.csv | sort -t',' -k14 -nr | grep ",4,0." | head
 1,5,0.50,8,kmeans,4,0.3712,0.3449,0.3576,0.3576,0.2851,0.3447,0.6059,0.8594,0.2663,0.1216
 ```
 
+Purity reached nearly 0.9 but ari is suboptimal.
 Then, let's see how good the DF-based feature selection is.  The following shows the 10 best results in ari where minimum DF was set to other than 1.
 
 ```bash
@@ -140,7 +141,7 @@ less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | sort -t',' -k11 -nr | head
 10,na,na,8,maximin,4,0.2455,0.2706,0.2574,0.2574,0.2113,0.2453,0.5160,0.6729,0.2633,0.1586
 ```
 
-Their ari was found to be around 0.2 (except for 0.3374), which is pretty low.  So VCGS does work!  
+It was found that maximin worked better than kmeans except for the best result. In any case, their ARI is 0.3374 at best and VCGS seems to work better.  
 
 How about v-measure or ami?
 
@@ -166,9 +167,8 @@ Observations:
 
 - Overall, we see similar patterns to ari.
   - df = 1 still works better (VCGS is better).
-  - kmeans still works better.
+  - kmeans still works better except for the best result.
 - LSA is sometimes effective.
-- Two results (ranking) are quite similar.
 
 ## Full texts vs. abstracts (smaller data)
 
@@ -229,33 +229,8 @@ Observations:
 
 - Using all fields (title+abstract+fulltext) achieved the best performance in ARI, followed by title+abs, then title.
 - When using only titles, DF-based feature selection worked better than VCGS in most cases. This would be due to the small number of words from titles (therefore not many keywords were identified by VCGS).  This tendency is also seen in title+abstract.
-- kmeans generally works better than maximin.
-- LSA is often found effective maybe due to the smaller size of data?
-
-Sort by prt.
-
-```bash
-less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
-1,10,0.85,20,kmeans,4,0.2518,0.2502,0.2510,0.2510,0.0894,0.2483,0.4642,0.8321,0.1441,0.1549
-1,10,0.85,12,kmeans,4,0.2561,0.2590,0.2575,0.2575,0.1023,0.2542,0.4660,0.8321,0.1844,0.1433
-1,10,0.95,16,kmeans,4,0.2544,0.2571,0.2557,0.2557,0.0956,0.2525,0.4625,0.8318,0.1615,0.1244
-1,10,0.90,16,kmeans,4,0.2544,0.2571,0.2557,0.2557,0.0956,0.2525,0.4625,0.8318,0.1615,0.1244
-1,10,0.95,20,kmeans,4,0.2497,0.2466,0.2481,0.2481,0.0800,0.2446,0.4611,0.8317,0.1435,0.1553
-
-less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
-1,5,0.10,20,kmeans,4,0.4377,0.3898,0.4123,0.4123,0.3473,0.3882,0.6198,0.8749,0.1655,0.1334
-1,7,0.55,8,kmeans,4,0.3600,0.3647,0.3623,0.3623,0.1880,0.3584,0.5139,0.8128,0.2214,0.1257
-1,9,1.00,20,kmeans,4,0.3621,0.3794,0.3706,0.3706,0.2007,0.3606,0.5120,0.8121,0.1635,0.1307
-1,6,0.65,8,kmeans,4,0.3466,0.3437,0.3452,0.3452,0.1731,0.3420,0.5110,0.8110,0.2259,0.0876
-1,6,0.60,8,kmeans,4,0.3466,0.3437,0.3452,0.3452,0.1731,0.3420,0.5110,0.8110,0.2259,0.0876
-
-less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
-50,nan,nan,0,kmeans,4,0.3080,0.3669,0.3349,0.3349,0.2050,0.3066,0.4847,0.8194,0.1757,0.0780
-1,5,1.00,0,kmeans,4,0.3023,0.3511,0.3249,0.3249,0.1870,0.3008,0.4802,0.8165,0.1239,0.0579
-1,5,0.95,0,kmeans,4,0.2952,0.3402,0.3161,0.3161,0.1692,0.2936,0.4715,0.8149,0.1153,0.0536
-1,5,0.90,0,kmeans,4,0.2952,0.3402,0.3161,0.3161,0.1692,0.2936,0.4715,0.8149,0.1153,0.0536
-1,6,1.00,20,kmeans,4,0.2905,0.3342,0.3108,0.3108,0.1598,0.2889,0.4667,0.8128,0.1968,0.0756
-```
+- maximin generally works better than kmeans for title+abstract+fulltext and title+abstract.
+- LSA is generally effective probably due to the smaller size of data.
 
 Sort by adjusted mutual information.
 
@@ -284,7 +259,36 @@ less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k12 -nr | head -5
 
 Observations:
 
-- For both metrics, the tendency changed (abstract > fulltext > title).
+- For both metrics, the tendency is the same but smaller difference between all and title+abs.
+
+Sort by prt.
+
+```bash
+less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
+1,10,0.85,20,kmeans,4,0.2518,0.2502,0.2510,0.2510,0.0894,0.2483,0.4642,0.8321,0.1441,0.1549
+1,10,0.85,12,kmeans,4,0.2561,0.2590,0.2575,0.2575,0.1023,0.2542,0.4660,0.8321,0.1844,0.1433
+1,10,0.95,16,kmeans,4,0.2544,0.2571,0.2557,0.2557,0.0956,0.2525,0.4625,0.8318,0.1615,0.1244
+1,10,0.90,16,kmeans,4,0.2544,0.2571,0.2557,0.2557,0.0956,0.2525,0.4625,0.8318,0.1615,0.1244
+1,10,0.95,20,kmeans,4,0.2497,0.2466,0.2481,0.2481,0.0800,0.2446,0.4611,0.8317,0.1435,0.1553
+
+less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
+1,5,0.10,20,kmeans,4,0.4377,0.3898,0.4123,0.4123,0.3473,0.3882,0.6198,0.8749,0.1655,0.1334
+1,7,0.55,8,kmeans,4,0.3600,0.3647,0.3623,0.3623,0.1880,0.3584,0.5139,0.8128,0.2214,0.1257
+1,9,1.00,20,kmeans,4,0.3621,0.3794,0.3706,0.3706,0.2007,0.3606,0.5120,0.8121,0.1635,0.1307
+1,6,0.65,8,kmeans,4,0.3466,0.3437,0.3452,0.3452,0.1731,0.3420,0.5110,0.8110,0.2259,0.0876
+1,6,0.60,8,kmeans,4,0.3466,0.3437,0.3452,0.3452,0.1731,0.3420,0.5110,0.8110,0.2259,0.0876
+
+less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k14 -nr | head -5
+50,nan,nan,0,kmeans,4,0.3080,0.3669,0.3349,0.3349,0.2050,0.3066,0.4847,0.8194,0.1757,0.0780
+1,5,1.00,0,kmeans,4,0.3023,0.3511,0.3249,0.3249,0.1870,0.3008,0.4802,0.8165,0.1239,0.0579
+1,5,0.95,0,kmeans,4,0.2952,0.3402,0.3161,0.3161,0.1692,0.2936,0.4715,0.8149,0.1153,0.0536
+1,5,0.90,0,kmeans,4,0.2952,0.3402,0.3161,0.3161,0.1692,0.2936,0.4715,0.8149,0.1153,0.0536
+1,6,1.00,20,kmeans,4,0.2905,0.3342,0.3108,0.3108,0.1598,0.2889,0.4667,0.8128,0.1968,0.0756
+```
+
+Observations:
+
+- prt are similar but other metics are quite different.
 
 # Evaluation metrics
 
