@@ -291,58 +291,21 @@ Observations:
 To see the difference among different evaluation metrics empirically, the following shows Pearson's correlation coefficient between every pair of metrics **by R**, not python.
 
 ```R
-cls <- c(h="numeric",ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric",prec="numeric") 
+cls <- c(r="numeric",d="numeric",n="numeric",k="numeric",c="numeric",h="numeric",ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric",prt="numeric",sc="numeric",sct="numeric") 
 
 # abstract data 
-x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls) 
-cor(x[,10:14],use="pairwise.complete.obs")
-             v       ari       ami       fms      prec
-v    1.0000000 0.8870610 0.9703003 0.7242510 0.6578350
-ari  0.8870610 1.0000000 0.9200020 0.8509830 0.4773953
-ami  0.9703003 0.9200020 1.0000000 0.8349414 0.5920434
-fms  0.7242510 0.8509830 0.8349414 1.0000000 0.2706669
-prec 0.6578350 0.4773953 0.5920434 0.2706669 1.0000000
+x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls,na.strings="na") 
+cor(x[,10:16],use="pairwise.complete.obs")
+            v       ari       ami       fms        prt         sc        sct
+v   1.0000000 0.8773201 0.9479307 0.7017890  0.4593293  0.2370127  0.3854788
+ari 0.8773201 1.0000000 0.8936266 0.8188384  0.3759744  0.1035182  0.2907318
+ami 0.9479307 0.8936266 1.0000000 0.8248086  0.3737182  0.1974180  0.2954746
+fms 0.7017890 0.8188384 0.8248086 1.0000000  0.4131840  0.2430231  0.1334362
+prt 0.4593293 0.3759744 0.3737182 0.4131840  1.0000000  0.3266357 -0.1264683
+sc  0.2370127 0.1035182 0.1974180 0.2430231  0.3266357  1.0000000 -0.2043118
+sct 0.3854788 0.2907318 0.2954746 0.1334362 -0.1264683 -0.2043118  1.0000000
 
-# all fields from full-text data
-x = read.csv("brca_top4_eval_all_sgl.csv",header=TRUE,colClasses=cls) 
-cor(x[,10:14],use="pairwise.complete.obs")
-              v       ari        ami         fms       prec
-v     1.0000000 0.8328906 0.96173695 -0.16737120  0.5505961
-ari   0.8328906 1.0000000 0.87147100  0.24547187  0.1331978
-ami   0.9617369 0.8714710 1.00000000  0.03414898  0.4890915
-fms  -0.1673712 0.2454719 0.03414898  1.00000000 -0.2401213
-prec  0.5505961 0.1331978 0.48909152 -0.24012131  1.0000000
-
-# title and abstract fields from full-text data
-x = read.csv("brca_top4_eval_ta_sgl.csv",header=TRUE,colClasses=cls) 
-cor(x[,10:14],use="pairwise.complete.obs")
-             v       ari       ami        fms       prec
-v    1.0000000 0.8897720 0.9710298 0.26435889 0.81380472
-ari  0.8897720 1.0000000 0.9445469 0.61008277 0.52964917
-ami  0.9710298 0.9445469 1.0000000 0.44942350 0.68373387
-fms  0.2643589 0.6100828 0.4494235 1.00000000 0.07285057
-prec 0.8138047 0.5296492 0.6837339 0.07285057 1.00000000
-
-# title field from full-text data
-x = read.csv("brca_top4_eval_t_sgl.csv",header=TRUE,colClasses=cls) 
-cor(x[,10:14],use="pairwise.complete.obs")
-             v       ari       ami       fms      prec
-v    1.0000000 0.3878568 0.9533737 0.3894954 0.8564203
-ari  0.3878568 1.0000000 0.4905749 0.6928299 0.1304839
-ami  0.9533737 0.4905749 1.0000000 0.6086753 0.7288949
-fms  0.3894954 0.6928299 0.6086753 1.0000000 0.2382257
-prec 0.8564203 0.1304839 0.7288949 0.2382257 1.0000000
-```
-
-ami and vd (or v) are found to be strongly correlated.  ari has relatively strong correlation with the three but it's not as strong as theirs.  On the other hand, fms has very weak to moderate correlations with the others.  The following shows the scatter plot for each pair of metrics, again by R.
-
-```R
-plot(x[,9:13])
-```
-
-<img src="figs/scatter_sgl.png" width="600">
-
-Focusing on only V-measure, ARI and AMI...
+ami and vd (or v) are found to be strongly correlated.  ari has relatively strong correlation with the three but it's not as strong as theirs.  The following shows the scatter plot for every pair of metrics: v, ari, ami, prt, sc, sct.
 
 ```R
 panel.cor <- function(x, y, digits = 3, cex.cor, ...)
@@ -364,10 +327,10 @@ panel.cor <- function(x, y, digits = 3, cex.cor, ...)
 }
 quartz("",6,5) # this is for Mac
 par(mar=c(5,4,1,1))
-pairs(x[,c(10,11,12)], upper.panel = panel.cor)
+pairs(x[,c(11,12,14,15)], upper.panel = panel.cor)
 ```
 
-<img src="figs/scatter_three.png" width="400">
+<img src="figs/scatter_four.png" width="400">
 
 How do r and d affect cluster quality? Note that P is used to refer to d below.
 
@@ -388,7 +351,7 @@ ag <- y %>%
 # plot
 quartz("",6,5) # this is for Mac
 par(mar=c(5,4,1,1))
-sp = ggplot(data=ag, mapping=aes(x=factor(R), y=factor(P), color=ARI)) + geom_point(alpha=.9, size=ag$ARI*40)
+sp = ggplot(data=ag, mapping=aes(x=factor(R), y=factor(P), color=ARI)) + geom_point(alpha=.9, size=ag$ARI*30)
 sp+scale_color_gradient(low="white", high="red") + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(italic(R)),y=expression(italic(P)))
 ```
 
@@ -410,20 +373,3 @@ sp2 + geom_jitter(alpha=.5, color="tomato", height=0) + theme_bw() + theme(panel
 ```
 
 <img src="figs/n_and_ari.png" width="400">
-
-What if we look at only a certain range of r and d?
-
-```R
-cls <- c(r="numeric", d="numeric", n="numeric", ari="numeric", ami="numeric", vd="numeric",v="numeric",fms="numeric") 
-x = read.csv("brca_med_top4_eval_sgl.csv",header=TRUE,colClasses=cls,na.strings="na")
-x[x$df == 1 & x$alg == "kmeans" & x$n > 0 & x$k == 4 & x$d >= 0.08 & x$d <= 0.21 & x$r <= 8, c(2,3,4,11)] -> y
-colnames(y) = c("R", "P", "n", "ARI")
-
-quartz("",6,5) # this is for Mac
-par(mar=c(5,4,1,1))
-
-sp3 = ggplot(data=y, mapping=aes(x=factor(n), y=ARI)) + geom_boxplot()
-sp3 + geom_jitter(alpha=.5, color="tomato", height=0, size=3) + theme_bw() + theme(panel.grid=element_blank()) + labs(x=expression(paste("Number of dimensions ", italic(n))))
-```
-
-<img src="figs/n_and_ari_with_limited_range_of_R_and_P.png" width="400">
