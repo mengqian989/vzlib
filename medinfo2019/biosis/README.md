@@ -9,6 +9,8 @@ This data set was created as follows:
 * Hereditary Breast and Ovarian Cancer Syndrome
 * Breast Carcinoma In Situ
 
+Note that the last two are direct children of "Breast Neoplasms" in MeSH hierarchy but are different from the MeSH terms we used for creating the PubMed (and PMC) data set.  This is because "Carcinoma, Ductal, Breast" and "Triple Negative Breast Neoplasms" used for the PubMed data set were not found in biosis databases.
+
 2. Downloaded the results by choosing 
 
 * "Save to other file formats" and then
