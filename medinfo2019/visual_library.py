@@ -10,8 +10,10 @@ import re
 import operator
 import math
 import gzip, bz2
-import random
 import copy
+
+import random
+random.seed(10)
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -897,9 +899,9 @@ def maximin_core(docs, m, what_to_cluster="document",
     candidates = list(range(sim.shape[0]))
 
     # pick the first centroid
-    centroids.append(candidates.pop(0)) # pick the first
-    #centroids.append(candidates.pop(\
-    #        random.randint(0, len(docs)))) # pick randomly
+    #centroids.append(candidates.pop(0)) # pick the first
+    centroids.append(candidates.pop(\
+            random.randint(0, len(docs)))) # pick randomly
 
     # Find next centroid iteratively
     while True:
