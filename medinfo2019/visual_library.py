@@ -340,9 +340,9 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
 
 
 '''
-Macro-averaged purity (Javed's version of homogeneity)
+Compute purity (macro-average is Javed's version of homogeneity)
 '''
-def compute_macro_purity(mesh, membership):
+def compute_purity(mesh, membership):
 
     # add ids to true labels (mesh). only the first 
     # cluster label is considered.
@@ -353,19 +353,22 @@ def compute_macro_purity(mesh, membership):
     # confusion matrix
     cm = metrics.confusion_matrix(labels, membership)
 
+    # compute max
+    sum_max = sum(cm.max(axis=0))
+
     # find largest match
     k2c = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     preds = [k2c[x] for x in membership]
     nclus = len(set(preds))
 
-    # compute homogeneity
+    # compute
     sum_h = 0.0
     for i in range(nclus):
         h = cm[k2c[i],i]/cm[:,i].sum()
         sum_h += h
-        print(i, "%.3f" % (h))
+        #print(i, "%.3f" % (h))
 
-    return sum_h / nclus
+    return sum_h/nclus, sum_max/len(membership) 
 
 
 '''
@@ -379,8 +382,9 @@ def evaluate(mesh, membership):
         return
 
     # precision (Javed's version of homogeneity)
-    prt = compute_macro_purity(mesh, membership)
-    print(" Purity-macro = %f" % prt)
+    prt_macro, prt_micro = compute_purity(mesh, membership)
+    print(" Purity-macro = %f" % prt_macro)
+    print(" Purity-micro = %f" % prt_micro)
 
     # v-score (variant for multilabels)
     c = compute_completeness(mesh, membership)
@@ -409,7 +413,7 @@ def evaluate(mesh, membership):
     print(" A-MI         = %f" % ami)
     print(" FMS          = %f" % fms)
 
-    return c, h, vd, v, ai, ami, fms, prt
+    return c, h, vd, v, ai, ami, fms, prt_macro, prt_micro
 
 
 '''
