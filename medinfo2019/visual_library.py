@@ -901,7 +901,7 @@ def maximin_core(docs, m, what_to_cluster="document",
     # pick the first centroid
     #centroids.append(candidates.pop(0)) # pick the first
     centroids.append(candidates.pop(\
-            random.randint(0, len(docs)))) # pick randomly
+            random.randint(0, len(docs)-1))) # pick randomly
 
     # Find next centroid iteratively
     while True:
