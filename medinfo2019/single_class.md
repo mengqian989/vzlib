@@ -41,7 +41,7 @@ Tested the combinations of the following parameters:
 - R: Parameter for VCGS.
   - 5, 6, 7, 8, 9, 10
 - D: Parameter for VCGS.
-  - 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0
+  - 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
 - Number of components (dimensions) for SVD: 
   - 0, 4, 8, 12, 16, 20
   - When set to 0, SVD is not applied.
@@ -57,10 +57,10 @@ Tested the combinations of the following parameters:
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about a couple of hours to complete.)
 
 ```bash
-nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single -d  "0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0" > log_sgl.txt &
+nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single -d  "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0" > log_sgl.txt &
 
 # use the same number of documents in each cluster by downsampling
-nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl_bal.csv --single --balance -d  "0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0" > log_bal.txt &
+nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single --balance -d  "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0" > log_bal.txt &
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
@@ -183,11 +183,11 @@ Observations:
 The aim of the following experiments is to show, if any, the advantage of full-text data over abstracts for clustering biomedical articles.  First, run eval.py script. (We can run them in parallel as follows. Takes less than an hour on miksa3.)
 
 ```bash
-nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single -d  "0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0" > log_full.txt &
+nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single -d  "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0" > log_full.txt &
 
-nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_ta_sgl.csv --fields title,abstract --single -d  "0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0" > log_ta.txt &
+nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_ta_sgl.csv --fields title,abstract --single -d  "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0" > log_ta.txt &
 
-nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_t_sgl.csv --fields title --single -d "0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1.0" > log_t.txt &
+nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_t_sgl.csv --fields title --single -d "0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0" > log_t.txt &
 ```
 
 Let's look at the result based on ARI.
