@@ -11,7 +11,6 @@ import operator
 import math
 import gzip, bz2
 import copy
-
 import random
 
 import numpy as np
@@ -269,14 +268,13 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     # find largest match
     h = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     preds = [h[x] for x in preds]
+    nclus = len(set(preds))
 
     # aligned confusion matrix
     print()
     print("#col #row max homogeneity")
-    sum_ho = 0.0
-    for i in h:
+    for i in range(nclus):
         ho = cm[h[i],i]/cm[:,i].sum()
-        sum_ho += ho
         print(i, h[i], cm[h[i],i], "%.3f" % (ho))
 
     # Convert to scipy matrix for faster calculation
@@ -354,18 +352,20 @@ def compute_macro_purity(mesh, membership):
 
     # confusion matrix
     cm = metrics.confusion_matrix(labels, membership)
-    cm = cm[:len(set(membership))]
+
     # find largest match
     k2c = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     preds = [k2c[x] for x in membership]
+    nclus = len(set(preds))
+
     # compute homogeneity
     sum_h = 0.0
-    for i in range(cm.shape[0]):
+    for i in range(nclus):
         h = cm[k2c[i],i]/cm[:,i].sum()
         sum_h += h
-        #print(i, "%.3f" % (h))
+        print(i, "%.3f" % (h))
 
-    return sum_h / cm.shape[0]
+    return sum_h / nclus
 
 
 '''
