@@ -265,10 +265,16 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     print("Confusion matrix")
     print(cm)
 
-    # find largest match
+    # find largest match column-wise
     h = {i:x for i,x in enumerate(cm.argmax(axis=0))}
     nclus = len(set(preds))
     preds = [h[x] for x in preds]
+    '''
+    # find largest match row-wise
+    h = {x:i for i,x in enumerate(cm.argmax(axis=1))}
+    nclus = len(set(preds))
+    preds = [h[x] for x in preds]
+    '''
 
     # aligned confusion matrix
     print()
@@ -319,16 +325,25 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
 
     # Add scatterplots to the subplots
     colors = ['C0', 'C1', 'C2', 'C3']
+
+    # mesh class
     for i in range(len(m2id)):
         indices = true_labels == i
-        ax[0].scatter(reduced_data[indices, 0], reduced_data[indices, 1], c=colors[i], alpha=.3, edgecolors='none', label=id2m[i])
-
+        ax[0].scatter(reduced_data[indices, 0], 
+                      reduced_data[indices, 1], 
+                      c=colors[i], alpha=.3, 
+                      edgecolors='none', label=id2m[i])
+    
+    # cluster
     for i in range(len(m2id)):
         indices = preds == i
-        ax[1].scatter(reduced_data[indices, 0], reduced_data[indices, 1], c=colors[i], alpha=.3, edgecolors='none')
+        ax[1].scatter(reduced_data[indices, 0], 
+                      reduced_data[indices, 1], 
+                      c=colors[i], alpha=.3, 
+                      edgecolors='none')
 
-    ax[0].set_title('Actual MeSH clusters')
-    ax[1].set_title('Predicted clusters')
+    ax[0].set_title('Underlying MeSH classes')
+    ax[1].set_title('Identified clusters')
 
     # add legend
     legends = [id2m[x] for x in range(len(id2m))]
