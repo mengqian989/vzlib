@@ -267,8 +267,8 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
 
     # find largest match
     h = {i:x for i,x in enumerate(cm.argmax(axis=0))}
-    preds = [h[x] for x in preds]
     nclus = len(set(preds))
+    preds = [h[x] for x in preds]
 
     # aligned confusion matrix
     print()
@@ -635,10 +635,13 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k, true_labels):
         # create cluster labels by inverse-transforming
         # cluster centers and take 5 words with highest values
         centers = svd_model.inverse_transform(km.cluster_centers_)
-        for c in centers:
-            i = np.argpartition(c, -5)[-5:]
-            labels_ = np.array(keywords)[i].tolist()
-            print(labels_)
+        for j, c in enumerate(centers):
+            i = np.argpartition(c, -10)[-10:] # top 10 (unsorted)
+            c_i = c[i]
+            i_ = np.argsort(c_i)[::-1] # sort
+            k_i = np.array(keywords)[i]
+            labels_ = k_i[i_].tolist()
+            print("C%d: " % (j+1) + ", ".join(labels_))
             cluster_labels.append(labels_)
 
     if n_components > 0:
