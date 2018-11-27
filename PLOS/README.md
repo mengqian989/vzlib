@@ -98,7 +98,7 @@ Finally create the data set with full text by adding body text extracted from pl
 
 ```bash
 cd ..
-python xml2tsv_pmc.py > data/plos_top6.txt
+python xml2tsv_pmc.py --input data/plos_pmc.xml.gz --med data/plos_med_top6.txt > data/plos_top6.txt
 ```
 
 Count the number of articles to make sure it didn't change.
