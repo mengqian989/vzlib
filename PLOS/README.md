@@ -1,6 +1,6 @@
 # Data set creation
 
-This document explains how the data set for this project was created (on Sep 15, 2018).
+This document explains how the data set for this project was created (on Sep 15, 2018).  Note that this data set is intended for evaluating cluster quality only; Our exploratory IR system will be using the entire PLOS archive.
 
 ## Getting data
 
