@@ -85,7 +85,7 @@ cut -f 4 plos_med_top6.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -
 
 Note that the numbers are different from plos_med.txt because duplicates have been eliminated in creating plos_med_top6.txt.  If we look at the number of lines (articles), they're the same.
 
-```
+```bash
 less plos_med.txt | grep "Digestive System Neoplasms" | wc -l
 4321
 less plos_med_top6.txt | grep "Digestive System Neoplasms" | wc -l
