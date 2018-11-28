@@ -36,11 +36,11 @@ parser.add_argument("-r", "--rank",
                     help="Rank R value(s) to be used, separated "
                     "by comma. (default: \"5,6,7,8,9,10\")")
 parser.add_argument("-d", "--relative_df", 
-                    default="0.05,0.10,0.15,0.20,0.25,0.30,"
-                    "0.35,0.40,0.45,0.55", 
+                    default="0.1,0.2,0.3,0.4,0.5,"
+                    "0.6,0.7,0.8,0.9,1.0", 
                     help="Relative DF value(s) to be used, separated "
-                    "by comma. (default: \"0.05,0.10,0.15,0.20,0.25,0.30,"
-                    "0.35,0.40,0.45,0.55\")")
+                    "by comma. (default: \"0.1,0.2,0.3,0.4,0.5,"
+                    "0.6,0.7,0.8,0.9,1.0\")")
 parser.add_argument("-n", "--dimensions", 
                     default="0,4,8,12,16,20", 
                     help="Number of components for SVD, separated "
