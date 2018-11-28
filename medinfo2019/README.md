@@ -321,7 +321,7 @@ Observations:
 
 # Additional experiment on BIOSIS data
 
-Data creation for this experiment is described here.
+Data creation for this experiment is described [here](biosis/README.md).
 
 ```bash
 nice python eval.py --input biosis.txt --output biosis_eval_sgl.csv --single > log_biosis.txt &
@@ -329,7 +329,13 @@ nice python eval.py --input biosis.txt --output biosis_eval_sgl.csv --single > l
 
 # Plotting MeSH classes and identified clusters
 
+From the results above, we can identify the best parameter settings and provide them to visual_library.py to plot MeSH classes and identified clusters.  Note that color assignment will change every time, so the resulting plot may look different (but cluster assignemnts won't change; only colors).
 
+```bash
+python visual_library.py -i brca_med_top4.txt.gz --clustering kmeans --svd 8 --single -r 8 -d 0.9 -k 4 --visualize
+```
+
+<img src="figs/mesh_and_cluster.png" width="400">
 
 
 
