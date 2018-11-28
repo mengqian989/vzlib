@@ -319,7 +319,7 @@ Observations:
 
 - Purity is similar but other metics are quite different.
 
-# Additional experiment on BIOSIS data
+## Additional experiment on BIOSIS data
 
 Data creation for this experiment is described [here](biosis/README.md).
 
@@ -327,7 +327,23 @@ Data creation for this experiment is described [here](biosis/README.md).
 nice python eval.py --input biosis.txt --output biosis_eval_sgl.csv --single > log_biosis.txt &
 ```
 
-# Plotting MeSH classes and identified clusters
+Sort the results by AMI.
+
+```bash
+less biosis_eval_sgl.csv | sort -t',' -k13 -nr | grep ",4,0" | head
+1,6,0.30,0,kmeans,nan,4,0.4931,0.4374,0.4636,0.4636,0.5056,0.4361,0.7583,0.9127,0.8309,0.0383,0.0176
+10,nan,nan,20,kmeans,nan,4,0.4813,0.4255,0.4517,0.4517,0.4979,0.4243,0.7548,0.9113,0.8285,0.1387,0.0539
+1,10,0.10,20,kmeans,nan,4,0.4926,0.4244,0.4560,0.4560,0.5083,0.4232,0.7632,0.7740,0.8293,0.1324,0.0598
+1,10,0.10,0,kmeans,nan,4,0.4189,0.4638,0.4402,0.4402,0.4740,0.4177,0.7102,0.7514,0.8352,0.0192,0.0088
+1,7,0.40,0,kmeans,nan,4,0.3958,0.4526,0.4223,0.4223,0.4179,0.3947,0.6724,0.7877,0.8375,0.0419,0.0190
+1,10,0.40,0,kmeans,nan,4,0.3935,0.4628,0.4254,0.4254,0.4202,0.3924,0.6679,0.8592,0.8327,0.0370,0.0168
+1,5,0.40,0,kmeans,nan,4,0.3927,0.4591,0.4233,0.4233,0.4030,0.3915,0.6592,0.8787,0.8379,0.0519,0.0236
+1,7,1.00,0,kmeans,nan,4,0.3893,0.4328,0.4099,0.4099,0.3998,0.3881,0.6677,0.7960,0.8290,0.0799,0.0361
+1,8,0.40,0,kmeans,nan,4,0.3872,0.4436,0.4135,0.4135,0.4095,0.3861,0.6673,0.7835,0.8343,0.0404,0.0183
+1,5,0.50,0,kmeans,nan,4,0.3852,0.4512,0.4156,0.4156,0.4007,0.3840,0.6578,0.7830,0.8355,0.0596,0.0273
+```
+
+## Plotting MeSH classes and identified clusters
 
 From the results above, we can identify the best parameter settings and provide them to visual_library.py to plot MeSH classes and identified clusters.  Note that color assignment will change every time, so the resulting plot may look different (but cluster assignemnts won't change; only colors).
 
