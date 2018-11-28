@@ -13,9 +13,9 @@ So, 39,332 / 224,940 = 17.5% of the articles have full texts.
 Look at the mesh term distribution. Note that only major mesh terms are considered (--major) and mesh terms are generalized (--generalize) up to the level specified by **target_mesh** variable in xml2tsv_med.py. 
 
 ```bash
-python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > brca_med.txt
+python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code > data/brca_med.txt
 
-cut -f 4 brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
+cut -f 4 data/brca_med.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr | less
   11115 Carcinoma, Ductal, Breast
    3475 Carcinoma, Lobular
    2588 Triple Negative Breast Neoplasms
@@ -36,7 +36,7 @@ Use only top 4 frequent MeSH. (Specify **classes** variables as follows in extra
 Run extract.py again.  (Later found that --major didn't make difference since there were no MeSH terms under the top four MeSH terms in the MeSH tree.  So, --major and --code may be omitted.) 
 
 ```bash
-python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > brca_med_top4.txt
+python xml2tsv_med.py --input data/brca_med.xml.gz --generalize --major --code --restrict > data/brca_med_top4.txt
 ```
 
 This results in 16,576 articles annotated with at least one of the four mesh terms.
@@ -49,7 +49,7 @@ wc -l brca_med_top4.txt
 Make sure the distribution of the classes is the same as the above but only top four terms.
 
 ```bash
-cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
+cut -f 4 data/brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -nr
   11115 Carcinoma, Ductal, Breast
    3475 Carcinoma, Lobular
    2588 Triple Negative Breast Neoplasms
@@ -59,16 +59,16 @@ cut -f 4 brca_med_top4.txt | perl -npe 's/[\|\+]/\n/g' | sort | uniq -c | sort -
 Finally create the data set with full text by adding body text extracted from plos_pmc.xml.
 
 ```bash
-python xml2tsv_pmc.py > brca_pmc_top4.txt
+python xml2tsv_pmc.py > data/brca_pmc_top4.txt
 ```
 
 Count the number of articles and look at the distribution of classes.
 
 ```bash
-wc -l brca_pmc_top4.txt
-1932 brca_pmc_top4.txt
+wc -l data/brca_pmc_top4.txt
+1932 data/brca_pmc_top4.txt
 
-cut -f 5 brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
+cut -f 5 data/brca_pmc_top4.txt | perl -npe 's/\|/\n/g' | sort | uniq -c | sort -nr
     935 Carcinoma, Ductal, Breast
     824 Triple Negative Breast Neoplasms
     290 Carcinoma, Lobular
@@ -81,11 +81,11 @@ Data set size (total number of documents).
 
 ```bash
 # medline
-zcat brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  wc -l
+zcat data/brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  wc -l
 14075
 
 # pmc
-zcat brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  wc -l
+zcat data/brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  wc -l
 1682
 ```
 
@@ -93,14 +93,14 @@ Distribution of classes (MeSH terms).
 
 ```bash
 # medline
-zcat brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  sort | uniq -c 
+zcat data/brca_med_top4.txt.gz | cut -f4 | grep -v '|' |  sort | uniq -c 
    1653 Breast Neoplasms, Male
    8644 Carcinoma, Ductal, Breast
    1341 Carcinoma, Lobular
    2437 Triple Negative Breast Neoplasms
 
 # pmc
-zcat brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c 
+zcat data/brca_pmc_top4.txt.gz | cut -f5 | grep -v '|' |  sort | uniq -c 
     124 Breast Neoplasms, Male
     687 Carcinoma, Ductal, Breast
      88 Carcinoma, Lobular
@@ -134,10 +134,10 @@ Tested the combinations of the following parameters:
 Run an evaluation script for medline data created above. Different combinations of parameters are executed. (It takes about a couple of hours to complete.)
 
 ```bash
-nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl.csv --single > log_sgl.txt &
+nice python eval.py --input data/brca_med_top4.txt.gz --output data/brca_med_top4_eval_sgl.csv --single > log_sgl.txt &
 
 # use the same number of documents in each cluster by downsampling
-nice python eval.py --input brca_med_top4.txt.gz --output brca_med_top4_eval_sgl_bal.csv --single --balance > log_bal.txt &
+nice python eval.py --input data/brca_med_top4.txt.gz --output data/brca_med_top4_eval_sgl_bal.csv --single --balance > log_bal.txt &
 ```
 
 The resulting file has a set of given parameters and evaluation metric values for each line in the following order:
@@ -163,7 +163,7 @@ Notes:
 Now let's look at the 10 best parameter combinations based on adjusted rand index (AMI).
 
 ```bash
-less brca_med_top4_eval_sgl.csv | sort -t',' -k13 -nr | grep ",4,0" | head
+less data/brca_med_top4_eval_sgl.csv | sort -t',' -k13 -nr | grep ",4,0" | head
 1,8,0.90,8,kmeans,nan,4,0.3950,0.3927,0.3938,0.3938,0.3073,0.3925,0.6015,0.9042,0.7871,0.2557,0.1666
 1,9,1.00,8,kmeans,nan,4,0.3928,0.3874,0.3901,0.3901,0.3046,0.3872,0.6018,0.8141,0.7846,0.2569,0.1647
 1,8,0.80,8,kmeans,nan,4,0.3958,0.3874,0.3916,0.3916,0.3102,0.3872,0.6071,0.8120,0.7841,0.2461,0.1669
@@ -188,7 +188,7 @@ Let's look at prt-sorted results.
 
 ```bash
 # ranking by prt
-less brca_med_top4_eval_sgl.csv | sort -t',' -k16 -nr | grep ",4,0" | head
+less data/brca_med_top4_eval_sgl.csv | sort -t',' -k16 -nr | grep ",4,0" | head
 1,7,0.20,4,maximin,0.80,4,0.3623,0.3961,0.3784,0.3784,0.2990,0.3621,0.5762,0.8244,0.7982,0.4748,0.0411
 1,8,0.20,4,maximin,0.80,4,0.3260,0.3755,0.3490,0.3490,0.2869,0.3258,0.5534,0.7858,0.7981,0.5080,0.0429
 1,8,0.90,8,kmeans,nan,4,0.3950,0.3927,0.3938,0.3938,0.3073,0.3925,0.6015,0.9042,0.7871,0.2557,0.1666
@@ -210,7 +210,7 @@ Observations:
 Then, let's see how good the DF-based feature selection is.  The following shows the 10 best results in AMI where minimum DF was set to other than 1.
 
 ```bash
-less brca_med_top4_eval_sgl.csv | grep -vP '^1,' | grep ",4,0" | sort -t',' -k13 -nr | head
+less data/brca_med_top4_eval_sgl.csv | grep -vP '^1,' | grep ",4,0" | sort -t',' -k13 -nr | head
 100,nan,nan,20,kmeans,nan,4,0.3676,0.3484,0.3577,0.3577,0.3374,0.3482,0.6311,0.7893,0.7613,0.1357,0.1064
 70,nan,nan,0,kmeans,nan,4,0.2722,0.2835,0.2778,0.2778,0.2037,0.2720,0.5263,0.6756,0.6696,0.0227,0.0151
 100,nan,nan,0,kmeans,nan,4,0.2719,0.3106,0.2899,0.2899,0.1681,0.2717,0.4832,0.7739,0.7294,0.0197,0.0168
@@ -233,18 +233,18 @@ Observations:
 The aim of the following experiments is to show, if any, the advantage of full-text data over abstracts for clustering biomedical articles.  First, run eval.py script. (We can run them in parallel as follows. Takes less than an hour on miksa3.)
 
 ```bash
-nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_all_sgl.csv --single > log_full.txt &
+nice python eval.py --input data/brca_pmc_top4.txt.gz --output data/brca_top4_eval_all_sgl.csv --single > log_full.txt &
 
-nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_ta_sgl.csv --fields title,abstract --single > log_ta.txt &
+nice python eval.py --input data/brca_pmc_top4.txt.gz --output data/brca_top4_eval_ta_sgl.csv --fields title,abstract --single > log_ta.txt &
 
-nice python eval.py --input brca_pmc_top4.txt.gz --output brca_top4_eval_t_sgl.csv --fields title --single > log_t.txt &
+nice python eval.py --input data/brca_pmc_top4.txt.gz --output data/brca_top4_eval_t_sgl.csv --fields title --single > log_t.txt &
 ```
 
 Sort by adjusted mutual information.
 
 ```bash
 # full text
-less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
+less data/brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
 1,6,0.40,8,maximin,0.90,4,0.4015,0.4389,0.4193,0.4193,0.4637,0.4001,0.6637,0.8125,0.8036,0.3521,0.1424
 1,9,0.60,16,maximin,0.99,4,0.3563,0.4013,0.3774,0.3774,0.3830,0.3548,0.6079,0.7311,0.7589,0.2206,0.1767
 1,8,0.50,8,maximin,0.99,4,0.3493,0.3840,0.3658,0.3658,0.4236,0.3478,0.6405,0.7494,0.7720,0.3620,0.1490
@@ -257,7 +257,7 @@ less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
 1,7,0.60,12,maximin,0.90,4,0.3387,0.4024,0.3678,0.3678,0.3742,0.3373,0.5925,0.7663,0.7673,0.2663,0.1461
 
 # title+abstract
-less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
+less data/brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
 1,5,0.10,20,kmeans,nan,4,0.4377,0.3898,0.4123,0.4123,0.3473,0.3882,0.6198,0.8749,0.7562,0.1655,0.1334
 1,5,0.20,16,kmeans,nan,4,0.3843,0.3861,0.3852,0.3852,0.2547,0.3828,0.5517,0.8414,0.7081,0.1533,0.1513
 1,5,1.00,8,maximin,0.90,4,0.3814,0.4461,0.4112,0.4112,0.4227,0.3797,0.6235,0.7277,0.7663,0.5386,0.1918
@@ -270,7 +270,7 @@ less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
 1,7,0.60,20,kmeans,nan,4,0.3615,0.3709,0.3661,0.3661,0.1965,0.3599,0.5157,0.7376,0.6570,0.1448,0.1338
 
 # title
-less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
+less data/brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k13 -nr | head
 1,5,0.90,20,kmeans,nan,4,0.3283,0.3233,0.3258,0.3258,0.2285,0.3216,0.5415,0.9621,0.7505,0.1742,0.0747
 50,nan,nan,4,kmeans,nan,4,0.3228,0.3405,0.3314,0.3314,0.2476,0.3212,0.5402,0.7901,0.7598,0.5600,-0.0528
 70,nan,nan,4,kmeans,nan,4,0.3176,0.3555,0.3355,0.3355,0.2712,0.3160,0.5421,0.6358,0.7706,0.6073,-0.0047
@@ -293,21 +293,21 @@ Observations:
 Sort by prt.
 
 ```bash
-less brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k16 -nr | head -5
+less data/brca_top4_eval_all_sgl.csv | grep ",4,0." | sort -t',' -k16 -nr | head -5
 1,6,0.40,8,maximin,0.90,4,0.4015,0.4389,0.4193,0.4193,0.4637,0.4001,0.6637,0.8125,0.8036,0.3521,0.1424
 1,5,0.30,8,maximin,0.99,4,0.3469,0.3906,0.3674,0.3674,0.4166,0.3454,0.6304,0.7398,0.7780,0.3780,0.1563
 1,8,0.50,8,maximin,0.99,4,0.3493,0.3840,0.3658,0.3658,0.4236,0.3478,0.6405,0.7494,0.7720,0.3620,0.1490
 1,8,0.50,8,maximin,0.90,4,0.3493,0.3840,0.3658,0.3658,0.4236,0.3478,0.6405,0.7494,0.7720,0.3620,0.1490
 1,5,0.30,12,maximin,0.99,4,0.3027,0.3466,0.3232,0.3232,0.3900,0.3012,0.6115,0.7657,0.7720,0.2777,0.1946
 
-less brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k16 -nr | head -5
+less data/brca_top4_eval_ta_sgl.csv | grep ",4,0." | sort -t',' -k16 -nr | head -5
 1,5,1.00,8,maximin,0.90,4,0.3814,0.4461,0.4112,0.4112,0.4227,0.3797,0.6235,0.7277,0.7663,0.5386,0.1918
 1,5,0.10,20,kmeans,nan,4,0.4377,0.3898,0.4123,0.4123,0.3473,0.3882,0.6198,0.8749,0.7562,0.1655,0.1334
 30,nan,nan,12,kmeans,nan,4,0.3496,0.3078,0.3274,0.3274,0.3088,0.3060,0.5974,0.8093,0.7283,0.2708,0.1825
 1,5,0.40,8,maximin,0.80,4,0.2670,0.3336,0.2966,0.2966,0.3451,0.2655,0.5649,0.7309,0.7160,0.3126,0.1103
 1,5,0.20,12,kmeans,nan,4,0.3696,0.3862,0.3777,0.3777,0.2603,0.3681,0.5456,0.7358,0.7111,0.1967,0.1790
 
-less brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k16 -nr | head -5
+less data/brca_top4_eval_t_sgl.csv | grep ",4,0." | sort -t',' -k16 -nr | head -5
 70,nan,nan,4,kmeans,nan,4,0.3176,0.3555,0.3355,0.3355,0.2712,0.3160,0.5421,0.6358,0.7706,0.6073,-0.0047
 100,nan,nan,4,kmeans,nan,4,0.3048,0.3681,0.3334,0.3334,0.2669,0.3033,0.5220,0.6188,0.7685,0.6613,-0.0112
 100,nan,nan,0,kmeans,nan,4,0.2920,0.3545,0.3202,0.3202,0.2644,0.2905,0.5188,0.7703,0.7661,0.4266,0.0320
@@ -324,13 +324,13 @@ Observations:
 Data creation for this experiment is described [here](biosis/README.md).
 
 ```bash
-nice python eval.py --input biosis.txt --output biosis_eval_sgl.csv --single > log_biosis.txt &
+nice python eval.py --input data/biosis.txt --output data/biosis_eval_sgl.csv --single > log_biosis.txt &
 ```
 
 Sort the results by AMI.
 
 ```bash
-less biosis_eval_sgl.csv | sort -t',' -k13 -nr | grep ",4,0" | head
+less data/biosis_eval_sgl.csv | sort -t',' -k13 -nr | grep ",4,0" | head
 1,6,0.30,0,kmeans,nan,4,0.4931,0.4374,0.4636,0.4636,0.5056,0.4361,0.7583,0.9127,0.8309,0.0383,0.0176
 10,nan,nan,20,kmeans,nan,4,0.4813,0.4255,0.4517,0.4517,0.4979,0.4243,0.7548,0.9113,0.8285,0.1387,0.0539
 1,10,0.10,20,kmeans,nan,4,0.4926,0.4244,0.4560,0.4560,0.5083,0.4232,0.7632,0.7740,0.8293,0.1324,0.0598
@@ -348,7 +348,7 @@ less biosis_eval_sgl.csv | sort -t',' -k13 -nr | grep ",4,0" | head
 From the results above, we can identify the best parameter settings and provide them to visual_library.py to plot MeSH classes and identified clusters.  Note that color assignment will change every time, so the resulting plot may look different (but cluster assignemnts won't change; only colors).
 
 ```bash
-python visual_library.py -i brca_med_top4.txt.gz --clustering kmeans --svd 8 --single -r 8 -d 0.9 -k 4 --visualize
+python visual_library.py -i data/brca_med_top4.txt.gz --clustering kmeans --svd 8 --single -r 8 -d 0.9 -k 4 --visualize
 ```
 
 <img src="figs/mesh_and_cluster.png" width="400">
