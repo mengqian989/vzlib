@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+{% if error %}<p class="error"><strong>Error: </strong> {{ error }}{% endif %}
+
+<form action = "{{ url_for('search') }}" method="POST" enctype="multipart/form-data" id="usrform">
+
+<dl>
+<dd>
+
+<dt>
+
+<div>
+<div id='TextBoxesGroup' style="padding-bottom: 1px;padding-left: 0px;">
+  <div id="TextBoxDiv1" style='margin-top: 15px;' >
+    <input type='text' name = "query1" id='query1' value="{{ query_his_1[0] }}" autofocus>
+    <select name="field1" id="field1">
+      <option>All</option>
+      <option>Title</option>
+      <option>Author</option>
+      <option>Affiliation</option>
+      <option>Journal Name</option>
+      <option>Subject</option>
+      <option>Abstract</option>
+      <option>Body</option>
+      <option>Publication Date (YYYY-MM-DD)</option>
+    </select>
+  </div>
+  <script>
+    document.getElementById("field1").value = field_his_new[0];
+
+  </script>
+</div>
+<input type='button' value='Add Field' id='addButton' style="margin-bottom: 20px;">
+<input type='button' value='Remove Field' id='removeButton' style="margin-bottom: 20px;">
+</div>
+
+<dt>
+
+<div>
+<div style="margin-top: 20px;">
+<input type="text_small" placeholder = "YYYY-MM-DD" name="query_facet_s" id="query_facet_s" value="{{ query_facet_s }}" style="margin-right: 10px;" autofocus>
+
+TO
+
+<input type="text_small" placeholder = "YYYY-MM-DD" name="query_facet_e" id="query_facet_e" value="{{ query_facet_e }}" style="margin-left: 10px;" autofocus>
+</div>
+<div style="margin-top: 14px;">
+<select name="field_plos" id="field_plos" style="margin-left: 0px;">
+<option>Choose Dataset</option>
+<option>PLoS</option>
+<option>PMC</option>
+</select>
+<script>
+  document.getElementById("field_plos").value = "{{ field_plos }}";
+</script>
+</div>
+</div>
+<dt>
+<input type=submit value="Search">
+
+
+</dl>
+
+<input type="hidden" name="cursor_mark" value="*">
+<input type="hidden" name="page" value=1>
+<input type="hidden" name="cursor_mark_list" value="*">
+
+</form>
+
+{% if docs %}
+
+<form action = "{{ url_for('download') }}" method="POST" enctype="multipart/form-data" id="downloadform">
+  <input type='hidden' name = "params" id='params' value="*">
+  <input type='hidden' name = "query_final" id='query_final' value="{{ query_final }}">
+  <dt>
+  <input type='button' value='Download All' id="allButton"  >
+  <input type='button' value='Download Facet' id="facetButton"  >
+</form>
+
+{{ total }} articles found ({{ (page-1)*10+1 }}-{{ page*10 }} are shown)
+
+<div class="result-area" style="padding: 15px 10px 10px 10px; margin-bottom: 15px;">
+  {% for d in docs |sort(attribute='publication_date', reverse = true)%}
+  <p><a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{ d.pmid }}%5Buid%5D">PMID:{{ d.pmid }}</a> <a href="http://localhost:8080/solr/pmc/select?q=pmid:{{ d.pmid }}">Full Text</a>{{d.publication_date_facet}} {{ d.title }}</p>
+
+  {% endfor %}
+</div>
+
+
+
+
+{% if next_1 %}
+<form method="post" action="{{ url_for('search') }}" class="inline" id = "pageform">
+  <div id='TextBoxesGroup_next' style="display:none">
+    <div id='TextBoxDiv_next1'>
+    <input type="hidden" name="query1" value="{{ query_his_1[0]}}">
+    <input type="hidden" name="field1" value= "{{ field_his[0] }}">
+    </div>
+  </div>
+  <div id='TextBoxesGroup_prev' style="display:none">
+    <div id='TextBoxDiv_prev1'>
+    <input type="hidden" name="query1" value="{{ query_his_1[0]}}">
+    <input type="hidden" name="field1" value= "{{ field_his[0] }}">
+    </div>
+  </div>
+  <input type="hidden" name="cursor_mark" id="cursor_mark" value="*">
+  <input type="hidden" name="cursor_mark_list" value="{{ cursor_mark_list }}">
+  <input type="hidden" name="counter_return" value="{{ counter_return }}">
+  <input type="hidden" name="field_plos" value="{{ field_plos }}">
+  <input type="hidden" name="query_facet_s" value="{{ query_facet_s }}">
+  <input type="hidden" name="query_facet_e" value="{{ query_facet_e }}">
+  <input type="hidden" name="next" value="{{ next_1 }}">
+  <input type="hidden" name="prev" value="{{ prev_1 }}">
+  <input type="hidden" name="page" value="{{ page }}">
+  <input type='button' value='Previous' id='prevButton'>
+  <input type='button' value='Next' id='nextButton'>
+</form>
+
+  {% endif %}
+
+{% endif %}
+
+
+
+{% endblock %}

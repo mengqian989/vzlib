@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<title>Simple PMC/PLoS Search</title>
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+
+<style>
+input[type=text] {
+    background-image: url("{{ url_for('static', filename='searchicon_small.png') }}");
+}
+</style>
+
+</head>
+<body>
+<script type="text/javascript" >
+var field_his_new = {{field_his|safe}};
+var conj_his_new = {{conj_his|safe}};
+var query_his_new = {{query_his|safe}};
+var counter = {{counter_return|safe}};
+
+console.log(counter);
+
+
+  $(document).ready(function(){
+
+    var field_his_new = {{field_his|safe}};
+    var conj_his_new = {{conj_his|safe}};
+    var query_his_new = {{query_his|safe}};
+    var counter = {{counter_return|safe}};
+    var i;
+    for (i=2; i<counter; i++){
+      console.log("here");
+      var newTextBoxDiv = $(document.createElement('div'))
+           .attr("id", 'TextBoxDiv' + i);
+
+      newTextBoxDiv.after().html('<input type="text" name="query' + i +
+            '" id="query' + i + '" value="' + query_his_new[i-1] + '" autofocus >' +
+            '\n<select name="field' + i + '" id="field' + i + '"> \n<option>All</option>' +
+            '\n<option>Title</option> \n<option>Author</option>' +
+            '\n<option>Affiliation</option> \n<option>Journal Name</option>' +
+            '\n<option>Subject</option> \n<option>Abstract</option>' +
+            '\n<option>Body</option> \n<option>Publication Date (YYYY-MM-DD)</option>' +
+            '\n</select>'+
+            '\n<select name="conj' + i + '" id="conj' + i + '">'+
+            '\n<option>AND</option> \n<option>OR</option> \n<option>NOT</option> \n</select>'
+             );
+
+      newTextBoxDiv.appendTo("#TextBoxesGroup");
+
+      var field_name = 'field' + i;
+      document.getElementById(field_name).value = field_his_new[i-1];
+
+      var conj_name = 'conj' + i;
+      document.getElementById(conj_name).value = conj_his_new[i-2];
+
+      var newTextBoxDiv_next = $(document.createElement('div'))
+           .attr("id", 'TextBoxDiv_next' + i);
+
+      newTextBoxDiv_next.after().html('<input type="text" name="query' + i +
+            '" id="query' + i + '" value="' + query_his_new[i-1] + '" >' +
+            '/n<input type="text" name="field' + i +
+            '" id="field' + i + '" value="' + field_his_new[i-1] + '" >'+
+            '/n<input type="text" name="conj' + i +
+            '" id="conj' + i + '" value="' + conj_his_new[i-2] + '" >');
+
+      newTextBoxDiv_next.appendTo("#TextBoxesGroup_next");
+
+      var newTextBoxDiv_prev = $(document.createElement('div'))
+           .attr("id", 'TextBoxDiv_next' + i);
+
+      newTextBoxDiv_prev.after().html('<input type="text" name="query' + i +
+            '" id="query' + i + '" value="' + query_his_new[i-1] + '" >' +
+            '/n<input type="text" name="field' + i +
+            '" id="field' + i + '" value="' + field_his_new[i-1] + '" >'+
+            '/n<input type="text" name="conj' + i +
+            '" id="conj' + i + '" value="' + conj_his_new[i-2] + '" >');
+
+      newTextBoxDiv_prev.appendTo("#TextBoxesGroup_prev");
+
+    }
+
+
+    $("#addButton").click(function () {
+
+    if(counter>10){
+       alert("Only 10 textboxes allow");
+       return false;
+      }
+
+    var newTextBoxDiv = $(document.createElement('div'))
+         .attr("id", 'TextBoxDiv' + counter);
+
+    newTextBoxDiv.after().html('<input type="text" name="query' + counter +
+          '" id="query' + counter + '" value="' + query_his_new[counter] + '" autofocus >' +
+          '\n<select name="field' + counter + '" id="field' + counter + '"> \n<option>All</option>' +
+          '\n<option>Title</option> \n<option>Author</option>' +
+          '\n<option>Affiliation</option> \n<option>Journal Name</option>' +
+          '\n<option>Subject</option> \n<option>Abstract</option>' +
+          '\n<option>Body</option> \n<option>Publication Date (YYYY-MM-DD)</option>' +
+          '\n</select>'+
+          '\n<select name="conj' + counter + '" id="conj' + counter + '">'+
+          '\n<option>AND</option> \n<option>OR</option> \n<option>NOT</option> \n</select>'
+           );
+
+    newTextBoxDiv.appendTo("#TextBoxesGroup");
+    counter++;
+
+
+
+
+    });
+
+    $("#removeButton").click(function () {
+  	 if(counter==2){
+             alert("No more textbox to remove");
+             return false;
+          }
+
+  	 counter--;
+
+         $("#TextBoxDiv" + counter).remove();
+
+       });
+
+     $("#nextButton").click(function () {
+     document.getElementById("cursor_mark").value = "next";
+     document.getElementById("pageform").submit();
+   });
+
+      $("#prevButton").click(function () {
+      document.getElementById("cursor_mark").value = "prev";
+      document.getElementById("pageform").submit();
+   });
+
+      $("#allButton").click(function () {
+      document.getElementById("params").value = "all";
+      document.getElementById("downloadform").submit();
+     });
+
+     $("#facetButton").click(function () {
+     document.getElementById("params").value = "facet";
+     document.getElementById("downloadform").submit();
+   });
+
+  });
+
+
+ {% block head %}{% endblock %}
+
+
+</script>
+
+<div class=page>
+  <h1>Simple PMC/PLoS Search</h1>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  {% for message in messages %}
+  <div class=flash>{{ message }}</div>
+
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+  {% block body %}{% endblock %}
+</div>
+<div class=copyright>
+Copyright &copy;
+<script type="text/javascript">
+var d = new Date()
+document.write(d.getFullYear())
+</script>
+Mengqian Wang
+</div>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<title>Simple PMC/PLoS Search</title>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+{% block head %}{% endblock %}
+
+</head>
+
+<style>
+input[type=text] {
+    background-image: url("{{ url_for('static', filename='searchicon_small.png') }}");
+}
+</style>
+
+<body>
+
+<div class=page>
+  <h1>Simple PMC/PLoS Search</h1>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  {% for message in messages %}
+  <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+  {% block body %}{% endblock %}
+</div>
+<div class=copyright>
+Copyright &copy;
+<script type="text/javascript">
+var d = new Date()
+document.write(d.getFullYear())
+</script>
+Mengqian Wang
+</div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+{% if error %}<p class="error"><strong>Error: </strong> {{ error }}{% endif %}
+
+<form action = "{{ url_for('search') }}" method="POST" enctype="multipart/form-data" id="usrform">
+
+<dl>
+<dd>
+
+<dt>
+
+<input type="text" name="query" id="query" value="{{ query }}" autofocus>
+<input type=submit value="Search">
+
+<dt>
+
+<select name="field" id="field">
+<option>All</option>
+<option>Title</option>
+<option>Author</option>
+<option>Affiliation</option>
+<option>Journal Name</option>
+<option>Subject</option>
+<option>Abstract</option>
+<option>Body</option>
+<option>Publication Date (YYYY-MM-DD)</option>
+</select>
+
+<dt>
+<input type="text" name="query_facet" id="query_facet" value="{{ query_facet }}" autofocus>
+
+<dt>
+<select name="field_facet" id="field_facet">
+<option>Facet by Month: ON</option>
+<option>Facet by Month: OFF</option>
+</select>
+
+
+
+
+
+</dd>
+</dl>
+
+<input type="hidden" name="next" value="*">
+<input type="hidden" name="page" value=0>
+
+</form>
+
+
+{% if docs %}
+
+{{ total }} articles found ({{ (page-1)*10+1 }}-{{ page*10 }} are shown)
+<div class="result-area">
+  {% for d in docs %}
+  <p><a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{ d.pmid[0] }}%5Buid%5D">PMID:{{ d.pmid[0] }}</a> {{ d.title[0] }}</p>
+  {% endfor %}
+</div>
+
+{% if next %}
+<form method="post" action="{{ url_for('search') }}" class="inline">
+  <input type="hidden" name="query_final" value="{{ query_final }}">
+  <input type="hidden" name="field" value="{{ field }}">
+  <input type="hidden" name="next" value="{{ next }}">
+  <input type="hidden" name="page" value="{{ page }}">
+  <button type="submit" name="submit" value="Next" class="link-button">
+    Next
+  </button>
+</form>
+{% endif %}
+
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,151 @@
+form{
+	padding:0.5em 1em;
+	background: #f2f2f2;
+    	border-radius: 3px;
+}
+
+.message{
+	padding:0.5em 1em;
+	background: #F0D6D6;
+}
+
+body            { font-family: sans-serif; background: #eee; }
+a, h1, h2, h3   { color: #404040; }
+h1, h2          { font-family: sans-serif; margin: 0; margin-bottom: 20px;}
+h2              { font-size: 1.2em; }
+
+.page           { margin: 2em auto; width: 80%; border: .5px solid #ccc;
+                  padding: 1.5em; background: white; }
+.metanav        { text-align: right; font-size: 0.7em; padding: 0.5em;
+                  margin-bottom: 2em; background: #fafafa; }
+.flash          { background: #CEE5F5; padding: 0.5em;
+                  border: 1px solid #AACBE2; }
+.error          { background-color: rgb(245,190,190) ; padding: 0.5em; }
+
+.copyright      { margin: -1.5em auto; width: 80%;
+		  height: 3em; background: #eee;
+                  padding: 0em 1.5em 0em 1.5em;
+                  font-size: 0.9em; color: #999999; }
+
+a { font-size: 0.8em; }
+
+a:link, a:visited {
+    background-color: green;
+    color: white;
+    padding: 2px 3px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+a:visited {
+    background-color: teal;
+}
+
+a:hover, a:active {
+    background-color: red;
+}
+
+input[type=text] {
+    width: 50%;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background-image: url("{{ url_for('static', filename='searchicon_small.png') }}");
+    background-color: white;
+    background-position: 5px;
+    background-size: 25px;
+    background-repeat: no-repeat;
+    padding: 5px 10px 5px 40px;
+}
+
+input[type=text_small] {
+    width: 20%;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background-image: url("{{ url_for('static', filename='searchicon_small.png') }}");
+    background-color: white;
+    background-position: 5px;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    padding: 5px 10px 5px 40px;
+}
+
+select {
+    width: 20%;
+		height: 31px;
+    padding: 0px 0px 0px 0px;
+    margin-bottom: 20px;
+		margin-left:10px;
+		margin-right:10px;
+    font-size: 16px;
+    background-color: white;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    padding: 13px 10px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 6px;
+    width: 150px;
+    margin-top: 30px;
+    cursor: pointer;
+}
+input[type=button] {
+    width: 15%;
+    background-color: #888888;
+    color: white;
+    font-size: 16px;
+    padding: 5px 5px 5px 5px;
+    margin: 8px 0;
+		margin-right: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+input[type=button]:hover {
+    background-color: #000000;
+}
+
+div {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+}
+
+button[type="submit"]{
+    font-size: 16px;
+    padding: 6px 20px 6px 20px;
+    border-radius: 6px;
+		margin-left: 0px;
+    border: 0;
+    background: #f4f4f4;
+}
+
+button[type="button"]{
+    font-size: 16px;
+    padding: 6px 20px 6px 20px;
+    border-radius: 6px;
+    border: 0;
+    background: #f4f4f4;
+}
+
+button[type="submit"]:hover{
+    background: #d2d2d2;
+}
+button[type="button"]:hover{
+    background: #d2d2d2;
+}
