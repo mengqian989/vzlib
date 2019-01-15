@@ -1,0 +1,2 @@
+This is a simple web interface for searching through PMC and PLoS database which are indexed on solr. 
+The web interface was built based on Flask.
