@@ -82,10 +82,12 @@ TO
 {{ total }} articles found ({{ (page-1)*10+1 }}-{{ page*10 }} are shown)
 
 <div class="result-area" style="padding: 15px 10px 10px 10px; margin-bottom: 15px;">
+  Response Time: {{ response_time }} ms
   {% for d in docs |sort(attribute='publication_date', reverse = true)%}
   <p><a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{ d.pmid }}%5Buid%5D">PMID:{{ d.pmid }}</a> {{d.publication_date_facet}} {{ d.title }}</p>
 
   {% endfor %}
+
 </div>
 
 
@@ -114,9 +116,10 @@ TO
   <input type="hidden" name="next" value="{{ next_1 }}">
   <input type="hidden" name="prev" value="{{ prev_1 }}">
   <input type="hidden" name="page" value="{{ page }}">
-  <input type='button' value='Previous' id='prevButton'>
-  <input type='button' value='Next' id='nextButton'>
+  <input type='button' value='Previous' id='prevButton' >
+  <input type='button' value='Next' id='nextButton' >
 </form>
+
 
   {% endif %}
 
