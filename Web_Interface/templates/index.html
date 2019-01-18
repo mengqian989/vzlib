@@ -83,7 +83,7 @@ TO
 
 <div class="result-area" style="padding: 15px 10px 10px 10px; margin-bottom: 15px;">
   {% for d in docs |sort(attribute='publication_date', reverse = true)%}
-  <p><a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{ d.pmid }}%5Buid%5D">PMID:{{ d.pmid }}</a> <a href="http://localhost:8080/solr/pmc/select?q=pmid:{{ d.pmid }}">Full Text</a>{{d.publication_date_facet}} {{ d.title }}</p>
+  <p><a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{ d.pmid }}%5Buid%5D">PMID:{{ d.pmid }}</a> {{d.publication_date_facet}} {{ d.title }}</p>
 
   {% endfor %}
 </div>
