@@ -7,6 +7,7 @@ import os
 import re
 import json
 import math
+import time
 from datetime import datetime 
 from flask import Flask, render_template, request, redirect, \
      url_for, send_from_directory, g, flash, session, jsonify
@@ -16,7 +17,7 @@ import os.path
 from flask import Response
 
 # change this URL
-SOLR = 'http://localhost:8080/solr/pmc'
+SOLR = 'http://localhost:8983/solr/pmc'
 
 # Setup a Solr instance. The timeout is optional.
 solr = pysolr.Solr(SOLR, timeout=10)
@@ -38,14 +39,17 @@ def home():
     conj_his = ['AND']*11
     counter_return = 2
     field1 = 'All'
+    response_time = '0'
     return render_template('index.html',batch_string = '', field1 = field1, field_facet = field_facet,field_batch = field_batch,
-                           field_plos = field_plos, conj_his = conj_his,
+                           field_plos = field_plos, conj_his = conj_his,response_time = response_time,
                            query_his_1 = query_his, field_his = field_his, counter_return = counter_return,
                            query_his = json.dumps(query_his))
 
 
 @app.route('/search',methods = ['POST'])
 def search():
+    response_time = 0
+    send_date = time.clock()
     error = None
     docs = None
     total = None
@@ -193,13 +197,14 @@ def search():
         field_plos = request.form['field_plos']
         
         if field_plos == 'PLoS':
-            SOLR = 'http://localhost:8080/solr/plos'
+            SOLR = 'http://localhost:8983/solr/plos'
             
         else:
-            SOLR = 'http://localhost:8080/solr/pmc'
+            SOLR = 'http://localhost:8983/solr/pmc'
             
         
         solr = pysolr.Solr(SOLR, timeout=10)
+        #facet by month
         
         params= {
                  'cursorMark': cursor_mark_num,
@@ -211,7 +216,8 @@ def search():
             
         query_his_1 = query_his    
         total = docs.hits
-
+        
+        print(page_prev)
         cursor_mark_list = request.form['cursor_mark_list']
         cursor_mark_list = cursor_mark_list.split(';')
         next_1 = docs.nextCursorMark
@@ -227,11 +233,13 @@ def search():
             #for d in docs:
             #    print("The title is '{0}'.".format(d['title']))
             
-    
+        receive_date = time.clock()
+        response_time = str(round(receive_date - send_date,3))
+        
     return render_template("index.html", docs=docs,
                            prev_1 = prev_1, next_1 = next_1,
                            cursor_mark_list = cursor_mark_list,
-                           total=total,
+                           total=total,response_time = response_time,
                            query_facet_s=q_f_s,query_facet_e=q_f_e,
                            query_final = query_final,
                            field_plos = field_plos,
