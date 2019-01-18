@@ -28,7 +28,7 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 regex = re.compile('\s+')
 
-@app.route('/pmc')
+@app.route('/')
 def home():
     query_his = ['']*11
     field_facet = 'Choose Faceting'
@@ -44,7 +44,7 @@ def home():
                            query_his = json.dumps(query_his))
 
 
-@app.route('/pmc/search',methods = ['POST'])
+@app.route('/search',methods = ['POST'])
 def search():
     error = None
     docs = None
@@ -125,6 +125,7 @@ def search():
             field = request.form[field_name]
             query_his[counter_1] = q
             field_his.append(field)
+            q_1 = q
             q = '"'+q+'"'
             conj_name = "conj"+str(counter_1+1)
             
@@ -133,7 +134,7 @@ def search():
             elif field == 'Abstract':
                 query = 'abstract:' + q
             elif field == 'Author':
-                query = 'author:' + q
+                query = 'author:' + '"*' + q_1 + '*"'
             elif field == 'Journal Name':
                 query = 'journal_name:' + q
             elif field == 'Body':
@@ -192,13 +193,13 @@ def search():
         field_plos = request.form['field_plos']
         
         if field_plos == 'PLoS':
-            query_final = query_final + " AND journal_name:PLoS*"
-        elif field_plos == 'PMC':
-            query_final = query_final
+            SOLR = 'http://localhost:8080/solr/plos'
+            
         else:
-            query_final = query_final
+            SOLR = 'http://localhost:8080/solr/pmc'
+            
         
-        #facet by month
+        solr = pysolr.Solr(SOLR, timeout=10)
         
         params= {
                  'cursorMark': cursor_mark_num,
@@ -210,8 +211,7 @@ def search():
             
         query_his_1 = query_his    
         total = docs.hits
-        
-        print(page_prev)
+
         cursor_mark_list = request.form['cursor_mark_list']
         cursor_mark_list = cursor_mark_list.split(';')
         next_1 = docs.nextCursorMark
@@ -268,7 +268,7 @@ def download():
             date = facet_month[counter_facet]
             if type(date) == str:
                 number = facet_month[counter_facet + 1]
-                if type(number) == int:
+                if type(number) == int and number != 0:
                     facet_string += date + "," + str(number) + "\n"
             counter_facet += 1
         content = facet_string
