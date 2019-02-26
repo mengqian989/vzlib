@@ -20,7 +20,7 @@ classes = {"Digestive System Neoplasms",
            "Endocrine Gland Neoplasms",
            "Head and Neck Neoplasms"}
 
-# generalize to MeSH one-level below the targe 
+# generalize to MeSH one-level below the target
 target_mesh = "Neoplasms by Site" 
 
 # log file
@@ -58,7 +58,7 @@ Read MeSH tree numbers
 mesh2code = dict()
 code2mesh = dict()
 if args.code:
-    with open("MeSH/d2018.bin") as f:
+    with open("MeSH/d2019.bin") as f:
         cnt = 0
         mh = ''
         mn = []

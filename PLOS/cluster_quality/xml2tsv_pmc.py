@@ -39,9 +39,9 @@ def unescape(str):
 
 # read --med file
 med = dict()
-with open(args.med) as f:
+with gzip.open(args.med) as f:
     for line in f:
-        pmid, title, abs, mesh, _ = line.split('\t')
+        pmid, title, abs, mesh, _ = line.decode().split('\t')
         mesh = '|'.join(list(set(delimiters.split(mesh))))
         if abs == '':
             abs = 'None'
