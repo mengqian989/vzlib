@@ -58,7 +58,7 @@ Read MeSH tree numbers
 mesh2code = dict()
 code2mesh = dict()
 if args.code:
-    with open("MeSH/d2019.bin") as f:
+    with gzip.open("MeSH/d2019.bin.gz") as f:
         cnt = 0
         mh = ''
         mn = []
