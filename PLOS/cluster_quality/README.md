@@ -115,3 +115,8 @@ The fields are tab-delimted.  If an article is annotated with multiple MeSH term
 
 > 17951913  Systemic chemotherapy and...  We report a case of...  Choroidal metastases occur most frequently...  Breast Neoplasms, Male
  
+## Experiments
+
+```bash
+nice python eval.py --input data/plos_med_top6.txt.gz --output data/plos_med_top6_eval_sgl.csv -k 6 --single > log_sgl.txt &
+```
