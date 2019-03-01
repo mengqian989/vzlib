@@ -120,8 +120,25 @@ The fields are tab-delimted.  If an article is annotated with multiple MeSH term
 Run experiment on abstracts and full texts.
 
 ```bash
+nice python eval.py --input data/plos_med_top6.txt.gz --output data/plos_med_top6_eval_title_sgl.csv -k 6 -f title --single > log_med_title_sgl.txt
 nice python eval.py --input data/plos_med_top6.txt.gz --output data/plos_med_top6_eval_sgl.csv -k 6 --single > log_med_sgl.txt &
 nice python eval.py --input data/plos_top6.txt.gz --output data/plos_top6_eval_sgl.csv -k 6 -t 0 --single > log_sgl.txt
+```
+
+### Results on abstracts
+
+```bash
+less data/plos_med_top6_eval_title_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | grep -v maximin | head
+1,7,1.00,0,kmeans,nan,6,0.6786,0.4959,0.5731,0.5731,0.2846,0.5721,0.4646,0.8561,0.6408,0.1305,-0.0035
+1,6,0.90,16,kmeans,nan,6,0.6367,0.4692,0.5402,0.5402,0.2212,0.5392,0.4171,0.8476,0.6171,0.3161,0.0604
+1,10,0.50,0,kmeans,nan,6,0.6100,0.4683,0.5298,0.5298,0.3139,0.5288,0.4760,0.7755,0.6474,0.0390,-0.0000
+1,7,0.50,20,kmeans,nan,6,0.6137,0.4652,0.5292,0.5292,0.3053,0.5282,0.4724,0.9078,0.6411,0.1982,-0.0307
+1,5,0.90,4,kmeans,nan,6,0.5747,0.4851,0.5261,0.5261,0.3710,0.5248,0.5229,0.7566,0.6588,0.8927,-0.7455
+1,5,0.90,0,spectral,nan,6,0.5867,0.4762,0.5257,0.5257,0.4292,0.5244,0.5731,0.2839,0.6536,0.9855,-0.5769
+1,5,0.90,0,kmeans,nan,6,0.5850,0.4752,0.5244,0.5244,0.4280,0.5231,0.5720,0.7554,0.6530,0.9861,-0.5769
+1,6,0.60,20,kmeans,nan,6,0.5936,0.4672,0.5229,0.5229,0.3231,0.5219,0.4771,0.7607,0.6476,0.2351,-0.0026
+1,7,0.90,16,kmeans,nan,6,0.5835,0.4615,0.5154,0.5154,0.3203,0.5144,0.4733,0.7522,0.6435,0.2719,-0.0159
+1,9,1.00,16,kmeans,nan,6,0.5849,0.4593,0.5146,0.5146,0.3213,0.5136,0.4759,0.8584,0.6437,0.2539,-0.0300
 ```
 
 ### Results on abstracts
