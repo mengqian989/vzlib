@@ -125,7 +125,7 @@ nice python eval.py --input data/plos_med_top6.txt.gz --output data/plos_med_top
 nice python eval.py --input data/plos_top6.txt.gz --output data/plos_top6_eval_sgl.csv -k 6 -t 0 --single > log_sgl.txt
 ```
 
-### Results on abstracts
+### Results on titles
 
 ```bash
 less data/plos_med_top6_eval_title_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | grep -v maximin | head
