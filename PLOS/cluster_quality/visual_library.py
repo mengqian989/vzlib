@@ -603,6 +603,7 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k, true_labels):
     data = csr_matrix((data, (row_idx, col_idx)), 
                       (len(docs), len(keywords)))
 
+
     # Also create keyword vectors
     values = [1.0] * len(keywords)
     col_idx = []
@@ -619,7 +620,7 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k, true_labels):
         data = data / norm(data, axis=1)[:,np.newaxis]
     elif what_to_cluster == "term":
         data = data.transpose() / norm(data, axis=0)[:,np.newaxis]
-
+    
     # SVD
     cluster_labels = []
     if n_components == 0: # no svd
@@ -993,7 +994,7 @@ def identify_keywords(num_docs, dfr, df, p_docs=0.5, html=False):
 ''' 
 Identify up to num_terms keywords
 '''
-def identify_n_keywords(num_docs, dfr, df, num_terms, html=False):
+def identify_n_keywords(dfr, df, num_terms, html=False):
 
     terms_sorted = sorted(dfr.items(), reverse=True, 
                           key=operator.itemgetter(1))
@@ -1004,7 +1005,7 @@ def identify_n_keywords(num_docs, dfr, df, num_terms, html=False):
     dfs = []
     dfrs = []
     c = 0
-    for w, v in terms_sorted:
+    for w, _ in terms_sorted:
         if c >= num_terms:
             break
         if w not in df:
@@ -1101,8 +1102,8 @@ def maximin_core(docs, m, what_to_cluster="document",
         membership = membership.tolist()[0]
 
     # renumber membership
-    m2id = {m:i for i,m in enumerate(set(membership))}
-    membership = [m2id[m] for m in membership]
+    m2id = {me:i for i,me in enumerate(set(membership))}
+    membership = [m2id[me] for me in membership]
 
     # compute Silhouette Coefficient. can't use sim
     # since diagonals were changed.
@@ -1332,7 +1333,20 @@ def del_lowdf(df,mindf=1):
 
     print("%d terms were removed" % len(inf))
 
+'''
+Delete low and high df words
+'''
+def del_low_high_df(df, mindf=1, maxdf=1000):
+    inf = []
+    for w in df:
+        if df[w] <= mindf or df[w] >= maxdf:
+            inf.append(w)
+    for w in inf:
+        del df[w]
 
+    print("%d terms were removed" % len(inf))
+
+    
 '''
 main
 '''

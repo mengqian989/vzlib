@@ -110,9 +110,9 @@ with open(args.output, "w") as f:
     Use VCGS for feature selection
     '''
 
-    # Discard low DF terms
+    # Discard low and high DF terms
     mindf = 1
-    vl.del_lowdf(df, mindf)
+    vl.del_low_high_df(df, mindf, len(docs))
     
     # rank is R in vcgs
     for rank in [int(x) for x in args.rank.split(',')]:
@@ -133,8 +133,7 @@ with open(args.output, "w") as f:
                     exit()
 
                 # Identify R*k keywords
-                keywords = vl.identify_n_keywords(
-                    len(docs_), dfr, df, rank*k)
+                keywords = vl.identify_n_keywords(dfr, df, rank*k)
 
             else:
                 # Identify keywords appearing in more than p_docs% of
@@ -175,7 +174,8 @@ with open(args.output, "w") as f:
                            print("# clusters = 1.  Skipping...")
                            continue
 
-                    # output                   
+                    # output
+                    
                     results = vl.evaluate(mesh_small, membership)
                     results = results + (sc,sct,)
                     print(" Silhouette   = %f" % sc)
