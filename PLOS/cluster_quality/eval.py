@@ -57,6 +57,10 @@ parser.add_argument("--df",
                     default="10,30,50,70,100", 
                     help="minimum df values to be considered, "
                     "separated by comma. (default: \"10,30,50,70,100\")")
+parser.add_argument("--sample", 
+                    default="0", type=int,
+                    help="number of articles sampled. Use all "
+                    "0 is given (default: 0)")
 parser.add_argument('--single',
                     help='Evaluate only single-class instances. '
                     '(default: False)',
@@ -88,10 +92,10 @@ docs, df, w2id, mesh = \
         vl.read_documents("", input=input_file,
                           stopwords=stopwords,
                           fields=args.fields,
-                          single_class=args.single)
+                          single_class=args.single,
+                          n_samples=args.sample)
 print("Finished reading %d documents" % len(docs))
 print("%d terms were identified" % len(df))
-
 
     
 '''
@@ -115,14 +119,28 @@ with open(args.output, "w") as f:
         if rank == -1:
             break
 
-        # Compute tfidf and find key terms
+        # Compute tfidf and extract top R (rank) terms
         docs_, dfr = vl.compute_tfidf(docs, df, "tfidf", rank)
         
         # p_docs is D in vcgs
         for p_docs in [float(x) for x in args.relative_df.split(',')]:
+            if p_docs <= 0:
+                
+                try:
+                    k = int(args.kmeans)
+                except:
+                    print("Error: k=\"%s\" is not valid" % args.kmeans)
+                    exit()
 
-            # Sort and output results (discovered keywords)
-            keywords = vl.output_keywords(len(docs_), dfr, df, p_docs)
+                # Identify R*k keywords
+                keywords = vl.identify_n_keywords(
+                    len(docs_), dfr, df, rank*k)
+
+            else:
+                # Identify keywords appearing in more than p_docs% of
+                # docs
+                keywords = vl.identify_keywords(
+                    len(docs_), dfr, df, p_docs)
 
             print("%d keywords were found" % len(keywords))
             if len(keywords) < 2:
@@ -143,7 +161,7 @@ with open(args.output, "w") as f:
 
                 # maximin
                 for theta in [float(x) for x in args.theta.split(',')]:
-                    if theta < 0:
+                    if theta <= 0:
                         break
 
                     _, membership, _, sc, sct = \
@@ -173,7 +191,7 @@ with open(args.output, "w") as f:
                 # kmeans
                 for n_clusters in [int(x) for x in args.kmeans.split(',')]:
                     # error check
-                    if n_clusters < 0 or \
+                    if n_clusters <= 0 or \
                             n_clusters >= len(docs_small): 
                         break
 
@@ -196,7 +214,7 @@ with open(args.output, "w") as f:
                 # spectral clustering
                 for n_clusters in [int(x) for x in args.kmeans.split(',')]:
                     # error check
-                    if n_clusters < 0 or \
+                    if n_clusters <= 0 or \
                             n_clusters >= len(docs_small): 
                         break
 
@@ -253,7 +271,7 @@ with open(args.output, "w") as f:
 
             # maximin
             for theta in [float(x) for x in args.theta.split(',')]:
-                if theta < 0:
+                if theta <= 0:
                     break
 
                 _, membership, _, sc, sct = \
@@ -318,7 +336,11 @@ with open(args.output, "w") as f:
                 print(" Silhouette   = %f" % sc)
                 print(" Silhouette_t = %f" % sct)
 
-                f.write("%d,%d,%.2f,%d,spectral,nan,%d," % \
-                            (mindf,rank, p_docs, svd, n_clusters))
+                if rank <= 0:
+                    f.write("%d,nan,nan,%d,spectral,nan,%d," % \
+                                (mindf, svd, n_clusters))
+                else:
+                    f.write("%d,%d,%.2f,%d,spectral,nan,%d," % \
+                                (mindf,rank, p_docs, svd, n_clusters))
                 f.write(",".join(["{:.4f}".format(x) for x in results]))
                 f.write("\n")

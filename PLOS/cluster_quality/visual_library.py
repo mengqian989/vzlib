@@ -676,9 +676,9 @@ def kmeans(docs, what_to_cluster, keywords, n_components, k, true_labels):
 
     if n_components > 0:
         print("Formed %d clusters after reducing "
-              "to %d dimensions." % (k, n_components))
+              "to %d dimensions by kmeans." % (k, n_components))
     else:
-        print("Formed %d clusters w/o SVD." % k)
+        print("Formed %d clusters w/o SVD by kmeans." % k)
 
     return km.labels_.tolist(), km.cluster_centers_,\
         kwd_vecs, cluster_labels, sc, sct
@@ -748,9 +748,11 @@ def spectral(docs, what_to_cluster, keywords,
 
     if n_components > 0:
         print("Formed %d clusters after reducing "
-              "to %d dimensions." % (k, n_components))
+              "to %d dimensions by spectral clustering." \
+                  % (k, n_components))
     else:
-        print("Formed %d clusters w/o SVD." % k)
+        print("Formed %d clusters w/o SVD by spectral "
+              "clustering." % k)
 
     return spectral.labels_.tolist(), sc, sct
 
@@ -808,7 +810,8 @@ def read_json(input, stopwords=[]):
 Read documents
 '''
 def read_documents(data_dir, input=None, source=None, 
-                   stopwords=[], fields="", single_class=False):
+                   stopwords=[], fields="", single_class=False,
+                   n_samples=None):
 
     docs = [] # store documents
     df = dict() # document frequency
@@ -822,10 +825,18 @@ def read_documents(data_dir, input=None, source=None,
         file = input
 
     mesh = []
+    cnt = 0
     with open_by_suffix(file) as f:
         for line in f:
+
+            # break after reading n_samples lines
+            if n_samples != 0 and cnt >= n_samples:
+                break
+
             if "inspec" in file:
                 terms = tokenize.split(line.lower())
+                cnt += 1
+
             elif "plos" in file or "pmc" in file:
                 _, title, abs, body, m = \
                     line.rstrip().split('\t')
@@ -846,6 +857,8 @@ def read_documents(data_dir, input=None, source=None,
                     continue
 
                 mesh.append(m)
+                cnt += 1
+
             else:
                 pmid, title, abs, m, _ = line.split('\t')
                 terms = tokenize.split((title+" "+abs).lower())
@@ -859,6 +872,7 @@ def read_documents(data_dir, input=None, source=None,
                 for m_ in m:
                     tmp.append(m_.split('/')[0])
                 mesh.append(tmp)
+                cnt += 1
 
             terms = [w for w in terms if w not in stopwords and \
                          len(w) > 1 and not exclude.match(w)]
@@ -943,9 +957,9 @@ def output_matrix(csv_dir, filename, docs, vocab):
 
 
 ''' 
-Sort and output results (discovered keywords)
+Identify keywords appearing in more than p_docs% of docs
 '''
-def output_keywords(num_docs, dfr, df, p_docs=0.5, html=False):
+def identify_keywords(num_docs, dfr, df, p_docs=0.5, html=False):
     min_dfr = num_docs * p_docs / 100
     terms_sorted = sorted(dfr.items(), reverse=True, 
                           key=operator.itemgetter(1))
@@ -969,11 +983,49 @@ def output_keywords(num_docs, dfr, df, p_docs=0.5, html=False):
             print("%s\t%d\t%d" % (w, df[w], dfr[w]))
         
     if html:
-        d = pd.DataFrame({"Term": keywords, "DF": dfs, "DFR": dfrs},
-                         columns=["Term", "DF", "DFR"])
+        d = pd.DataFrame(
+            {"Term": keywords, "DF": dfs, "DFR": dfrs},
+            columns=["Term", "DF", "DFR"])
         display(HTML(d.to_html(index=False)))
 
     return keywords
+
+''' 
+Identify up to num_terms keywords
+'''
+def identify_n_keywords(num_docs, dfr, df, num_terms, html=False):
+
+    terms_sorted = sorted(dfr.items(), reverse=True, 
+                          key=operator.itemgetter(1))
+    if not html:
+        print("term\tDF\tDFR")
+
+    keywords = []
+    dfs = []
+    dfrs = []
+    c = 0
+    for w, v in terms_sorted:
+        if c >= num_terms:
+            break
+        if w not in df:
+            continue
+
+        keywords.append(w)
+        dfs.append(df[w])
+        dfrs.append(dfr[w])
+        c += 1
+
+        if not html:
+            print("%s\t%d\t%d" % (w, df[w], dfr[w]))
+        
+    if html:
+        d = pd.DataFrame(
+            {"Term": keywords, "DF": dfs, "DFR": dfrs},
+            columns=["Term", "DF", "DFR"])
+        display(HTML(d.to_html(index=False)))
+
+    return keywords
+
 
 '''
 Normalize matrix (not used)
@@ -1131,10 +1183,10 @@ def maximin(csv_dir, docs, file_sim, cluster, keywords,
 
     if n_components > 0:
         print("Formed %d clusters after reducing "
-              "to %d dimensions." % (len(set(membership)),
+              "to %d dimensions by maximin." % (len(set(membership)),
                                      n_components))
     else:
-        print("Formed %d clusters w/o SVD." % \
+        print("Formed %d clusters w/o SVD by maximin." % \
               len(set(membership)))
 
         
