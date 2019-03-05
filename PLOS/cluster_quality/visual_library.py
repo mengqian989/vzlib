@@ -25,6 +25,7 @@ from sklearn import metrics
 from sklearn.cluster import KMeans, SpectralClustering
 from sklearn.decomposition import TruncatedSVD
 from sklearn import preprocessing
+from sklearn.manifold import TSNE
 
 from IPython.display import display, HTML
 
@@ -184,10 +185,13 @@ def main():
     else:
         keywords = identify_keywords(
             len(docs), dfr, df, args.p_docs)
+    print("Identified {} keywords".format(len(keywords)))
 
     # Create new matrix with the keywords (mesh is also needed
     # in case some docs are removed)
+    print("Before: {} docs".format(len(docs)))
     docs, mesh = update(docs, keywords, mesh)
+    print("After: {} docs".format(len(docs)))
 
     # clustering
     print()
@@ -216,7 +220,7 @@ def main():
     if args.visualize:
         print()
         print("Visualizing...")
-        visualize(docs, args.cluster, mesh, membership, keywords)
+        visualize(docs, args.cluster, mesh, membership, keywords, 'tsne')
         
 '''
 make balanced data
@@ -259,7 +263,8 @@ def balance_data(file=None):
 '''
 visualize actual and predicted clusters.
 '''
-def visualize(docs, what_to_cluster, true_labels, preds, keywords):
+def visualize(docs, what_to_cluster, true_labels,
+              preds, keywords, method="svd"):
 
     # add ids to keywords
     keywords.sort()
@@ -316,10 +321,23 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     # SVD
     cluster_labels = []
 
-    svd_model = TruncatedSVD(n_components=2,
-                             random_state=42)
-    svd_model.fit(data)
-    reduced_data = svd_model.transform(data)
+    if method == "svd":
+        svd_model = TruncatedSVD(n_components=2,
+                                 random_state=42)
+        svd_model.fit(data)
+        reduced_data = svd_model.transform(data)
+    else:
+        if data.shape[1] > 20:
+            # reduce dims first..
+            svd_model = TruncatedSVD(
+                n_components=20, random_state=42)
+            reduced_data = svd_model.fit_transform(data)
+        else:
+            reduced_data = data
+        # then apply tsne
+        tsne = TSNE(n_components=2, 
+                    n_iter=400, random_state=123)
+        reduced_data = tsne.fit_transform(reduced_data)
 
     # sample data points to avoid clatters
     preds = np.array(preds)
@@ -335,7 +353,7 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     # Create a plot with subplots in a grid of 1X2
     fig, ax = plt.subplots(1, 2, figsize=(8, 4))
 
-    # Add scatterplots to the subplots
+    # Add scatter plots to the subplots
     colors = ["C{}".format(x) for x in range(nclus)]
 
     # mesh class
@@ -363,7 +381,7 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     ax[0].legend(loc='upper left', prop={'size': 6})
 
     # Show the plots
-    plt.show()
+    plt.savefig('plot.pdf')
 
 
 '''
@@ -849,7 +867,7 @@ def read_documents(data_dir, input=None, source=None,
                 text = ""
                 if "title" in fields:
                     text += title
-                if "abstract" in fields:
+                if "abstract" in fields or "abs" in fields:
                     text += " " + abs
                 if "body" in fields:
                     text += " " + body
