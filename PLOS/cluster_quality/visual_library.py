@@ -12,6 +12,7 @@ import math
 import gzip, bz2
 import copy
 import random
+random.seed(10)
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -1059,7 +1060,6 @@ def maximin_core(docs, m, what_to_cluster="document",
     candidates = list(range(sim.shape[0]))
 
     # pick the first centroid
-    random.seed(10)
     centroids.append(candidates.pop(\
             random.randint(0, len(docs)-1)))
 
@@ -1312,10 +1312,14 @@ def update(docs, keywords, mesh=[]):
         for w in keywords:
             if w in d:
                 h[w] = d[w]
-        if len(h) > 0: # exclude doc w/ no terms
-            docs_new.append(h)
-            if len(mesh) != 0:
-                mesh_new.append(mesh[i])
+        if len(h) == 0: # exclude doc w/ no terms
+            # give random word if no word is found
+            h[keywords[random.randint(0, len(keywords)-1)]] = 1
+            
+        docs_new.append(h)
+
+        if len(mesh) != 0:
+            mesh_new.append(mesh[i])
 
     return docs_new, mesh_new
 

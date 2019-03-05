@@ -244,7 +244,7 @@ with open(args.output, "w") as f:
         if mindf == -1:
             break
 
-        vl.del_lowdf(df, mindf)
+        vl.del_low_high_df(df, mindf)
         
         # Compute tfidf. Use rank=0 to disable VCGS
         docs_, _ = vl.compute_tfidf(docs, df, "tfidf", rank=0)
