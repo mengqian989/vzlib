@@ -117,15 +117,22 @@ def main():
                         help="Mesh term file corresponding to "
                         "the input. Needed for PMC file "
                         "(default: None)")
+    parser.add_argument("--format", default="abs", 
+                        help="Input file format (line/abs/full) "
+                        "(default: abs)")
     parser.add_argument('--single',
-                        help='Evaluate only single-class instances.'
+                        help='Evaluate only single-class instances '
                         '(default: False)',
                         action='store_true')
+    parser.add_argument("--sample", 
+                        default="0", type=int,
+                        help="number of articles sampled. Use all "
+                        "if 0 (default: 0)")
     parser.add_argument('--visualize',
-                        help='Visualize results. (default: False)',
+                        help='Visualize results (default: False)',
                         action='store_true')
     parser.add_argument('--balance',
-                        help='Balance the data. (default: False)',
+                        help='Balance the data (default: False)',
                         action='store_true')
 
 
@@ -146,11 +153,10 @@ def main():
     start = time.time() # measure processing time
 
     print("Reading documents...")
-    docs, df, w2id, mesh = read_documents(data_dir, 
-                                          input=input_file,
-                                          stopwords=stopwords,
-                                          fields=args.fields,
-                                          single_class=args.single)
+    docs, df, w2id, mesh = read_documents(
+        data_dir, input=input_file, stopwords=stopwords,
+        fields=args.fields, single_class=args.single,
+        n_samples=args.sample, format=args.format)
     print("Finished reading %d documents" % len(docs))
     print("%d terms were identified" % len(df))
 
@@ -160,14 +166,7 @@ def main():
         mesh = read_mesh(args.mesh)
 
     # Remove terms whose df is lower than mindf
-    inf = []
-    if args.mindf:
-        for w in df:
-            if df[w] <= args.mindf:
-                inf.append(w)
-        for w in inf:
-            del df[w]
-    print("%d terms were removed" % len(inf))
+    del_low_high_df(df, mindf=args.mindf)
 
     # Compute tfidf and find key terms
     print("Computing TFIDF and finding key terms...")
@@ -179,7 +178,12 @@ def main():
         output_matrix(csv_dir, args.matrix, docs, df.keys())
 
     # Sort and output results (discovered keywords)
-    keywords = output_keywords(len(docs), dfr, df, args.p_docs)
+    if args.p_docs <= 0:
+        keywords = identify_n_keywords(
+            dfr, df, args.rank*args.n_clusters)
+    else:
+        keywords = identify_keywords(
+            len(docs), dfr, df, args.p_docs)
 
     # Create new matrix with the keywords (mesh is also needed
     # in case some docs are removed)
@@ -195,9 +199,9 @@ def main():
                     args.theta, args.svd)
         #visualize_network(sim, keywords, membership)
     elif args.clustering == "kmeans":
-        membership, _, _, _, sc, sct = kmeans(docs, args.cluster, keywords, 
-                                              args.svd, args.n_clusters,
-                                              np.array(mesh).ravel())
+        membership, _, _, _, sc, sct = kmeans(
+            docs, args.cluster, keywords, args.svd,
+            args.n_clusters, np.array(mesh).ravel())
 
     end = time.time()
     print("Processing time (sec):", end - start)
@@ -266,7 +270,7 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     m2id = {m:i for i,m in enumerate(set([x[0] for x in true_labels]))}
     id2m = {i:m for m,i in m2id.items()}
     true_labels = [m2id[m[0]] for m in true_labels]
-    
+
     # confusion matrix
     cm = metrics.confusion_matrix(true_labels, preds)
     print()
@@ -332,7 +336,7 @@ def visualize(docs, what_to_cluster, true_labels, preds, keywords):
     fig, ax = plt.subplots(1, 2, figsize=(8, 4))
 
     # Add scatterplots to the subplots
-    colors = ['C0', 'C1', 'C2', 'C3']
+    colors = ["C{}".format(x) for x in range(nclus)]
 
     # mesh class
     for i in range(len(m2id)):
@@ -813,7 +817,7 @@ Read documents
 '''
 def read_documents(data_dir, input=None, source=None, 
                    stopwords=[], fields="", single_class=False,
-                   n_samples=None):
+                   n_samples=sys.maxsize, format="abs"):
 
     docs = [] # store documents
     df = dict() # document frequency
@@ -835,11 +839,11 @@ def read_documents(data_dir, input=None, source=None,
             if n_samples != 0 and cnt >= n_samples:
                 break
 
-            if "inspec" in file:
+            if format=="line":
                 terms = tokenize.split(line.lower())
                 cnt += 1
 
-            elif "plos" in file or "pmc" in file:
+            elif format=="full":
                 _, title, abs, body, m = \
                     line.rstrip().split('\t')
                 text = ""
@@ -1340,7 +1344,7 @@ def del_lowdf(df,mindf=1):
 '''
 Delete low and high df words
 '''
-def del_low_high_df(df, mindf=1, maxdf=1000):
+def del_low_high_df(df, mindf=1, maxdf=sys.maxsize):
     inf = []
     for w in df:
         if df[w] <= mindf or df[w] >= maxdf:
