@@ -36,11 +36,9 @@ parser.add_argument("-r", "--rank",
                     help="Rank R value(s) to be used, separated "
                     "by comma. (default: \"5,6,7,8,9,10\")")
 parser.add_argument("-d", "--relative_df", 
-                    default="0.1,0.2,0.3,0.4,0.5,"
-                    "0.6,0.7,0.8,0.9,1.0", 
+                    default="0.6,0.8,1.0,1.2,1.4,1.6", 
                     help="Relative DF value(s) to be used, separated "
-                    "by comma. (default: \"0.1,0.2,0.3,0.4,0.5,"
-                    "0.6,0.7,0.8,0.9,1.0\")")
+                    "by comma. (default: \"0.6,0.8,1.0,1.2,1.4,1.6\")")
 parser.add_argument("-n", "--dimensions", 
                     default="0,4,8,12,16,20", 
                     help="Number of components for SVD, separated "
@@ -50,9 +48,9 @@ parser.add_argument("-t", "--theta",
                     help="Theta values to be used for maximin, "
                     "separated by comma. (default: \"0.8,0.9,0.99\")")
 parser.add_argument("-k", "--kmeans", 
-                    default="4", 
+                    default="6", 
                     help="k values to be used for kmeans, "
-                    "separated by comma. (default: \"4\")")
+                    "separated by comma. (default: \"6\")")
 parser.add_argument("--df", 
                     default="10,30,50,70,100", 
                     help="minimum df values to be considered, "
@@ -61,6 +59,9 @@ parser.add_argument("--sample",
                     default="0", type=int,
                     help="number of articles sampled. Use all "
                     "0 is given (default: 0)")
+parser.add_argument("--format", default="other", 
+                    help="Input file format (line/abs/full) "
+                    "(default: abs)")
 parser.add_argument('--single',
                     help='Evaluate only single-class instances. '
                     '(default: False)',
@@ -88,12 +89,10 @@ else:
 
 # Read documents
 print("Reading documents...")
-docs, df, w2id, mesh = \
-        vl.read_documents("", input=input_file,
-                          stopwords=stopwords,
-                          fields=args.fields,
-                          single_class=args.single,
-                          n_samples=args.sample)
+docs, df, w2id, mesh = vl.read_documents(
+    "", input=input_file, stopwords=stopwords,
+    fields=args.fields, single_class=args.single,
+    n_samples=args.sample, format=args.format)
 print("Finished reading %d documents" % len(docs))
 print("%d terms were identified" % len(df))
 
