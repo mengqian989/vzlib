@@ -120,10 +120,31 @@ The fields are tab-delimted.  If an article is annotated with multiple MeSH term
 Run experiment on abstracts and full texts.
 
 ```bash
-nice python eval.py --input data/plos_med_top6.txt.gz --output data/plos_med_top6_eval_title_sgl.csv -k 6 -f title --single > log_med_title_sgl.txt
-nice python eval.py --input data/plos_med_top6.txt.gz --output data/plos_med_top6_eval_sgl.csv -k 6 --single > log_med_sgl.txt &
-nice python eval.py --input data/plos_top6.txt.gz --output data/plos_top6_eval_sgl.csv -k 6 -t 0 --single > log_sgl.txt
+nice python eval.py --input data/plos_top6.txt.gz --output output/plos_med_top6_eval_title_sgl.csv -k 6 -f title --single --format full > log_med_title_sgl.txt &
+nice python eval.py --input data/plos_med_top6.txt.gz --output output/plos_med_top6_eval_sgl.csv -k 6 --single --format abs > log_med_sgl.txt &
+nice python eval.py --input data/plos_top6.txt.gz --output output/plos_top6_eval_sgl.csv -k 6 -t 0 --single --format full > log_sgl.txt & 
 ```
+
+### Results on titles
+
+```bash
+less output/plos_med_top6_eval_title_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | head
+
+```
+
+### Results on abstracts
+
+```bash
+less output/plos_med_top6_eval_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | head
+```
+
+### Results on full texts
+
+```bash
+less output/plos_top6_eval_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | head
+```
+
+## Obsolete
 
 ### Results on titles
 
