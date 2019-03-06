@@ -173,6 +173,18 @@ less output/plos_top6_eval_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | head
 1,8,1.00,8,maximin,0.80,6,0.4708,0.4700,0.4704,0.4704,0.3519,0.4700,0.4925,0.6732,0.6925,0.5876,0.2712
 ```
 
+## Sample size and cluster quality
+
+```bash
+1,8,1.40,20,kmeans,nan,6,0.6163,0.5482,0.5802,0.5802,0.3662,0.5799,0.5301,0.8817,0.7285,0.2691,0.1489
+
+# sample=0 means 'use all'
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
+  echo -n $i
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title --clustering kmeans --svd 20 -r 8 -d 1.4 -k 6 --sample $i | grep A-MI
+done
+```
+
 ## Obsolete
 
 ### Results on titles
