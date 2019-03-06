@@ -195,22 +195,22 @@ done
 10000 A-MI         = 0.519458
 0 A-MI         = 0.581956
 
-for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
-  echo -n "$i "
-  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title --clustering kmeans --svd 20 -r 8 -d 1.4 -k 6 --sample $i | grep "Processing time"
-done
-100 Processing time (sec): 0.1148529052734375
-200 Processing time (sec): 0.2982356548309326
-400 Processing time (sec): 0.3228304386138916
-600 Processing time (sec): 0.41292500495910645
-800 Processing time (sec): 0.4974498748779297
-1000 Processing time (sec): 0.5495660305023193
-2000 Processing time (sec): 0.9557673931121826
-4000 Processing time (sec): 1.748807668685913
-6000 Processing time (sec): 2.7802958488464355
-8000 Processing time (sec): 3.909938097000122
-10000 Processing time (sec): 5.196731090545654
-0 Processing time (sec): 5.916701555252075
+# make title only data
+less data/plos_top6.txt.gz | perl -ne '@a=split(/\t/);print("$a[0]\t$a[1]\t\t\t$a[4]")' | gzip > data/plos_top6_title.txt.gz
+# measure
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do   echo -n "$i ";   nice python visual_library.py -i data/plos_top6_title.txt.gz --single --format full --fields title --clustering kmeans --svd 20 -r 8 -d 1.4 -k 6 --sample $i | grep "Processing time"; done 
+100 Processing time (sec): 0.06934070587158203
+200 Processing time (sec): 0.21411657333374023
+400 Processing time (sec): 0.2160656452178955
+600 Processing time (sec): 0.24439454078674316
+800 Processing time (sec): 0.27433323860168457
+1000 Processing time (sec): 0.3233377933502197
+2000 Processing time (sec): 0.42231249809265137
+4000 Processing time (sec): 0.7704150676727295
+6000 Processing time (sec): 1.236863613128662
+8000 Processing time (sec): 1.9074664115905762
+10000 Processing time (sec): 2.7687151432037354
+0 Processing time (sec): 3.2354702949523926
 ```
 
 ### for titles and abstracts
@@ -237,20 +237,20 @@ done
 
 for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
   echo -n "$i "
-  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs --clustering kmeans --svd 20 -r 10 -d 1.2 -k 6 --sample $i | grep "Processing time"
+  nice python visual_library.py -i data/plos_top6_abs.txt.gz --single --format full --fields title,abs --clustering kmeans --svd 20 -r 10 -d 1.2 -k 6 --sample $i | grep "Processing time"
 done
-100 Processing time (sec): 0.226637601852417
-200 Processing time (sec): 0.30213356018066406
-400 Processing time (sec): 0.4811091423034668
-600 Processing time (sec): 0.5541117191314697
-800 Processing time (sec): 0.6463909149169922
-1000 Processing time (sec): 0.7757415771484375
-2000 Processing time (sec): 1.3893358707427979
-4000 Processing time (sec): 2.6663200855255127
-6000 Processing time (sec): 4.000134229660034
-8000 Processing time (sec): 5.556488752365112
-10000 Processing time (sec): 7.273090362548828
-0 Processing time (sec): 8.225756645202637
+100 Processing time (sec): 0.2009420394897461
+200 Processing time (sec): 0.23556756973266602
+400 Processing time (sec): 0.376389741897583
+600 Processing time (sec): 0.37632226943969727
+800 Processing time (sec): 0.42809462547302246
+1000 Processing time (sec): 0.522179126739502
+2000 Processing time (sec): 0.8164660930633545
+4000 Processing time (sec): 1.546290397644043
+6000 Processing time (sec): 2.484266519546509
+8000 Processing time (sec): 3.6278839111328125
+10000 Processing time (sec): 4.822795629501343
+0 Processing time (sec): 5.5005409717559814
 ```
 
 ## Obsolete
