@@ -175,14 +175,82 @@ less output/plos_top6_eval_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | head
 
 ## Sample size and cluster quality
 
+### for titles
 ```bash
-1,8,1.40,20,kmeans,nan,6,0.6163,0.5482,0.5802,0.5802,0.3662,0.5799,0.5301,0.8817,0.7285,0.2691,0.1489
-
 # sample=0 means 'use all'
 for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
   echo -n $i
   nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title --clustering kmeans --svd 20 -r 8 -d 1.4 -k 6 --sample $i | grep A-MI
 done
+100 A-MI         = 0.320289
+200 A-MI         = 0.203923
+400 A-MI         = 0.085942
+600 A-MI         = 0.233143
+800 A-MI         = 0.416032
+1000 A-MI         = 0.496599
+2000 A-MI         = 0.623462
+4000 A-MI         = 0.538047
+6000 A-MI         = 0.487626
+8000 A-MI         = 0.560157
+10000 A-MI         = 0.519458
+0 A-MI         = 0.581956
+
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
+  echo -n "$i "
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title --clustering kmeans --svd 20 -r 8 -d 1.4 -k 6 --sample $i | grep "Processing time"
+done
+100 Processing time (sec): 0.1148529052734375
+200 Processing time (sec): 0.2982356548309326
+400 Processing time (sec): 0.3228304386138916
+600 Processing time (sec): 0.41292500495910645
+800 Processing time (sec): 0.4974498748779297
+1000 Processing time (sec): 0.5495660305023193
+2000 Processing time (sec): 0.9557673931121826
+4000 Processing time (sec): 1.748807668685913
+6000 Processing time (sec): 2.7802958488464355
+8000 Processing time (sec): 3.909938097000122
+10000 Processing time (sec): 5.196731090545654
+0 Processing time (sec): 5.916701555252075
+```
+
+### for titles and abstracts
+```bash
+1,10,1.20,20,kmeans,nan,6,0.6272,0.5530,0.5878,0.5878,0.3684,0.5875,0.5348,0.8749,0.7291,0.3607,0.3063
+
+# sample=0 means 'use all'
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
+  echo -n $i
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs --clustering kmeans --svd 20 -r 10 -d 1.2 -k 6 --sample $i | grep A-MI
+done
+100 A-MI         = 0.377786
+200 A-MI         = 0.335321
+400 A-MI         = 0.265791
+600 A-MI         = 0.492016
+800 A-MI         = 0.518745
+1000 A-MI         = 0.587677
+2000 A-MI         = 0.595761
+4000 A-MI         = 0.547354
+6000 A-MI         = 0.590048
+8000 A-MI         = 0.477772
+10000 A-MI         = 0.551990
+0 A-MI         = 0.587466
+
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
+  echo -n "$i "
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs --clustering kmeans --svd 20 -r 10 -d 1.2 -k 6 --sample $i | grep "Processing time"
+done
+100 Processing time (sec): 0.226637601852417
+200 Processing time (sec): 0.30213356018066406
+400 Processing time (sec): 0.4811091423034668
+600 Processing time (sec): 0.5541117191314697
+800 Processing time (sec): 0.6463909149169922
+1000 Processing time (sec): 0.7757415771484375
+2000 Processing time (sec): 1.3893358707427979
+4000 Processing time (sec): 2.6663200855255127
+6000 Processing time (sec): 4.000134229660034
+8000 Processing time (sec): 5.556488752365112
+10000 Processing time (sec): 7.273090362548828
+0 Processing time (sec): 8.225756645202637
 ```
 
 ## Obsolete
