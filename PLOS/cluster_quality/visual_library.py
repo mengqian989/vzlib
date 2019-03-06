@@ -12,7 +12,6 @@ import math
 import gzip, bz2
 import copy
 import random
-random.seed(10)
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -1335,6 +1334,7 @@ def update(docs, keywords, mesh=[]):
             if w in d:
                 h[w] = d[w]
         if len(h) == 0: # exclude doc w/ no terms
+            random.seed(i)
             # give random word if no word is found
             h[keywords[random.randint(0, len(keywords)-1)]] = 1
             

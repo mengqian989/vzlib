@@ -59,8 +59,8 @@ parser.add_argument("--sample",
                     default="0", type=int,
                     help="number of articles sampled. Use all "
                     "0 is given (default: 0)")
-parser.add_argument("--format", default="other", 
-                    help="Input file format (line/abs/full) "
+parser.add_argument("--format", default="abs", 
+                    help="Input file format (line|abs|full) "
                     "(default: abs)")
 parser.add_argument('--single',
                     help='Evaluate only single-class instances. '
