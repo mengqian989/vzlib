@@ -32,25 +32,25 @@ parser.add_argument("-f", "--fields",
                     "If not specified, all fields are used "
                     "(default: \"\")")
 parser.add_argument("-r", "--rank", 
-                    default="5,6,7,8,9,10", 
+                    default="6,8,10,12,14,16", 
                     help="Rank R value(s) to be used, separated "
-                    "by comma. (default: \"5,6,7,8,9,10\")")
+                    "by comma. (default: \"6,8,10,12,14,16\")")
 parser.add_argument("-d", "--relative_df", 
                     default="0.6,0.8,1.0,1.2,1.4,1.6", 
                     help="Relative DF value(s) to be used, separated "
                     "by comma. (default: \"0.6,0.8,1.0,1.2,1.4,1.6\")")
 parser.add_argument("-n", "--dimensions", 
-                    default="0,4,8,12,16,20", 
+                    default="0,10,20,30,40,50", 
                     help="Number of components for SVD, separated "
-                    "by comma. (default: \"0,4,8,12,16,20\")")
+                    "by comma. (default: \"0,10,20,30,40,50\")")
 parser.add_argument("-t", "--theta", 
                     default="0.8,0.9,0.99", 
                     help="Theta values to be used for maximin, "
                     "separated by comma. (default: \"0.8,0.9,0.99\")")
 parser.add_argument("-k", "--kmeans", 
-                    default="6", 
+                    default="4", 
                     help="k values to be used for kmeans, "
-                    "separated by comma. (default: \"6\")")
+                    "separated by comma. (default: \"4\")")
 parser.add_argument("--df", 
                     default="10,30,50,70,100", 
                     help="minimum df values to be considered, "
@@ -243,7 +243,7 @@ with open(args.output, "w") as f:
         if mindf == -1:
             break
 
-        vl.del_low_high_df(df, mindf)
+        vl.del_low_high_df(df, mindf, len(docs))
         
         # Compute tfidf. Use rank=0 to disable VCGS
         docs_, _ = vl.compute_tfidf(docs, df, "tfidf", rank=0)
