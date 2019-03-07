@@ -253,9 +253,9 @@ done
 0 Processing time (sec): 5.5005409717559814
 ```
 
-<details><summary>
 ## Obsolete
- </summary>
+
+<details><summary>SHOW</summary>
  
 ### Results on titles
 
