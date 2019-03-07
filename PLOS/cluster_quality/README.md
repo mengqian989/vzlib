@@ -253,8 +253,10 @@ done
 0 Processing time (sec): 5.5005409717559814
 ```
 
+<details><summary>
 ## Obsolete
-
+ </summary>
+ 
 ### Results on titles
 
 ```bash
@@ -303,3 +305,4 @@ less data/plos_top6_eval_sgl.csv | grep ",6,0." | sort -t',' -k13 -nr | head
 1,9,1.00,0,kmeans,nan,6,0.4985,0.4406,0.4678,0.4678,0.2042,0.4674,0.4119,0.8085,0.6448,0.2093,0.1528
 ```
 
+</details>
