@@ -215,12 +215,11 @@ for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do   echo -n "$i 
 
 ### for titles and abstracts
 ```bash
-1,10,1.20,20,kmeans,nan,6,0.6272,0.5530,0.5878,0.5878,0.3684,0.5875,0.5348,0.8749,0.7291,0.3607,0.3063
 
 # sample=0 means 'use all'
 for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
   echo -n $i
-  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs --clustering kmeans --svd 20 -r 10 -d 1.2 -k 6 --sample $i | grep A-MI
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs --clustering kmeans --svd 40 -r 16 -d 1.0 -k 6 --sample $i | grep A-MI
 done
 100 A-MI         = 0.377786
 200 A-MI         = 0.335321
@@ -251,6 +250,46 @@ done
 8000 Processing time (sec): 3.6278839111328125
 10000 Processing time (sec): 4.822795629501343
 0 Processing time (sec): 5.5005409717559814
+```
+
+### for full text
+```bash
+1,14,1.20,20,kmeans,nan,6,0.5270,0.4613,0.4920,0.4920,0.2139,0.4916,0.4215,0.8207,0.6513,0.2620,0.1781
+
+# sample=0 means 'use all'
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do
+  echo -n $i
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs,body --clustering kmeans --svd 20 -r 14 -d 1.2 -k 6 --sample $i | grep A-MI
+done
+100 A-MI         = 0.295346
+200 A-MI         = 0.196831
+400 A-MI         = 0.099206
+600 A-MI         = 0.303481
+800 A-MI         = 0.187155
+1000 A-MI         = 0.261142
+2000 A-MI         = 0.469417
+4000 A-MI         = 0.326718
+6000 A-MI         = 0.387437
+8000 A-MI         = 0.366588
+10000 A-MI         = 0.278852
+0 A-MI         = 0.491601
+
+for i in 100 200 400 600 800 1000 2000 4000 6000 8000 10000 0; do   
+  echo -n "$i ";   
+  nice python visual_library.py -i data/plos_top6.txt.gz --single --format full --fields title,abs,body --clustering kmeans --svd 20 -r 14 -d 1.2 -k 6 --sample $i | grep "Processing time"; 
+done
+100 Processing time (sec): 0.6615867614746094
+200 Processing time (sec): 1.606123447418213
+400 Processing time (sec): 2.90543794631958
+600 Processing time (sec): 3.7888309955596924
+800 Processing time (sec): 4.599233388900757
+1000 Processing time (sec): 5.7834179401397705
+2000 Processing time (sec): 11.545138597488403
+4000 Processing time (sec): 21.9506356716156
+6000 Processing time (sec): 32.561360359191895
+8000 Processing time (sec): 43.7649130821228
+10000 Processing time (sec): 54.45869064331055
+0 Processing time (sec): 60.54986906051636
 ```
 
 ## Obsolete
