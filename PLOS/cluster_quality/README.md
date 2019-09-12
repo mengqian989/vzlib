@@ -121,18 +121,21 @@ Run experiment on title only, title & abstracts, and title & abs & body text.
 
 ```sh
 bash ./auto_num.sh --fields="title" > output/plos_top6_eval_title.txt
-bash ./auto_num.sh --fields="title,abstract" > output/plos_top6_eval_title_abs.txt
+bash ./auto_num.sh --fields="title,abstract" > output/plos_top6_eval_abs.txt
 bash ./auto_num.sh --fields="title,abstract,body" > output/plos_top6_eval_all.txt
 ```
 
+## Results
 
 
 
 
 
+## Obsolete
 
+<details><summary>SHOW</summary>
 
-
+## Experiments
 
 Run experiment on abstracts and full texts.
 
@@ -308,10 +311,6 @@ done
 10000 Processing time (sec): 54.45869064331055
 0 Processing time (sec): 60.54986906051636
 ```
-
-## Obsolete
-
-<details><summary>SHOW</summary>
  
 ### Results on titles
 
