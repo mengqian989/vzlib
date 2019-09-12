@@ -127,6 +127,26 @@ bash ./auto_num.sh --fields="title,abstract,body" > output/plos_top6_eval_all.tx
 
 ## Results
 
+Extracted AMI and processing time by the following one-liners.
+Used them to draw graphs using R (the R script is found in an Overleaf project as plos2019/figs/graphs.R). 
+
+```sh
+less output/plos_top6_eval_title.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_abs.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_all.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+
+less output/plos_top6_eval_title.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_abs.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_all.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+
+less output/plos_top6_eval_title.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_abs.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_all.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+
+less output/plos_top6_eval_title.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_abs.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_all.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+```
 
 
 
