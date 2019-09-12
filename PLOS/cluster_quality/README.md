@@ -117,6 +117,23 @@ The fields are tab-delimted.  If an article is annotated with multiple MeSH term
  
 ## Experiments
 
+Run experiment on title only, title & abstracts, and title & abs & body text.
+
+```sh
+bash ./auto_num.sh --fields="title" > output/plos_top6_eval_title.txt
+bash ./auto_num.sh --fields="title,abstract" > output/plos_top6_eval_title_abs.txt
+bash ./auto_num.sh --fields="title,abstract,body" > output/plos_top6_eval_all.txt
+```
+
+
+
+
+
+
+
+
+
+
 Run experiment on abstracts and full texts.
 
 ```bash
