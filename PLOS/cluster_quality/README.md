@@ -117,6 +117,49 @@ The fields are tab-delimted.  If an article is annotated with multiple MeSH term
  
 ## Experiments
 
+Run experiment on title only, title & abstracts, and title & abs & body text.
+
+```sh
+bash ./auto_num.sh --fields="title" > output/plos_top6_eval_title.txt
+bash ./auto_num.sh --fields="title,abstract" > output/plos_top6_eval_abs.txt
+bash ./auto_num.sh --fields="title,abstract,body" > output/plos_top6_eval_all.txt
+```
+
+## Results
+
+Extracted AMI and processing time by the following one-liners.
+Used them to draw graphs using R (the R script is found in an Overleaf project as plos2019/figs/graphs.R). 
+
+```sh
+less output/plos_top6_eval_title.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_abs.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_all.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+
+less output/plos_top6_eval_title.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_abs.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_all.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+
+less output/plos_top6_eval_title.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_abs.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_all.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+
+less output/plos_top6_eval_title.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_abs.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_all.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+```
+
+![plos_ami](plos_ami.png)
+
+![plos_time](plos_time.png)
+
+
+
+## Obsolete
+
+<details><summary>SHOW</summary>
+
+## Experiments
+
 Run experiment on abstracts and full texts.
 
 ```bash
@@ -291,10 +334,6 @@ done
 10000 Processing time (sec): 54.45869064331055
 0 Processing time (sec): 60.54986906051636
 ```
-
-## Obsolete
-
-<details><summary>SHOW</summary>
  
 ### Results on titles
 
