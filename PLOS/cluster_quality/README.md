@@ -148,6 +148,9 @@ less output/plos_top6_eval_abs.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\
 less output/plos_top6_eval_all.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
 ```
 
+![plos_ami](plos_ami.png)
+
+![plos_time](plos_time.png)
 
 
 
