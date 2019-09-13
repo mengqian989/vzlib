@@ -127,7 +127,7 @@ bash ./auto_num.sh --fields="title,abstract,body" > output/plos_top6_eval_all.tx
 
 ## Results
 
-Extracted AMI and processing time by the following one-liners.
+Extracted AMI and processing time by the following commands.
 Used them to draw graphs using R (the R script is found in an Overleaf project as plos2019/figs/graphs.R). 
 
 ```sh
