@@ -152,6 +152,22 @@ less output/plos_top6_eval_all.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\
 
 ![plos_time](plos_time.png)
 
+Compared k-means and mini-batch k-means.
+
+```sh
+less output/plos_top6_eval_abs.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_mkmeans_abs.txt | grep AMI | cut -f3 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_abs.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_mkmeans_abs.txt | grep AMI | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_abs.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_mkmeans_abs.txt | grep Total | cut -f4 -d' ' | perl -npe 's/\n/,/'
+less output/plos_top6_eval_abs.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+less output/plos_top6_eval_mkmeans_abs.txt | grep Total | cut -f3 -d'(' | perl -npe 's/\)\n/,/'
+```
+
+![plos_ami_kmeans](plos_ami_kmeans.png)
+
+![plos_time_kmeans](plos_time_kmeans.png)
 
 
 ## Obsolete
